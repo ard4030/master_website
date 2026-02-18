@@ -94,7 +94,8 @@ NEXT_PUBLIC_API_BASE_URL=http://localhost:3001/api
 
 ### CartContext
 **مسئولیت:** مدیریت سبد خرید
-- `cart` - اطلاعات سبد (items, totalPrice, totalCount)
+- `cart.items` - لیست محصولات
+- `cart.totalAmount` - مجموع قیمت (استفاده شود از این key)
 - `addToCart()` - افزودن محصول
 - `removeFromCart()` - حذف محصول
 - `updateQuantity()` - بروز رسانی تعداد
