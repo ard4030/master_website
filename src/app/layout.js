@@ -4,6 +4,7 @@ import Header from "@/components/header/Header";
 import { AuthProvider } from "@/context/AuthContext";
 import { MerchantProvider } from "@/context/MerchantContext";
 import { CartProvider } from "@/context/CartContext";
+import { OrderProvider } from "@/context/OrderContext";
 import { ToastContainer } from "react-toastify";
 
 const geistSans = Geist({
@@ -40,12 +41,14 @@ export default function RootLayout({ children }) {
         <MerchantProvider>
           <AuthProvider>
             <CartProvider>
+              <OrderProvider>
                 <div>
                   
 
                   <Header />
                   {children}
                 </div>
+              </OrderProvider>
             </CartProvider>
           </AuthProvider>
         </MerchantProvider>

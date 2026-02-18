@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { AuthContext } from '@/context/AuthContext'
 import { MerchantContext } from '@/context/MerchantContext'
-import { MdDashboard, MdAssessment, MdShoppingCart, MdAccountBalanceWallet, MdPayments, MdNotifications, MdSettings, MdHeadset, MdCategory, MdInventory2, MdDesignServices } from 'react-icons/md'
+import { MdDashboard, MdAssessment, MdShoppingCart, MdAccountBalanceWallet, MdPayments, MdNotifications, MdSettings, MdHeadset, MdCategory, MdInventory2, MdDesignServices, MdLocationOn } from 'react-icons/md'
 
 const Sidebar = () => {
   const pathname = usePathname()
@@ -15,7 +15,7 @@ const Sidebar = () => {
   const menuItems = [
     {
       label: 'داشبورد',
-      href: '/dashboard',
+      href: '/dashboard/userprofile',
       icon: MdDashboard,
       type: ['user', 'merchant'],
       permissions: [],
@@ -24,6 +24,13 @@ const Sidebar = () => {
       label: 'شارش های من',
       href: '/dashboard/reports',
       icon: MdAssessment,
+      type: ['user'],
+      permissions: [],
+    },
+    {
+      label: 'آدرس‌های من',
+      href: '/dashboard/addresses',
+      icon: MdLocationOn,
       type: ['user'],
       permissions: [],
     },
