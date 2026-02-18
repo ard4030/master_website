@@ -1,5 +1,5 @@
 'use client';
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import ProductHeader from '../ProductHeader';
 import CallToActionBanner from '../CallToActionBanner';
 import ProductGallery from '../ProductGallery';
@@ -13,10 +13,44 @@ import ShippingInfo from '../ShippingInfo';
 import ProductSpecsTab from '../smComponents/ProductSpecsTab';
 import ProductReviewsTab from '../smComponents/ProductReviewsTab';
 import Sticky from 'react-stickynode';
+import { CartContext } from '@/context/CartContext';
 
-const ProductLayout = ({ idPage }) => {
+const ProductLayout = ({ idPage,product }) => {
   const [pageId, setPageId] = useState('');
   const [activeTab, setActiveTab] = useState('specs');
+  const [selectedVariant, setSelectedVariant] = useState(null);
+  const { addToCart } = useContext(CartContext);
+
+  // در بار اول، اولین variant را انتخاب کند یا خود محصول را
+  useEffect(() => {
+    if (!selectedVariant) {
+      if (product?.variants && product.variants.length > 0) {
+        setSelectedVariant(product.variants[0]);
+      } else {
+        // اگر variants نیست، خود محصول را به عنوان variant انتخاب کن
+        setSelectedVariant(product);
+      }
+    }
+  }, [product]);
+
+  const handleAddToCart = () => {
+    console.log('>>>>>>>.',product);
+    
+    if (addToCart && product) {
+      // اگر variant دارد، از color+size یک ID درست کن
+      // if (product.isVariants && selectedVariant) {
+      //   variantId = `${selectedVariant.color}-${selectedVariant.size}`;
+      // }
+
+      const cartData = {
+        _id: product._id,                                               
+        isVariants: product.isVariants || false,                        
+        variantId: selectedVariant._id || null, // یا می‌توانی color-size را اینجا بسازی
+      };
+      console.log('Sending to cart:', cartData);
+      addToCart(cartData);
+    }
+  };
 
   useEffect(() => {
     setPageId(idPage);
@@ -138,7 +172,7 @@ const ProductLayout = ({ idPage }) => {
         <Sticky
           className="z-1 relative lg:col-span-3 dana"
           enabled={true}
-          top={20}
+          top={80}
           bottomBoundary={1200}
         >
           <div className="lg:col-span-3 dana">
@@ -146,6 +180,12 @@ const ProductLayout = ({ idPage }) => {
               price={productData.price}
               originalPrice={productData.originalPrice}
               discount={productData.discount}
+              handleAddToCart={handleAddToCart}
+              // onAddToCart={handleAddToCart}
+              productId={product?._id}
+              isVariants={product?.isVariants}
+              variantId={selectedVariant?._id || null}
+              product={product}
             />
 
           </div>
