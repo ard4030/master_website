@@ -1,0 +1,83 @@
+@import "tailwindcss";
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+}
+
+@font-face {
+  font-family: 'dana-bold';
+  src: url(../../public/assets/fonts/dana/eot/dana-fanum-bold.eot);
+  src: url(../../public/assets/fonts/dana/woff/dana-fanum-bold.woff);
+  src: url(../../public/assets/fonts/dana/woff2/dana-fanum-bold.woff2);
+}
+
+@font-face {
+  font-family: 'dana-medium';
+  src: url(../../public/assets/fonts/dana/eot/dana\ medium.eot);
+  src: url(../../public/assets/fonts/dana/woff/dana\ medium.woff);
+  src: url(../../public/assets/fonts/dana/woff2/dana\ medium.woff2);
+  src: url(../../public/assets/fonts/dana/ttf/dana\ medium.ttf);
+}
+
+@font-face {
+  font-family: 'dana-bolditalic';
+  src: url(../../public/assets/fonts/dana/eot/dana-fanum-bolditalic.eot);
+  src: url(../../public/assets/fonts/dana/woff/dana-fanum-bolditalic.woff);
+  src: url(../../public/assets/fonts/dana/woff2/dana-fanum-bolditalic.woff2);
+}
+
+@font-face {
+  font-family: 'dana-regular';
+  src: url(../../public/assets/fonts/dana/eot/dana-fanum-regular.eot);
+  src: url(../../public/assets/fonts/dana/woff/dana-fanum-regular.woff);
+  src: url(../../public/assets/fonts/dana/woff2/dana-fanum-regular.woff2);
+}
+
+@font-face {
+  font-family: 'dana-demi-bold';
+  src: url(../../public/assets/fonts/dana/eot/dana\ demibold.eot);
+  src: url(../../public/assets/fonts/dana/woff/dana\ demibold.woff);
+  src: url(../../public/assets/fonts/dana/woff2/dana\ medium.woff2);
+  src: url(../../public/assets/fonts/dana/ttf/dana\ demibold.ttf);
+}
+
+input:focus-visible{outline: none;}
+
+.primary{background: var(--primary);}
+
+.dana{font-family: 'dana-regular'!important;}
+.danaBold{font-family: 'dana-bold'!important;}
+.danaMed{font-family: 'dana-medium'!important;}
+.danaDemiBold{font-family: 'dana-demi-bold'!important;}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+html{
+  direction: rtl;
+}
+
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: Arial, Helvetica, sans-serif;
+}
