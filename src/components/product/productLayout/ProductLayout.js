@@ -53,12 +53,15 @@ const ProductLayout = ({ idPage,product }) => {
   };
 
   useEffect(() => {
+    console.log(product);
+    
     setPageId(idPage);
   }, [idPage]);
 
   // نمونه داده ها
   const productData = {
-    title: 'جوراب مردانه آریان نخ باف مدل 7-5121 بسته 12 عددی',
+    title: product?.name,
+    category : product?.category[0]?.name,
     rating: 4.2,
     reviewCount: '۲۷ دیدگاه',
     discount: 37,
@@ -66,7 +69,7 @@ const ProductLayout = ({ idPage,product }) => {
     price: '89000',
     originalPrice: '140000',
     images: [
-      "https://fakestoreapi.com/img/81fPKd-2AYL._AC_SL1500_t.png",
+      `${process.env.NEXT_PUBLIC_LIARA_IMAGE_URL}${product?.mainImage}`,
       "https://fakestoreapi.com/img/81fPKd-2AYL._AC_SL1500_t.png",
       "https://fakestoreapi.com/img/71-3HjGNDUL._AC_SY879._SX._UX._SY._UY_t.png",
       "https://fakestoreapi.com/img/81fPKd-2AYL._AC_SL1500_t.png",
@@ -143,6 +146,7 @@ const ProductLayout = ({ idPage,product }) => {
       
       <ProductHeader
         title={productData.title}
+        category={productData.category}
         rating={productData.rating}
         reviewCount={productData.reviewCount}
         discount={productData.discount}
@@ -177,7 +181,7 @@ const ProductLayout = ({ idPage,product }) => {
         >
           <div className="lg:col-span-3 dana">
             <PriceBox
-              price={productData.price}
+              price={product.price}
               originalPrice={productData.originalPrice}
               discount={productData.discount}
               handleAddToCart={handleAddToCart}

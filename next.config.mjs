@@ -10,11 +10,11 @@ const nextConfig = {
                     pathname:"/**",
                     hostname:"fakestoreapi.com",
                 },
-                // {
-                //     protocol: "https",
-                //     hostname: "d3o47ov0yc40fm.cloudfront.net", // hashing
-                //     pathname: "/**",
-                // },
+                {
+                    protocol: "https",
+                    hostname: "sleepy-moser-ro-qpewlr.storage.c2.liara.space", // hashing
+                    pathname: "/**",
+                },
             ]
     }
 };
