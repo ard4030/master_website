@@ -4,14 +4,9 @@ import { CartContext } from "@/context/CartContext";
 import { MdAdd, MdRemove } from "react-icons/md";
 import { isCart } from "@/utils/functions";
 
-const ProductActionsSection = ({
-  onAddToCart,
-  productId,
-  isVariants,
-  variantId,
-}) => {
-  const { cart, isLoading, increaseQuantity, decreaseQuantity } =
-    useContext(CartContext);
+const ProductActionsSection = ({onAddToCart,productId,isVariants,variantId,}) => {
+
+  const { cart, isLoading, increaseQuantity, decreaseQuantity } = useContext(CartContext);
   const cartItems = isCart({
     productId,
     variantId,
