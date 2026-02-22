@@ -114,14 +114,17 @@ export const getCart = async () => {
 }
 
 export const isCart = ({productId, variantId, items,isVariants}) => {
-  console.log('Checking cart for productId:', productId, 'variantId:', variantId, 'items:', items)
+  // console.log('Checking cart for productId:', productId, 'variantId:', variantId, 'items:', items)
+  // console.log("isVariant",isVariants)
   if (!items || items.length === 0) return false;
   let item ;
   if(isVariants){
-    item = items.find(i => String(i.productId) === String(productId) && String(i?.variant?._id) === String(variantId));
+    item = items.find(i => String(i.productId) === String(productId) && String(i?.variantId) === String(variantId));
   }else{
     item = items.find(i => String(i.productId) === String(productId) && !i.variantId);
   } 
+
+  // console.log("item ",item)
 
   return item;
 }

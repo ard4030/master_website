@@ -2,9 +2,11 @@
 
 import React, { useContext } from 'react'
 import { CartContext } from '@/context/CartContext'
+import OrderContext from '@/context/OrderContext'
 
 const StepOne = () => {
   const { cart } = useContext(CartContext) || {}
+  const { order } = useContext(OrderContext)
 
   return (
     <div className="bg-white rounded-lg shadow p-6">

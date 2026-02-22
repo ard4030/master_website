@@ -2,15 +2,18 @@
 
 import React, { useState, useContext } from 'react'
 import { AuthContext } from '@/context/AuthContext'
+import OrderContext from '@/context/OrderContext'
 import Login from '@/components/global/Login'
 import StepIndicator from '@/components/cart/StepIndicator'
 import StepOne from '@/components/cart/StepOne'
 import StepTwo from '@/components/cart/StepTwo'
 import StepThree from '@/components/cart/StepThree'
 import StepFour from '@/components/cart/StepFour'
+import { toast } from 'react-toastify'
 
 const CartPage = () => {
   const { user } = useContext(AuthContext)
+  const { order } = useContext(OrderContext)
   const [currentStep, setCurrentStep] = useState(1)
   const [isLoginOpen, setIsLoginOpen] = useState(false)
 
@@ -22,6 +25,18 @@ const CartPage = () => {
   ]
 
   const handleStepChange = (step) => {
+    // بررسی آیا می‌خواهند از مرحله 2 به بعد برود
+    if (step > currentStep && currentStep === 2) {
+      if (!order.address) {
+        toast.error('لطفاً یک آدرس را انتخاب کنید')
+        return
+      }
+      if (!order.shippingMethod) {
+        toast.error('لطفاً یک روش ارسال را انتخاب کنید')
+        return
+      }
+    }
+
     // اگر مرحله 2 یا بعدتر باشد و لاگین نکرده باشیم
     if (step > 1 && !user) {
       setIsLoginOpen(true)

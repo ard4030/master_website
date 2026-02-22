@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useEffect, useContext } from 'react'
+import React, { useState, useContext, useEffect } from 'react'
 import { MdAdd } from 'react-icons/md'
 import { apiRequest } from '@/utils/functions'
 import { toast } from 'react-toastify'
@@ -8,10 +8,37 @@ import OrderContext from '@/context/OrderContext'
 
 const StepTwo = () => {
   const { order, setOrder } = useContext(OrderContext)
-  const [addresses, setAddresses] = useState([])
-  const [isLoading, setIsLoading] = useState(true)
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
+  const [isLoading, setIsLoading] = useState(true)
+
+  // دریافت اطلاعات checkout در ورود به مرحله دوم
+  useEffect(() => {
+    fetchCheckoutData()
+  }, [])
+
+  const fetchCheckoutData = async () => {
+    setIsLoading(true)
+    const response = await apiRequest('/checkout/data', 'GET')
+    if (response.success) {
+      const addressList = response.data.data.addresses || []
+      const shippingMethodsList = response.data.data.shippingMethods || []
+      const paymentGatewaysList = response.data.data.paymentGateways || []
+
+      setOrder({
+        ...order,
+        addresses: addressList,
+        shippingMethods: shippingMethodsList,
+        paymentGateways: paymentGatewaysList,
+        // انتخاب خودکار اولین آدرس
+        address: order.address || (addressList.length > 0 ? addressList[0] : null),
+        shippingMethod: order.shippingMethod || (shippingMethodsList.length > 0 ? shippingMethodsList[0] : null),
+      })
+    } else {
+      toast.error(response.error || 'خطا در دریافت اطلاعات')
+    }
+    setIsLoading(false)
+  }
   const [formData, setFormData] = useState({
     name: '',
     phone: '',
@@ -21,29 +48,13 @@ const StepTwo = () => {
     fullAddress: '',
   })
 
-  // دریافت آدرس‌های کاربر
-  useEffect(() => {
-    fetchAddresses()
-  }, [])
-
-  const fetchAddresses = async () => {
-    setIsLoading(true)
-    const response = await apiRequest('/addresses', 'GET')
-    if (response.success) {
-      const addressList = response.data.addresses || []
-      setAddresses(addressList)
-      // انتخاب خودکار اولین آدرس
-      if (addressList.length > 0 && !order.address) {
-        setOrder({ ...order, address: addressList[0] })
-      }
-    } else {
-      toast.error(response.error || 'خطا در دریافت آدرس‌ها')
-    }
-    setIsLoading(false)
-  }
-
   const handleSelectAddress = (addr) => {
     setOrder({ ...order, address: addr })
+  }
+
+
+  const handleSelectShippingMethod = (method) => {
+    setOrder({ ...order, shippingMethod: method })
   }
 
   const handleOpenModal = () => {
@@ -62,6 +73,22 @@ const StepTwo = () => {
     setIsModalOpen(false)
   }
 
+  const refreshCheckoutData = async () => {
+    const response = await apiRequest('/checkout/data', 'GET')
+    if (response.success) {
+      const addressList = response.data.data.addresses || []
+      const shippingMethodsList = response.data.data.shippingMethods || []
+      const paymentGatewaysList = response.data.data.paymentGateways || []
+      
+      setOrder({
+        ...order,
+        addresses: addressList,
+        shippingMethods: shippingMethodsList,
+        paymentGateways: paymentGatewaysList,
+      })
+    }
+  }
+
   const handleSave = async () => {
     if (!formData.name || !formData.phone || !formData.state || !formData.city || !formData.postalCode || !formData.fullAddress) {
       toast.error('لطفاً تمام فیلدها را پر کنید')
@@ -72,13 +99,14 @@ const StepTwo = () => {
     const response = await apiRequest('/addresses', 'POST', formData)
     if (response.success) {
       toast.success('آدرس با موفقیت افزوده شد')
-      fetchAddresses()
+      await refreshCheckoutData()
       handleCloseModal()
     } else {
       toast.error(response.error || 'خطا در افزودن آدرس')
     }
     setIsSaving(false)
   }
+
 
   return (
     <div className="bg-white rounded-lg shadow p-6" dir="rtl">
@@ -93,13 +121,9 @@ const StepTwo = () => {
         </button>
       </div>
 
-      {isLoading ? (
-        <div className="text-center py-8">
-          <p className="text-gray-600 dana">درحال بارگذاری آدرس‌ها...</p>
-        </div>
-      ) : addresses.length > 0 ? (
+      {order.addresses && order.addresses.length > 0 ? (
         <div className="space-y-3">
-          {addresses.map((addr) => (
+          {order.addresses.map((addr) => (
             <label
               key={addr._id || addr.id}
               className="flex items-center p-4 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100 transition-colors text-right"
@@ -130,6 +154,48 @@ const StepTwo = () => {
           >
             افزودن آدرس
           </button>
+        </div>
+      )}
+
+      {/* انتخاب روش ارسال */}
+      {order.address && (
+        <div className="mt-8">
+          <h2 className="text-2xl danaBold text-gray-800 mb-6">انتخاب روش ارسال</h2>
+          {order.shippingMethods.length > 0 ? (
+            <div className="space-y-3">
+              {order.shippingMethods.map((method) => (
+                <label
+                  key={method._id || method.id}
+                  className="flex items-center p-4 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100 transition-colors text-right border-2 border-transparent"
+                  style={{
+                    borderColor: (order.shippingMethod?._id || order.shippingMethod?.id) === (method._id || method.id) ? '#2563eb' : 'transparent',
+                  }}
+                >
+                  <input
+                    type="radio"
+                    name="shippingMethod"
+                    checked={(order.shippingMethod?._id || order.shippingMethod?.id) === (method._id || method.id)}
+                    onChange={() => handleSelectShippingMethod(method)}
+                    className="w-5 h-5"
+                  />
+                  <div className="mr-4 flex-1">
+                    <div className="flex items-center justify-between">
+                      <h3 className="danaBold text-gray-800">{method.name}</h3>
+                      <p className="text-lg danaBold text-blue-600">{method.cost?.toLocaleString('fa-IR')} تومان</p>
+                    </div>
+                    <p className="text-sm text-gray-600 dana mt-1">زمان تحویل: {method.deliveryTime}</p>
+                    {method.description && (
+                      <p className="text-sm text-gray-600 dana mt-1">{method.description}</p>
+                    )}
+                  </div>
+                </label>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-8 bg-gray-50 rounded-lg">
+              <p className="text-gray-600 dana">هیچ روش ارسالی در دسترس نیست</p>
+            </div>
+          )}
         </div>
       )}
 
