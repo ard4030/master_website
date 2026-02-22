@@ -14,6 +14,17 @@ export const CartProvider = ({ children }) => {
         getCart();
     }, []);
 
+
+    const createRol = async () => {
+        const response = await apiRequest('/bootstrap/init-superadmin', 'POST', {});
+        console.log(response);
+        
+    }
+
+    // useEffect(() => {
+    //     createRol();
+    // },[])
+
     const addToCart = async (item) => {
        
         setIsLoading(true);

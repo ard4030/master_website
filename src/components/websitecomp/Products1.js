@@ -136,7 +136,7 @@ const Products1 = ({
 
         {/* Products Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          {products.map((product) => (
+          {products?.length&& products.map((product) => (
             <div
               key={product.id || product._id}
               className="bg-white rounded-lg border border-gray-200 overflow-hidden hover:shadow-lg transition-shadow duration-300"
