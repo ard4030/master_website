@@ -8,6 +8,7 @@ import { usePathname } from 'next/navigation';
 import 'swiper/css';
 import 'swiper/css/navigation';
 import Link from 'next/link';
+import Image from 'next/image';
 
 /**
  * کامپوننت محصولات لغزنده
@@ -120,11 +121,14 @@ const ProductSwp2 = ({
                     {product.badge}
                   </div>
                 )}
+                
                 {(product.image || product.mainImage) && (
-                  <img 
+                  <Image 
                     src={getImageUrl(product.mainImage || product.image)} 
                     alt={product.name || product.title} 
-                    className="max-w-full max-h-full object-contain" 
+                    width={2000}
+                    height={2000}
+                    className=" w-[400px] max-h-full rounded-md object-contain" 
                   />
                 )}
               </div>

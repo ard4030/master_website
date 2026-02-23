@@ -3,11 +3,17 @@
 import { MerchantProvider } from '@/context/MerchantContext'
 import Products1 from "@/components/websitecomp/Products1";
 import TopSection1 from "@/components/websitecomp/TopSection1";
+import ProductSwp2 from '@/components/websitecomp/ProductSwp2';
+import AboutMe from '@/components/websitecomp/AboutMe';
+import ProductsSwp3 from '@/components/websitecomp/ProductsSwp3';
+import Footer1 from '@/components/websitecomp/Footer1';
 
 function renderComponent(component) {
   if (!component) return null
 
-  const { id, componentId, styles, instanceId, props } = component
+  const { id, componentId, styles, instanceId, props } = component;
+  console.log('>>>>>>>>>>',id);
+  
 
   // کامپوننت‌های جدید (site builder)
   switch (id) {
@@ -15,6 +21,14 @@ function renderComponent(component) {
       return <Products1 key={instanceId} {...props} />
     case 'topsection1':
       return <TopSection1 key={instanceId} {...props} />
+     case 'productSwp2':
+      return <ProductSwp2 key={instanceId} {...props} />
+     case 'productsSwp3':
+      return <ProductsSwp3 key={instanceId} {...props} />
+     case 'aboutMe':
+      return <AboutMe key={instanceId} {...props} />
+     case 'footer1':
+      return <Footer1 key={instanceId} {...props} />
     default:
       return null
   }
