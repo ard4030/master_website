@@ -2,12 +2,14 @@
 
 import React, { useState, useContext, useEffect } from 'react'
 import { MdAdd } from 'react-icons/md'
-import { apiRequest } from '@/utils/functions'
+import { apiRequest, getOrCreateDeviceId } from '@/utils/functions'
 import { toast } from 'react-toastify'
 import OrderContext from '@/context/OrderContext'
+import { CartContext } from '@/context/CartContext'
 
 const StepTwo = () => {
   const { order, setOrder } = useContext(OrderContext)
+  const { cart, getCart,setCart } = useContext(CartContext)
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
@@ -22,17 +24,15 @@ const StepTwo = () => {
     const response = await apiRequest('/checkout/data', 'GET')
     if (response.success) {
       const addressList = response.data.data.addresses || []
-      const shippingMethodsList = response.data.data.shippingMethods || []
       const paymentGatewaysList = response.data.data.paymentGateways || []
 
       setOrder({
         ...order,
         addresses: addressList,
-        shippingMethods: shippingMethodsList,
         paymentGateways: paymentGatewaysList,
         // انتخاب خودکار اولین آدرس
         address: order.address || (addressList.length > 0 ? addressList[0] : null),
-        shippingMethod: order.shippingMethod || (shippingMethodsList.length > 0 ? shippingMethodsList[0] : null),
+        shippingMethod: order.shippingMethod || null,
       })
     } else {
       toast.error(response.error || 'خطا در دریافت اطلاعات')
@@ -53,8 +53,34 @@ const StepTwo = () => {
   }
 
 
-  const handleSelectShippingMethod = (method) => {
-    setOrder({ ...order, shippingMethod: method })
+  const handleSelectShippingMethod = async (methodKey) => {
+    const method = cart[methodKey]
+    if (method) {
+      // تغییر state
+      setOrder({ ...order, 
+        shippingMethod: {
+          slug: method.slug,
+          ...method
+        }
+      })
+
+      // ارسال slug به endpoint کارت
+      const deviceId = getOrCreateDeviceId()
+      const response = await apiRequest('/cart', 'POST', {
+        deviceId,
+        shippingMethod: method.slug
+      })
+
+      if (response.success) {
+        // کارت را دوباره بکش
+        // await getCart()
+        // console.log("resssss ",response.data)
+        setCart(response.data.data)
+        toast.success('روش ارسال انتخاب شد')
+      } else {
+        toast.error(response.error || 'خطا در تغییر روش ارسال')
+      }
+    }
   }
 
   const handleOpenModal = () => {
@@ -77,13 +103,11 @@ const StepTwo = () => {
     const response = await apiRequest('/checkout/data', 'GET')
     if (response.success) {
       const addressList = response.data.data.addresses || []
-      const shippingMethodsList = response.data.data.shippingMethods || []
       const paymentGatewaysList = response.data.data.paymentGateways || []
       
       setOrder({
         ...order,
         addresses: addressList,
-        shippingMethods: shippingMethodsList,
         paymentGateways: paymentGatewaysList,
       })
     }
@@ -158,44 +182,41 @@ const StepTwo = () => {
       )}
 
       {/* انتخاب روش ارسال */}
-      {order.address && (
+      {order.address && cart && (
         <div className="mt-8">
           <h2 className="text-2xl danaBold text-gray-800 mb-6">انتخاب روش ارسال</h2>
-          {order.shippingMethods.length > 0 ? (
-            <div className="space-y-3">
-              {order.shippingMethods.map((method) => (
+          <div className="space-y-3">
+            {['withPost', 'withTipax', 'withTrucking', 'withPickup'].map((methodKey) => {
+              const method = cart[methodKey]
+              if (!method) return null // اگر روش موجود نیست، نشون نده
+              
+              const isSelected = order.shippingMethod?.slug === method.slug
+              return (
                 <label
-                  key={method._id || method.id}
+                  key={methodKey}
                   className="flex items-center p-4 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100 transition-colors text-right border-2 border-transparent"
                   style={{
-                    borderColor: (order.shippingMethod?._id || order.shippingMethod?.id) === (method._id || method.id) ? '#2563eb' : 'transparent',
+                    borderColor: isSelected ? '#2563eb' : 'transparent',
                   }}
                 >
                   <input
                     type="radio"
                     name="shippingMethod"
-                    checked={(order.shippingMethod?._id || order.shippingMethod?.id) === (method._id || method.id)}
-                    onChange={() => handleSelectShippingMethod(method)}
+                    checked={isSelected}
+                    onChange={() => handleSelectShippingMethod(methodKey)}
                     className="w-5 h-5"
                   />
                   <div className="mr-4 flex-1">
                     <div className="flex items-center justify-between">
-                      <h3 className="danaBold text-gray-800">{method.name}</h3>
-                      <p className="text-lg danaBold text-blue-600">{method.cost?.toLocaleString('fa-IR')} تومان</p>
+                      <h3 className="danaBold text-gray-800">{method.description}</h3>
+                      <p className="text-lg danaBold text-blue-600">{method.price.toLocaleString('fa-IR')} تومان</p>
                     </div>
-                    <p className="text-sm text-gray-600 dana mt-1">زمان تحویل: {method.deliveryTime}</p>
-                    {method.description && (
-                      <p className="text-sm text-gray-600 dana mt-1">{method.description}</p>
-                    )}
+                    <p className="text-sm text-gray-600 dana mt-1">زمان تحویل: {method.receive}</p>
                   </div>
                 </label>
-              ))}
-            </div>
-          ) : (
-            <div className="text-center py-8 bg-gray-50 rounded-lg">
-              <p className="text-gray-600 dana">هیچ روش ارسالی در دسترس نیست</p>
-            </div>
-          )}
+              )
+            })}
+          </div>
         </div>
       )}
 

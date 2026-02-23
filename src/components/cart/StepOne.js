@@ -21,7 +21,10 @@ const StepOne = () => {
             >
               <div className="text-right flex-1">
                 <h3 className="danaBold text-gray-800">{item.name}</h3>
-                <p className="text-sm text-gray-600 dana">تعداد: {item.quantity || 1}</p>
+                <div className='flex items-center mt-2'>
+                  <p className="text-sm text-gray-600 dana ml-3">تعداد: {item.quantity || 1}</p>
+                  {item.msg && <p className="text-sm text-red-600 dana">{item.msg}</p>}
+                </div>
               </div>
               <div className="text-left">
                 <p className="danaBold text-blue-600">
