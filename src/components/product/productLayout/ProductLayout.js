@@ -194,7 +194,8 @@ const ProductLayout = ({ idPage,product }) => {
 
           </div>
         </Sticky>
-            <ProductSpecifications specs={specifications} />
+        <div className='col-span-8'><ProductSpecifications specs={specifications} product={product} /></div>
+            
       </div>
 
       {/* Tabs Section */}
