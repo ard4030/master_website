@@ -109,7 +109,7 @@ const ProductsSwp3 = ({
   };
 
   return (
-    <div className="w-full bg-white overflow-hidden">
+    <div className="w-full bg-white overflow-hidden dana">
       <div className="max-w-7xl mx-auto">
         {/* Hero Section */}
         <div className="py-12 md:py-20 px-6 md:px-12">

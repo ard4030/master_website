@@ -73,7 +73,7 @@ const TopSection1 = ({
             <img
               src={getImageUrl(imageUrl)}
               alt={title}
-              className="w-full max-w-md rounded-lg shadow-lg"
+              className="w-full  rounded-lg shadow-lg"
             />
           </div>
         </div>

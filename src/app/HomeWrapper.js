@@ -7,6 +7,7 @@ import ProductSwp2 from '@/components/websitecomp/ProductSwp2';
 import AboutMe from '@/components/websitecomp/AboutMe';
 import ProductsSwp3 from '@/components/websitecomp/ProductsSwp3';
 import Footer1 from '@/components/websitecomp/Footer1';
+import FeaturesSection from '@/components/websitecomp/FeaturesSection';
 
 function renderComponent(component) {
   if (!component) return null
@@ -29,6 +30,8 @@ function renderComponent(component) {
       return <AboutMe key={instanceId} {...props} />
      case 'footer1':
       return <Footer1 key={instanceId} {...props} />
+     case 'featuresSection':
+      return <FeaturesSection key={instanceId} {...props} />
     default:
       return null
   }

@@ -59,7 +59,7 @@ const Footer1 = ({
   ]
 
   return (
-    <footer className="bg-gray-50 border-t border-gray-300 py-10 px-5 md:py-14 md:px-8 rtl font-dana" dir="rtl">
+    <footer className="dana bg-gray-50 border-t border-gray-300 py-10 px-5 md:py-14 md:px-8 rtl font-dana" dir="rtl">
       <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-8 md:gap-10 mb-8">
         {/* Contact Info Section */}
         <div className="flex flex-col gap-6 md:col-span-1 lg:col-span-1">

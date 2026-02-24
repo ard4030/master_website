@@ -121,14 +121,13 @@ const ProductSwp2 = ({
                     {product.badge}
                   </div>
                 )}
-                
                 {(product.image || product.mainImage) && (
                   <Image 
                     src={getImageUrl(product.mainImage || product.image)} 
                     alt={product.name || product.title} 
                     width={2000}
                     height={2000}
-                    className=" w-[400px] max-h-full rounded-md object-contain" 
+                    className="max-w-full max-h-full rounded-md object-contain" 
                   />
                 )}
               </div>
