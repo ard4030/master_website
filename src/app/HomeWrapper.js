@@ -8,6 +8,9 @@ import AboutMe from '@/components/websitecomp/AboutMe';
 import ProductsSwp3 from '@/components/websitecomp/ProductsSwp3';
 import Footer1 from '@/components/websitecomp/Footer1';
 import FeaturesSection from '@/components/websitecomp/FeaturesSection';
+import SplitShowcase from '@/components/websitecomp/SplitShowcase';
+import CategoriesSwiper from '@/components/websitecomp/CategoriesSwiper';
+import HeroBannerSwiper from '@/components/websitecomp/HeroBannerSwiper';
 
 function renderComponent(component) {
   if (!component) return null
@@ -32,6 +35,12 @@ function renderComponent(component) {
       return <Footer1 key={instanceId} {...props} />
      case 'featuresSection':
       return <FeaturesSection key={instanceId} {...props} />
+     case 'splitShowcase':
+      return <SplitShowcase key={instanceId} {...props} />
+     case 'categoriesSwiper':
+      return <CategoriesSwiper key={instanceId} {...props} />
+     case 'heroBannerSwiper':
+      return <HeroBannerSwiper key={instanceId} {...props} />
     default:
       return null
   }
