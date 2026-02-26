@@ -11,6 +11,8 @@ import FeaturesSection from '@/components/websitecomp/FeaturesSection';
 import SplitShowcase from '@/components/websitecomp/SplitShowcase';
 import CategoriesSwiper from '@/components/websitecomp/CategoriesSwiper';
 import HeroBannerSwiper from '@/components/websitecomp/HeroBannerSwiper';
+import DigikalaSwiper from '@/components/websitecomp/DigikalaSwiper';
+import DigikalaOfferSwiper from '@/components/websitecomp/DigikalaOfferSwiper';
 
 function renderComponent(component) {
   if (!component) return null
@@ -41,6 +43,11 @@ function renderComponent(component) {
       return <CategoriesSwiper key={instanceId} {...props} />
      case 'heroBannerSwiper':
       return <HeroBannerSwiper key={instanceId} {...props} />
+     case 'digikalaSwiper':
+      return <DigikalaSwiper key={instanceId} {...props} />
+     case 'digikalaOfferSwiper':
+      return <DigikalaOfferSwiper key={instanceId} {...props} />
+      
     default:
       return null
   }
