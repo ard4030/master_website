@@ -3,11 +3,23 @@
 import { MerchantProvider } from '@/context/MerchantContext'
 import Products1 from "@/components/websitecomp/Products1";
 import TopSection1 from "@/components/websitecomp/TopSection1";
+import ProductSwp2 from '@/components/websitecomp/ProductSwp2';
+import AboutMe from '@/components/websitecomp/AboutMe';
+import ProductsSwp3 from '@/components/websitecomp/ProductsSwp3';
+import Footer1 from '@/components/websitecomp/Footer1';
+import FeaturesSection from '@/components/websitecomp/FeaturesSection';
+import SplitShowcase from '@/components/websitecomp/SplitShowcase';
+import CategoriesSwiper from '@/components/websitecomp/CategoriesSwiper';
+import HeroBannerSwiper from '@/components/websitecomp/HeroBannerSwiper';
+import DigikalaSwiper from '@/components/websitecomp/DigikalaSwiper';
+import DigikalaOfferSwiper from '@/components/websitecomp/DigikalaOfferSwiper';
 
 function renderComponent(component) {
   if (!component) return null
 
-  const { id, componentId, styles, instanceId, props } = component
+  const { id, componentId, styles, instanceId, props } = component;
+  console.log('>>>>>>>>>>',id);
+  
 
   // کامپوننت‌های جدید (site builder)
   switch (id) {
@@ -15,6 +27,27 @@ function renderComponent(component) {
       return <Products1 key={instanceId} {...props} />
     case 'topsection1':
       return <TopSection1 key={instanceId} {...props} />
+     case 'productSwp2':
+      return <ProductSwp2 key={instanceId} {...props} />
+     case 'productsSwp3':
+      return <ProductsSwp3 key={instanceId} {...props} />
+     case 'aboutMe':
+      return <AboutMe key={instanceId} {...props} />
+     case 'footer1':
+      return <Footer1 key={instanceId} {...props} />
+     case 'featuresSection':
+      return <FeaturesSection key={instanceId} {...props} />
+     case 'splitShowcase':
+      return <SplitShowcase key={instanceId} {...props} />
+     case 'categoriesSwiper':
+      return <CategoriesSwiper key={instanceId} {...props} />
+     case 'heroBannerSwiper':
+      return <HeroBannerSwiper key={instanceId} {...props} />
+     case 'digikalaSwiper':
+      return <DigikalaSwiper key={instanceId} {...props} />
+     case 'digikalaOfferSwiper':
+      return <DigikalaOfferSwiper key={instanceId} {...props} />
+      
     default:
       return null
   }
