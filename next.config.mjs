@@ -15,6 +15,13 @@ const nextConfig = {
                     hostname: "sleepy-moser-ro-qpewlr.storage.c2.liara.space", // hashing
                     pathname: "/**",
                 },
+                {
+                    protocol: "https",
+                    hostname: "c992009.parspack.net", // hashing
+                    pathname: "/**",
+                },
+
+                
             ]
     }
 };
