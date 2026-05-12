@@ -13,6 +13,7 @@ import CategoriesSwiper from '@/components/websitecomp/CategoriesSwiper';
 import HeroBannerSwiper from '@/components/websitecomp/HeroBannerSwiper';
 import DigikalaSwiper from '@/components/websitecomp/DigikalaSwiper';
 import DigikalaOfferSwiper from '@/components/websitecomp/DigikalaOfferSwiper';
+import AboutUs from '@/components/websitecomp/AboutUs';
 
 function renderComponent(component) {
   if (!component) return null
@@ -47,7 +48,8 @@ function renderComponent(component) {
       return <DigikalaSwiper key={instanceId} {...props} />
      case 'digikalaOfferSwiper':
       return <DigikalaOfferSwiper key={instanceId} {...props} />
-      
+     case 'aboutUs':
+      return <AboutUs key={instanceId} {...props} />
     default:
       return null
   }
