@@ -3,14 +3,12 @@ import React, { useState, useContext, useEffect } from 'react';
 import { CartContext } from '@/context/CartContext';
 import ProductImageSection from './ProductImageSection';
 import ProductInfoSection from './ProductInfoSection';
-import ProductColorsSection from './ProductColorsSection';
-import ProductActionsSection from './ProductActionsSection';
 import ProductShippingSection from './ProductShippingSection';
 import ProductRatingsSection from './ProductRatingsSection';
+import ProductPriceSection from './ProductPriceSection';
 
 const ProductLayout2 = ({ idPage, product }) => {
   const [selectedVariant, setSelectedVariant] = useState(null);
-  const { addToCart } = useContext(CartContext);
 
   // در بار اول، اولین variant را انتخاب کند یا خود محصول را
   useEffect(() => {
@@ -24,22 +22,6 @@ const ProductLayout2 = ({ idPage, product }) => {
     }
   }, [product]);
 
-  const handleAddToCart = () => {
-    if (addToCart && product) {
-      // اگر variant دارد، از color+size یک ID درست کن
-      // if (product.isVariants && selectedVariant) {
-      //   variantId = `${selectedVariant.color}-${selectedVariant.size}`;
-      // }
-
-      const cartData = {
-        _id: product._id,                                               
-        isVariants: product.isVariants || false,                        
-        variantId: selectedVariant._id || null, // یا می‌توانی color-size را اینجا بسازی
-      };
-      console.log('Sending to cart:', cartData);
-      addToCart(cartData);
-    }
-  };
 
   // استخراج داده‌های محصول
   const variants = product?.variants || [];
@@ -58,29 +40,6 @@ const ProductLayout2 = ({ idPage, product }) => {
     ratingAverage: product?.ratingAverage || 0,
     reviewCount: product?.reviewCount || 0,
     variants: variants,
-  };
-
-  // استخراج رنگها و سایزها از variants
-  const uniqueColors = [...new Set(variants.map(v => v.color))].filter(Boolean);
-  const uniqueSizes = [...new Set(variants.map(v => v.size))].filter(Boolean);
-
-  const colors = uniqueColors.map((color, idx) => ({
-    id: idx,
-    name: color,
-    code: getColorCode(color)
-  }));
-
-  const sizes = uniqueSizes.map((size, idx) => ({
-    id: idx,
-    name: size
-  }));
-
-  // برای انتخاب بر اساس رنگ و سایز
-  const handleVariantSelect = (color, size) => {
-    const variant = variants.find(v => v.color === color && v.size === size);
-    if (variant) {
-      setSelectedVariant(variant);
-    }
   };
 
   return (
@@ -111,26 +70,11 @@ const ProductLayout2 = ({ idPage, product }) => {
               description={productData.description}
             />
 
-            {colors.length > 0 && (
-              <ProductColorsSection 
-                colors={colors}
-                selectedColor={firstVariant?.color}
-                onColorSelect={(color) => {
-                  // اگر یک سایز انتخاب شده است، آن را نگه دار
-                  const newVariant = variants.find(v => 
-                    v.color === color && v.size === firstVariant?.size
-                  ) || variants.find(v => v.color === color);
-                  if (newVariant) setSelectedVariant(newVariant);
-                }}
-              />
-            )}
-
-            <ProductActionsSection
-              onAddToCart={handleAddToCart}
-              productId={product?._id}
-              isVariants={product?.isVariants}
-              variantId={selectedVariant?._id || null}
-            />
+            <ProductPriceSection 
+            product={product} 
+            isVariants={product.isVariants} 
+            variants={product.variants} 
+            variantsFull={product.variantsFull} />
 
             <ProductShippingSection
               freeShipping={productData.freeShipping}
@@ -150,22 +94,5 @@ const ProductLayout2 = ({ idPage, product }) => {
   );
 };
 
-// تابع برای دریافت کد رنگی
-function getColorCode(colorName) {
-  const colorMap = {
-    'سیاه': '#000000',
-    'سفید': '#F5F5F5',
-    'قرمز': '#FF0000',
-    'آبی': '#0000FF',
-    'سبز': '#00AA00',
-    'زرد': '#FFFF00',
-    'نارنجی': '#FFA500',
-    'صورتی': '#FFC0CB',
-    'خاکی': '#C0A080',
-    'قهوه‌ای': '#8B6F47',
-    'طلایی': '#D4A574',
-  };
-  return colorMap[colorName] || '#808080'; // خاکستری پیش فرض
-}
 
 export default ProductLayout2;

@@ -34,8 +34,6 @@ const ProductLayout = ({ idPage,product }) => {
   }, [product]);
 
   const handleAddToCart = () => {
-    console.log('>>>>>>>.',product);
-    
     if (addToCart && product) {
       // اگر variant دارد، از color+size یک ID درست کن
       // if (product.isVariants && selectedVariant) {
@@ -53,8 +51,6 @@ const ProductLayout = ({ idPage,product }) => {
   };
 
   useEffect(() => {
-    console.log(product);
-    
     setPageId(idPage);
   }, [idPage]);
 

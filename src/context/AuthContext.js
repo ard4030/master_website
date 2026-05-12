@@ -17,7 +17,7 @@ export const AuthProvider = ({ children }) => {
       setLoading(true)
       const response = await apiRequest('/auth/is-login', 'GET')
       if (response.success && response.data.user) {
-        console.log(response.data);
+        // console.log("asdasd",response.data);
         
         setUser({...response.data.user,type: response.data.type})
       }

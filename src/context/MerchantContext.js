@@ -1,18 +1,42 @@
 'use client'
 
-import { createContext } from 'react'
+import apiRequest from '@/utils/functions'
+import { usePathname } from 'next/navigation'
+import { createContext, useEffect, useState } from 'react'
 
 export const MerchantContext = createContext()
 
-export const MerchantProvider = ({ children, homepageData }) => {
-  const activeTheme = homepageData?.data?.activeTheme
+export const MerchantProvider = ({ children }) => {
+  const [activeMerchant,setActiveMerchant] = useState(null)
+  const [loading,setLoading] = useState(true)
+  // const activeTheme = homepageData?.data?.activeTheme;
+  const pathName = usePathname();
+ 
+
+  useEffect(() => {
+    if(!activeMerchant && pathName.startsWith("/product")){
+      getMerchant()
+    }
+  },[])
+
+  const getMerchant = async () => {
+    setLoading(true)
+    const res = await apiRequest("/homepage","GET");
+    if(res.success){
+      setActiveMerchant(res.data.data)
+    }
+    // console.log("----------",res.data.data)
+    setLoading(false)
+  }
 
   return (
     <MerchantContext.Provider
       value={{
-        homepageData,
-        activeTheme,
-        components: activeTheme?.components || []
+        activeMerchant,setActiveMerchant,
+        loading,setLoading
+        // homepageData,
+        // activeTheme,
+        // components: activeTheme?.components || []
       }}
     >
       {children}

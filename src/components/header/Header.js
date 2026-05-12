@@ -8,6 +8,8 @@ import { CartContext } from '@/context/CartContext'
 import { usePathname } from 'next/navigation'
 import { MdShoppingCart, MdPerson, MdLogout } from 'react-icons/md'
 import { apiRequest } from '@/utils/functions'
+import { MerchantContext } from '@/context/MerchantContext'
+import Image from 'next/image'
 
 const Header = () => {
   const [isLoginOpen, setIsLoginOpen] = useState(false)
@@ -15,6 +17,9 @@ const Header = () => {
   const { user, setUser } = useContext(AuthContext)
   const { cart } = useContext(CartContext) || {}
   const pathName = usePathname()
+  const { activeMerchant,loading } = useContext(MerchantContext)
+
+  // console.log("hommm ",activeMerchant)
 
   // محاسبه تعداد کل آیتم ها در سبد
   const cartItemsCount = cart?.items?.reduce((total, item) => total + (item.quantity || 1), 0) || 0
@@ -35,19 +40,39 @@ const Header = () => {
     setIsLoginOpen(true)
   }
 
+
   return (
     <>
     {
       !pathName.startsWith('/dashboard')  &&
       !pathName.startsWith('/sitebuilder') && 
       !pathName.startsWith('/newsitebuilder') && 
-
+      loading?
+      <header className="sticky top-0 z-100 bg-white border-b border-gray-200">
+        <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+          <div className="flex-shrink-0">
+            <div className="h-6 w-24 bg-gray-200 rounded animate-pulse"></div>
+          </div>
+          <nav className="flex items-center gap-4">
+            <div className="h-10 w-10 bg-gray-200 rounded-lg animate-pulse"></div>
+            <div className="h-10 w-10 bg-gray-200 rounded-lg animate-pulse"></div>
+            <div className="h-10 w-24 bg-gray-200 rounded-lg animate-pulse"></div>
+          </nav>
+        </div>
+      </header>
+      :
+      activeMerchant &&
       <header className="sticky top-0 z-100 bg-white border-b border-gray-200 dana">
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
           {/* سمت راست - لوگو */}
-          <div className="flex-shrink-0">
+          <div className="flex items-center">
             <Link href="/" className="inline-flex items-center gap-2 hover:opacity-80 transition-opacity">
-              <span className="text-xl danaBold text-gray-800">MasterShop</span>
+              {/* <span className="text-xl danaBold text-gray-800">MasterShop</span> */}
+              <Image 
+              width={40}
+              height={40}
+              alt='logo'
+              src={process.env.NEXT_PUBLIC_LIARA_IMAGE_URL+activeMerchant.merchant.storeImage} />
             </Link>
           </div>
 

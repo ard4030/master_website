@@ -14,12 +14,6 @@ async function getHomepageData() {
       cache: 'no-store'
     })
     
-    // console.log("response ",response)
-
-    // if (!response.ok) {
-    //   throw new Error('Failed to fetch homepage data')
-    // }
-
     let data = await response.json()
     // console.log("[[[[[ ",data)
     if(data.success){
@@ -30,11 +24,28 @@ async function getHomepageData() {
 
   } catch (error) {
     final.error = error.message
-    // console.log(error.message)
   }
 
   return final
 
+}
+
+export async function generateMetadata() {
+  const homepageData = await getHomepageData()
+  
+  const merchant = homepageData.data?.merchant || {}
+  
+  return {
+    title: merchant.metaTitle || 'فروشگاه',
+    description: merchant.metaDescription || '',
+    keywords: merchant.metaKeywords || '',
+    ...(merchant.canonicalUrl && { alternates: { canonical: merchant.canonicalUrl } }),
+    openGraph: {
+      title: merchant.ogTitle || merchant.metaTitle || 'فروشگاه',
+      description: merchant.ogDescription || merchant.metaDescription || '',
+      ...(merchant.ogImage && { images: [{ url: merchant.ogImage }] }),
+    },
+  }
 }
 
 export default async function Home() {

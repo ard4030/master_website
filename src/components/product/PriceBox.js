@@ -1,6 +1,6 @@
 'use client';
 import React, { useState } from 'react';
-import ProductActionsSection from './productLayout2/ProductActionsSection';
+// import ProductActionsSection from './productLayout2/ProductActionsSection';
 
 const PriceBox = ({ price, originalPrice, discount,handleAddToCart,product,variantId  }) => {
   const [quantity, setQuantity] = useState(1);
@@ -47,12 +47,12 @@ const PriceBox = ({ price, originalPrice, discount,handleAddToCart,product,varia
           </div>
         </div>
       </div>
-            <ProductActionsSection
+            {/* <ProductActionsSection
               onAddToCart={handleAddToCart}
               productId={product?._id}
               isVariants={product?.isVariants}
               variantId={variantId}
-            />
+            /> */}
       {/* <button className='w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 rounded-xl transition'>
         افزودن به سبد
       </button> */}
