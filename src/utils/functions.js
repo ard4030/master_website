@@ -129,4 +129,19 @@ export const isCart = ({productId, variantId, items,isVariants}) => {
   return item;
 }
 
+export function formatPrice(price, toPersian = false) {
+  const num = Number(price);
+  if (isNaN(num)) return '';
+
+  // جدا کردن سه‌رقمی
+  let formatted = num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+
+  // اگر فلگ فعال بود، اعداد فارسی کن
+  if (toPersian) {
+    formatted = formatted.replace(/[0-9]/g, d => '۰۱۲۳۴۵۶۷۸۹'[d]);
+  }
+
+  return formatted;
+}
+
 export default apiRequest

@@ -27,7 +27,7 @@ const SplitShowcase = ({
   ctaText = 'شروع گفتگو',
   ctaLink = '#',
   sectionBackgroundColor = 'bg-gray-100',
-  accentBackgroundColor = 'bg-rose-500',
+  accentBackgroundColor = 'bg-sky-50',
   card1ImageUrl = 'https://images.unsplash.com/photo-1529421308418-eab98863cee1?w=1200&h=900&fit=crop',
   card1Text = 'سنسور',
   card2ImageUrl = 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=1200&h=900&fit=crop',
@@ -49,11 +49,11 @@ const SplitShowcase = ({
 
   return (
     <section className={`w-full ${sectionBackgroundColor}`}>
-      <div className="mx-auto max-w-7xl px-6 md:px-12 py-12 md:py-16">
-        <div className="relative rounded-2xl bg-white ">
+      <div className="mx-auto max-w-7xl px-6 md:px-12 py-12 md:py-16 ">
+        <div className="relative rounded-2xl bg-red ">
           <div className="grid grid-cols-1 lg:grid-cols-2">
             {/* سمت چپ: متن */}
-            <div className="pl-16" dir="rtl">
+            <div className="pl-16 p-4" dir="rtl">
               <div className="flex items-center justify-between mb-10">
                 <span className="text-sm danaMed text-gray-900">{brandText}</span>
 
@@ -81,7 +81,7 @@ const SplitShowcase = ({
             </div>
 
             {/* سمت راست: پنل رنگی */}
-            <div className={`relative min-h-65 sm:min-h-80 lg:min-h-full ${accentBackgroundColor}`}>
+            <div className={`relative min-h-65 sm:min-h-80 lg:min-h-full rounded-3xl ${accentBackgroundColor}`}>
 
             </div>
           </div>
@@ -108,7 +108,7 @@ const SplitShowcase = ({
                       <img
                         src={card.imageUrl}
                         alt={String(card.text || 'تصویر')}
-                        className="absolute top-6 right-10 w-full h-full object-cover"
+                        className="absolute top-3 right-10 w-full h-full object-cover"
                         draggable={false}
                       />
                     ) : null}

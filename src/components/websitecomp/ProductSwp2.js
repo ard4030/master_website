@@ -1,5 +1,5 @@
 'use client';
-import React from 'react'
+import React, { useRef } from 'react'
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation } from 'swiper/modules';
 import { usePathname } from 'next/navigation';
@@ -9,6 +9,8 @@ import 'swiper/css';
 import 'swiper/css/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
+// import ViewPrice from '../global/other/ViewPrice';
+import { formatPrice } from '@/utils/functions';
 
 /**
  * کامپوننت محصولات لغزنده
@@ -24,6 +26,8 @@ const ProductSwp2 = ({
   subtitle = 'محصولات منتخب ما برای شما'
 }) => {
   const pathName = usePathname()
+  const prevRef = useRef(null)
+  const nextRef = useRef(null)
 
   // تابع کمکی برای تبدیل URL تصویر
   const getImageUrl = (imagePath) => {
@@ -86,55 +90,89 @@ const ProductSwp2 = ({
   if(pathName !== '/newsitebuilder') products = data || sampleProducts
 
   return (
-    <div className="w-full py-10  px-10 dana" dir="rtl">
-      <Swiper
-        modules={[Navigation]}
-        spaceBetween={30}
-        slidesPerView={1}
-        navigation
-        loop={true}
-      >
-        {products.map((product) => (
-          <SwiperSlide key={product.id || product._id}>
-            <div className="flex flex-col md:flex-row items-center justify-between gap-12 md:gap-16 px-8 md:px-20 py-12 md:py-16 bg-gradient-to-br from-blue-50 via-yellow-50 to-orange-100 rounded-3xl min-h-96 md:min-h-96" dir="rtl">
-              <div className="flex flex-col justify-center flex-1 w-full md:w-auto">
-                <div className="text-2xl md:text-3xl font-semibold text-black mb-3 tracking-wider">
-                  تومان {parseInt(product.price || 0).toLocaleString('fa-IR')}
-                </div>
-                <h2 className="text-4xl md:text-5xl font-bold text-black mb-4 md:mb-6 leading-tight">
-                  {product.name || product.title}
-                </h2>
-                <p className="text-sm md:text-base text-gray-700 mb-7 md:mb-8 leading-relaxed max-w-sm">
-                  {product.description || product.shortDescription || 'بدون توضیحات'}
-                </p>
-                <Link
-                href={product.href || `/product/${product.id || product._id}`}
-                >
-                <button className="w-fit px-10 py-3 md:py-4 border-2 border-black rounded-full bg-transparent text-xs md:text-sm font-bold text-black tracking-widest transition-all duration-300 hover:bg-black hover:text-white">
-                  خرید کنید
-                </button>
-                </Link>
-              </div>
-              <div className="relative flex items-center justify-center flex-1 w-full md:w-auto h-64 md:h-96" dir="rtl">
-                {product.badge && (
-                  <div className="absolute top-4 md:top-6 left-4 md:left-6 w-24 h-24 md:w-28 md:h-28 border-3 border-black rounded-full bg-white flex items-center justify-center font-bold text-xs text-black text-center p-2 md:p-3 z-10 shadow-lg">
-                    {product.badge}
+    <div className="w-full py-10 px-10 dana" dir="rtl">
+      <div className="relative">
+        {/* دکمه قبلی */}
+        <button
+          ref={prevRef}
+          className="absolute right-3 top-1/2 -translate-y-1/2 z-20 w-8 h-8 rounded-full bg-white/90 border border-gray-200 shadow flex items-center justify-center text-gray-600 hover:bg-black hover:text-white hover:border-black transition-all duration-200"
+        >
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <polyline points="9 18 15 12 9 6" />
+          </svg>
+        </button>
+        {/* دکمه بعدی */}
+        <button
+          ref={nextRef}
+          className="absolute left-3 top-1/2 -translate-y-1/2 z-20 w-8 h-8 rounded-full bg-white/90 border border-gray-200 shadow flex items-center justify-center text-gray-600 hover:bg-black hover:text-white hover:border-black transition-all duration-200"
+        >
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <polyline points="15 18 9 12 15 6" />
+          </svg>
+        </button>
+
+        <Swiper
+          modules={[Navigation]}
+          spaceBetween={30}
+          slidesPerView={1}
+          navigation={{ prevEl: prevRef.current, nextEl: nextRef.current }}
+          onBeforeInit={(swiper) => {
+            swiper.params.navigation.prevEl = prevRef.current
+            swiper.params.navigation.nextEl = nextRef.current
+          }}
+          loop={true}
+        >
+          {products.map((product) => (
+            <SwiperSlide key={product.id || product._id}>
+              <div className="flex flex-col md:flex-row items-center justify-between gap-5 md:gap-14 px-10 md:px-20 py-10 md:py-14 bg-linear-to-br from-blue-50 via-yellow-50 to-orange-100 rounded-3xl min-h-80 md:min-h-96" dir="rtl">
+                {/* بخش متن */}
+                <div className="flex flex-col justify-center flex-1 w-full md:w-auto">
+                  {/* قیمت */}
+                  <div className="flex items-baseline gap-1.5 mb-3">
+                    <span className="text-3xl md:text-2xl font-bold text-gray-600 tracking-tight leading-none">
+                      {formatPrice(product.price)}
+                    </span>
+                    <span className="text-xs text-gray-500 font-light">تومان</span>
                   </div>
-                )}
-                {(product.image || product.mainImage) && (
-                  <Image 
-                    src={getImageUrl(product.mainImage || product.image)} 
-                    alt={product.name || product.title} 
-                    width={2000}
-                    height={2000}
-                    className="max-w-full max-h-full rounded-md object-contain" 
-                  />
-                )}
+                  {/* خط جداکننده */}
+                  <div className="w-8 h-0.5 bg-black/80 mb-3 rounded-full" />
+                  {/* عنوان محصول */}
+                  <h2 className="text-3xl md:text-4xl font-bold text-black leading-snug mb-3">
+                    {product.name || product.title}
+                  </h2>
+                  {/* توضیحات */}
+                  <p className="text-xs md:text-sm text-gray-500 leading-relaxed max-w-xs mb-6 line-clamp-3">
+                    {product.description || product.shortDescription || 'بدون توضیحات'}
+                  </p>
+                  {/* دکمه خرید */}
+                  <Link href={product.href || `/product/${product.id || product._id}`}>
+                    <button className="w-fit px-8 py-2.5 dana border border-black rounded-full bg-transparent text-sm font-bold text-gray-600 tracking-widest transition-all duration-300 hover:bg-black hover:text-white">
+                      خرید کنید
+                    </button>
+                  </Link>
+                </div>
+                {/* بخش تصویر */}
+                <div className="relative flex items-center justify-center flex-1 w-full md:w-auto h-56 md:h-80" dir="rtl">
+                  {product.badge && (
+                    <div className="absolute top-3 left-3 w-20 h-20 md:w-30 md:h-30 border-2 border-black rounded-full bg-white flex items-center justify-center font-bold text-xs text-black text-center p-2 z-10 shadow-md">
+                      {product.badge}
+                    </div>
+                  )}
+                  {(product.image || product.mainImage) && (
+                    <Image
+                      src={getImageUrl(product.mainImage || product.image)}
+                      alt={product.name || product.title}
+                      width={2000}
+                      height={2000}
+                      className="max-w-full max-h-full rounded-md object-contain"
+                    />
+                  )}
+                </div>
               </div>
-            </div>
-          </SwiperSlide>
-        ))}
-      </Swiper>
+            </SwiperSlide>
+          ))}
+        </Swiper>
+      </div>
     </div>
   )
 }

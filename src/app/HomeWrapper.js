@@ -13,6 +13,7 @@ import CategoriesSwiper from '@/components/websitecomp/CategoriesSwiper';
 import HeroBannerSwiper from '@/components/websitecomp/HeroBannerSwiper';
 import DigikalaSwiper from '@/components/websitecomp/DigikalaSwiper';
 import DigikalaOfferSwiper from '@/components/websitecomp/DigikalaOfferSwiper';
+import AboutUs from '@/components/websitecomp/AboutUs';
 import { useContext, useEffect } from 'react';
 import SimpleBanner from '@/components/websitecomp/SimpleBanner';
 import Products2 from '@/components/websitecomp/Products2';
@@ -54,7 +55,8 @@ function renderComponent(component) {
       return <SimpleBanner key={instanceId} {...props} />
     case 'products2':
       return <Products2 key={instanceId} {...props} /> 
-      
+     case 'aboutUs':
+      return <AboutUs key={instanceId} {...props} />
     default:
       return null
   }
