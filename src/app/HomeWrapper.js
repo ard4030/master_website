@@ -1,6 +1,6 @@
 'use client'
 
-import { MerchantProvider } from '@/context/MerchantContext'
+import { MerchantContext, MerchantProvider } from '@/context/MerchantContext'
 import Products1 from "@/components/websitecomp/Products1";
 import TopSection1 from "@/components/websitecomp/TopSection1";
 import ProductSwp2 from '@/components/websitecomp/ProductSwp2';
@@ -13,12 +13,13 @@ import CategoriesSwiper from '@/components/websitecomp/CategoriesSwiper';
 import HeroBannerSwiper from '@/components/websitecomp/HeroBannerSwiper';
 import DigikalaSwiper from '@/components/websitecomp/DigikalaSwiper';
 import DigikalaOfferSwiper from '@/components/websitecomp/DigikalaOfferSwiper';
+import { useContext, useEffect } from 'react';
 
 function renderComponent(component) {
   if (!component) return null
 
   const { id, componentId, styles, instanceId, props } = component;
-  console.log('>>>>>>>>>>',id);
+  // console.log('>>>>>>>>>>',id);
   
 
   // کامپوننت‌های جدید (site builder)
@@ -57,11 +58,20 @@ export default function HomeWrapper({ homepageData }) {
   const activeTheme = homepageData?.data?.activeTheme
   const newTheme = homepageData?.data?.theme
 
+  const {setActiveMerchant,setLoading} = useContext(MerchantContext);
+
+  useEffect(() => {
+    if(homepageData) {
+      setActiveMerchant(homepageData?.data)
+      setLoading(false)
+    }
+  },[homepageData])
+
   // استفاده از تم جدید (اگر موجود باشد) یا تم قدیمی
   const componentsToRender = newTheme?.components || activeTheme?.components || []
 
   return (
-    <MerchantProvider homepageData={homepageData}>
+    
       <div className="w-full min-h-screen bg-white">
         {/* Render components from theme */}
         {componentsToRender && Array.isArray(componentsToRender) && componentsToRender.length > 0 ? (
@@ -79,6 +89,6 @@ export default function HomeWrapper({ homepageData }) {
           </div>
         )}
       </div>
-    </MerchantProvider>
+  
   )
 }
