@@ -16,7 +16,7 @@ import Link from 'next/link'
  */
 const TopSection1 = ({
   subtitle = 'ارز ونه های محدود برای خت بیو ...',
-  title = 'وقتشه نووت را آنلاین بخری!',
+  title =  'غداتو داغ تحویل بگیر!',
   description = 'بهترین کیفیت، طعم و تازگی در یک جا. سفارش کنید و در کمتر از 2 ساعت دریافت کنید.',
   imageUrl = 'https://images.unsplash.com/photo-1509042239860-f550ce710b93?w=500&h=500&fit=crop',
   ctaText = 'مشاهده کن',

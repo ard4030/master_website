@@ -137,7 +137,7 @@ const HeroBannerSwiper = ({
 
   return (
     <section className="w-full bg-white">
-      <style jsx global>{`
+      {/* <style jsx global>{`
         .hero-banner-swiper .swiper-pagination {
           bottom: 18px;
         }
@@ -157,7 +157,7 @@ const HeroBannerSwiper = ({
         .hero-banner-swiper .swiper-button-prev {
           display: none;
         }
-      `}</style>
+      `}</style> */}
 
       <div className="w-full">
         <Swiper
