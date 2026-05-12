@@ -14,6 +14,8 @@ import HeroBannerSwiper from '@/components/websitecomp/HeroBannerSwiper';
 import DigikalaSwiper from '@/components/websitecomp/DigikalaSwiper';
 import DigikalaOfferSwiper from '@/components/websitecomp/DigikalaOfferSwiper';
 import { useContext, useEffect } from 'react';
+import SimpleBanner from '@/components/websitecomp/SimpleBanner';
+import Products2 from '@/components/websitecomp/Products2';
 
 function renderComponent(component) {
   if (!component) return null
@@ -48,6 +50,10 @@ function renderComponent(component) {
       return <DigikalaSwiper key={instanceId} {...props} />
      case 'digikalaOfferSwiper':
       return <DigikalaOfferSwiper key={instanceId} {...props} />
+     case 'simpleBanner':
+      return <SimpleBanner key={instanceId} {...props} />
+    case 'products2':
+      return <Products2 key={instanceId} {...props} /> 
       
     default:
       return null
