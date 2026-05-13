@@ -328,13 +328,6 @@ const DigikalaSwiper = ({
 
   return (
     <section className="w-full bg-white" dir="rtl">
-      <style jsx global>{`
-        .digikala-swiper .swiper-button-next,
-        .digikala-swiper .swiper-button-prev {
-          display: none;
-        }
-      `}</style>
-
       <div className="max-w-7xl mx-auto px-4 md:px-6 py-6 md:py-8">
         <div className="bg-white border border-gray-200 rounded-2xl overflow-hidden">
           {/* Header */}

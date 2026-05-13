@@ -1,10 +1,12 @@
 import "./globals.css";
-import Header from "@/components/header/Header";
+// import Header from "@/components/header/Header";
 import { AuthProvider } from "@/context/AuthContext";
 import { MerchantProvider } from "@/context/MerchantContext";
 import { CartProvider } from "@/context/CartContext";
 import { OrderProvider } from "@/context/OrderContext";
 import { ToastContainer } from "react-toastify";
+import Header from "@/components/header/Header";
+import Header1 from "@/components/websitecomp/Header1";
 
 export const metadata = {
   title: "Create Next App",
@@ -32,7 +34,7 @@ export default function RootLayout({ children }) {
             <CartProvider>
               <OrderProvider>
                 <div>
-                  <Header />
+                  <Header1 />
                   {children}
                 </div>
               </OrderProvider>

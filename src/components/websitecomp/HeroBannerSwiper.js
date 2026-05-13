@@ -64,28 +64,6 @@ const HeroBannerSwiper = ({
 
   return (
     <section className="w-full bg-white">
-      <style jsx global>{`
-        .hero-banner-swiper .swiper-pagination {
-          bottom: 18px;
-        }
-        .hero-banner-swiper .swiper-pagination-bullet {
-          width: 6px;
-          height: 6px;
-          opacity: 0.4;
-          background: #111827;
-          margin: 0 5px !important;
-        }
-        .hero-banner-swiper .swiper-pagination-bullet-active {
-          width: 18px;
-          border-radius: 9999px;
-          opacity: 0.9;
-        }
-        .hero-banner-swiper .swiper-button-next,
-        .hero-banner-swiper .swiper-button-prev {
-          display: none;
-        }
-      `}</style>
-
       <div className="relative w-full">
         <Swiper
           modules={[Autoplay, Pagination, Navigation]}

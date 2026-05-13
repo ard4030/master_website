@@ -1,3 +1,5 @@
+'use client'
+
 import { AuthContext } from '@/context/AuthContext'
 import Image from 'next/image'
 import React, { useContext, useState, useEffect } from 'react'

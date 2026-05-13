@@ -351,13 +351,6 @@ const DigikalaOfferSwiper = ({
 
   return (
     <section className="w-full bg-white" dir="rtl">
-      <style jsx global>{`
-        .digikala-offer-swiper .swiper-button-next,
-        .digikala-offer-swiper .swiper-button-prev {
-          display: none;
-        }
-      `}</style>
-
       <div className="max-w-7xl mx-auto px-4 md:px-6 py-6 md:py-8">
         <div className="rounded-2xl overflow-hidden bg-red-500">
           <div className="flex pl-1">
