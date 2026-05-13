@@ -16,6 +16,8 @@ import DigikalaOfferSwiper from '@/components/websitecomp/DigikalaOfferSwiper';
 import AboutUs from '@/components/websitecomp/AboutUs';
 import BannerTwo from '@/components/websitecomp/BannerTwo';
 import Footer2 from '@/components/websitecomp/Footer2';
+import SimpleBanner from '@/components/websitecomp/SimpleBanner';
+import Products2 from '@/components/websitecomp/Products2';
 
 
 function renderComponent(component) {
