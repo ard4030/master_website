@@ -1,12 +1,11 @@
 'use client';
-import React, { useState } from 'react'
+import React, { useState, useRef } from 'react'
 import { Swiper, SwiperSlide } from 'swiper/react';
-import { Navigation } from 'swiper/modules';
 import { usePathname } from 'next/navigation';
+import { HiChevronLeft, HiChevronRight } from 'react-icons/hi';
 
 // Import Swiper styles
 import 'swiper/css';
-import 'swiper/css/navigation';
 
 /**
  * کامپوننت محصولات لغزنده - استایل 3
@@ -26,6 +25,7 @@ const ProductsSwp3 = ({
   const pathName = usePathname()
   const [activeMainSlide, setActiveMainSlide] = useState(0)
   const [selectedProductIndex, setSelectedProductIndex] = useState(0)
+  const swiperRef = useRef(null)
 
   // تابع کمکی برای تبدیل URL تصویر
   const getImageUrl = (imagePath) => {
@@ -113,14 +113,14 @@ const ProductsSwp3 = ({
       <div className="max-w-7xl mx-auto">
         {/* Hero Section */}
         <div className="py-12 md:py-20 px-6 md:px-12">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-12 items-center mb-16">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-12 items-center mb-6">
             {/* Left Content */}
             <div className="flex flex-col justify-center space-y-6 text-right order-2 lg:order-1" dir="rtl">
               <div className="text-sm text-gray-600 tracking-wider">
                 {subtitle}
               </div>
               
-              <h1 className="text-5xl md:text-6xl font-bold text-black leading-tight">
+              <h1 className="text-3xl md:text-6xl font-bold text-black leading-tight">
                 {selectedProduct?.title || title}
               </h1>
               
@@ -128,7 +128,7 @@ const ProductsSwp3 = ({
                 {selectedProduct?.description || description}
               </p>
 
-              <div className="flex items-center gap-6 pt-4">
+              <div className="flex items-center gap-6">
                 <button className="px-6 py-2 rounded-full border-2 border-blue-600 bg-blue-600 text-white text-sm font-semibold hover:bg-blue-700 transition-colors flex items-center gap-2">
                   <span>فروشنده شو</span>
                   <span>←</span>
@@ -140,16 +140,6 @@ const ProductsSwp3 = ({
                 )}
               </div>
 
-              {/* Decorative dots */}
-              <div className="flex items-center gap-3 pt-4">
-                <span className="text-gray-300">•</span>
-                <span className="text-gray-300">•</span>
-                <span className="text-gray-300">•</span>
-                <span className="text-gray-300">•</span>
-                <span className="text-gray-300">•</span>
-                <span className="text-gray-300">•</span>
-                <span className="text-gray-300">•</span>
-              </div>
             </div>
 
             {/* Right Content - Hero Image */}
@@ -165,22 +155,40 @@ const ProductsSwp3 = ({
           </div>
 
           {/* Products Grid Below */}
-          <div className="mt-12 md:mt-20">
+          <div className="mt-4 md:mt-10">
             <div className="text-right mb-8 text-sm text-gray-600" dir="rtl">
-              دیدن چیزی هستید؟
+               محصولات دیگر:
             </div>
             
+            <div className="relative">
+              {/* دکمه قبلی */}
+              <button
+                onClick={() => swiperRef.current?.slidePrev()}
+                className="absolute right-[-5] top-1/2 -translate-y-1/2 z-10 -mr-3 flex items-center justify-center bg-gray-100 hover:bg-gray-300 text-black rounded-full shadow-md transition-all duration-200 hover:scale-105 w-6 h-6 md:w-8 md:h-8"
+                aria-label="قبلی"
+              >
+                <HiChevronRight className="w-3 h-3 md:w-4 md:h-4 text-black shrink-0" />
+              </button>
+
+              {/* دکمه بعدی */}
+              <button
+                onClick={() => swiperRef.current?.slideNext()}
+                className="absolute left-[-5] top-1/2 -translate-y-1/2 z-10 -ml-3 flex items-center justify-center bg-gray-100 hover:bg-gray-300 text-black rounded-full shadow-md transition-all duration-200 hover:scale-105 w-6 h-6 md:w-8 md:h-8"
+                aria-label="بعدی"
+              >
+                <HiChevronLeft className="w-3 h-3 md:w-4 md:h-4 text-black shrink-0" />
+              </button>
+
             <Swiper
-              modules={[Navigation]}
-              spaceBetween={24}
-              slidesPerView={1}
+              onSwiper={(swiper) => { swiperRef.current = swiper }}
+              spaceBetween={12}
+              slidesPerView={2.5}
               breakpoints={{
-                640: { slidesPerView: 2 },
+                640: { slidesPerView: 4 },
                 1024: { slidesPerView: 5 }
               }}
-              navigation
               loop={true}
-              className="w-full"
+              className="w-full px-1"
             >
               {products.map((product, index) => (
                 <SwiperSlide key={product.id || product._id}>
@@ -216,6 +224,7 @@ const ProductsSwp3 = ({
                 </SwiperSlide>
               ))}
             </Swiper>
+            </div>
           </div>
         </div>
       </div>

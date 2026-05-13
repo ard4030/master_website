@@ -1,5 +1,5 @@
 'use client'
-
+import { useContext, useEffect } from 'react';
 import { MerchantContext, MerchantProvider } from '@/context/MerchantContext'
 import Products1 from "@/components/websitecomp/Products1";
 import TopSection1 from "@/components/websitecomp/TopSection1";
@@ -14,7 +14,9 @@ import HeroBannerSwiper from '@/components/websitecomp/HeroBannerSwiper';
 import DigikalaSwiper from '@/components/websitecomp/DigikalaSwiper';
 import DigikalaOfferSwiper from '@/components/websitecomp/DigikalaOfferSwiper';
 import AboutUs from '@/components/websitecomp/AboutUs';
-import { useContext, useEffect } from 'react';
+import BannerTwo from '@/components/websitecomp/BannerTwo';
+import Footer2 from '@/components/websitecomp/Footer2';
+
 
 function renderComponent(component) {
   if (!component) return null
@@ -51,6 +53,10 @@ function renderComponent(component) {
       return <DigikalaOfferSwiper key={instanceId} {...props} />
      case 'aboutUs':
       return <AboutUs key={instanceId} {...props} />
+     case 'bannerTwo':
+      return <BannerTwo key={instanceId} {...props} />      
+     case 'footer2':
+      return <Footer2 key={instanceId} {...props} />    
     default:
       return null
   }
