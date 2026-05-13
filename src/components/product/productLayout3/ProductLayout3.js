@@ -41,13 +41,20 @@ const ProductLayout3 = ({ idPage, product }) => {
       </div>
 
       {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-4 py-8">
+      <div className="max-w-[85%] mx-auto px-4 py-8">
         {/* Product Section */}
         <div className="grid grid-cols-12 gap-8 mb-12">
           
+          {/* Right: Gallery - 65% (Mobile: top, Desktop: right) */}
+          <div className="col-span-12 lg:col-span-8 order-first lg:order-last">
+            <ProductImageGallery 
+              mainImage={productData.mainImage}
+              galleryImages={productData.galleryImages}
+            />
+          </div>
 
-          {/* Left: Product Details - 35% */}
-          <div className="col-span-12 lg:col-span-4 space-y-4">
+          {/* Left: Product Details - 35% (Mobile: bottom, Desktop: left) */}
+          <div className="col-span-12 lg:col-span-4 space-y-4 order-last lg:order-first">
             <ProductInfo product={productData} />
             <div className="flex gap-3 items-start">
               <div className="flex-1">
@@ -59,14 +66,6 @@ const ProductLayout3 = ({ idPage, product }) => {
                 />
               </div>
             </div>
-          </div>
-
-          {/* Right: Gallery - 65% */}
-          <div className="col-span-12 lg:col-span-8">
-            <ProductImageGallery 
-              mainImage={productData.mainImage}
-              galleryImages={productData.galleryImages}
-            />
           </div>
 
         </div>

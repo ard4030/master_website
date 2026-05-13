@@ -51,6 +51,10 @@ function renderComponent(component) {
       return <DigikalaSwiper key={instanceId} {...props} />
      case 'digikalaOfferSwiper':
       return <DigikalaOfferSwiper key={instanceId} {...props} />
+     case 'simpleBanner':
+      return <SimpleBanner key={instanceId} {...props} />
+    case 'products2':
+      return <Products2 key={instanceId} {...props} /> 
      case 'aboutUs':
       return <AboutUs key={instanceId} {...props} />
      case 'bannerTwo':
