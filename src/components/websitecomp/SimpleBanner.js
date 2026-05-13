@@ -1,13 +1,14 @@
 'use client'
 
 import Image from 'next/image'
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 
 /**
  * کامپوننت بنر ساده
  * @param {String} imageUrl - آدرس تصویر
  * @param {Number} width - عرض (درصد، مثال: 80)
- * @param {Number} height - ارتفاع (پیکسل، مثال: 200)
+ * @param {Number} height - ارتفاع دسکتاپ (پیکسل، مثال: 200)
+ * @param {Number} heightMobile - ارتفاع موبایل (پیکسل، مثال: 150)
  * @param {Number} radius - گرد‌کردن گوشه‌ها (پیکسل، مثال: 10)
  * @param {Number} marginTop - فاصله از بالا (پیکسل، مثال: 10)
  * @param {Number} marginBottom - فاصله از پایین (پیکسل، مثال: 20)
@@ -19,6 +20,7 @@ const SimpleBanner = ({
   imageUrl = 'Screenshot 2026-05-12 220759.png',
   width = '100',
   height = '200',
+  heightMobile = '150',
   radius = '10',
   marginTop = '0',
   marginBottom = '0',
@@ -26,7 +28,14 @@ const SimpleBanner = ({
   objectFit = 'cover',
   backgroundColor = 'transparent'
 }) => {
-  // تابع کمکی برای تبدیل URL تصویر
+  const [isMobile, setIsMobile] = useState(false)
+
+  useEffect(() => {
+    setIsMobile(window?.innerWidth < 768)
+    const handleResize = () => setIsMobile(window?.innerWidth < 768)
+    window?.addEventListener('resize', handleResize)
+    return () => window?.removeEventListener('resize', handleResize)
+  }, [])
   const getImageUrl = (imagePath) => {
     if (!imagePath) return ''
     if (imagePath.startsWith('http')) return imagePath
@@ -44,9 +53,13 @@ const SimpleBanner = ({
 
   // تبدیل مقادیر عددی به px
   const numHeight = typeof height === 'string' ? parseFloat(height) : height
+  const numHeightMobile = typeof heightMobile === 'string' ? parseFloat(heightMobile) : heightMobile
   const numRadius = typeof radius === 'string' ? parseFloat(radius) : radius
   const numMarginTop = typeof marginTop === 'string' ? parseFloat(marginTop) : marginTop
   const numMarginBottom = typeof marginBottom === 'string' ? parseFloat(marginBottom) : marginBottom
+
+  // استفاده از ارتفاع موبایلی یا دسکتاپی بر اساس screen size
+  const currentHeight = isMobile ? numHeightMobile : numHeight
 
   // تنظیمات محاذاه
   const containerStyles = {
@@ -60,7 +73,7 @@ const SimpleBanner = ({
   const bannerStyles = {
     position: 'relative',
     width: getWidthValue(width),
-    height: `${numHeight}px`,
+    height: `${currentHeight}px`,
     borderRadius: `${numRadius}px`,
     overflow: 'hidden'
   }
