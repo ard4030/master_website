@@ -1,7 +1,8 @@
-'use client'
-
+"use client"
 import { AuthContext } from '@/context/AuthContext'
 import Image from 'next/image'
+import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import React, { useContext, useState, useEffect } from 'react'
 
 const Header1 = ({ 
@@ -15,11 +16,16 @@ const Header1 = ({
   logoWidthMobile = '40',
   logoHeightMobile = '40',
   headerMinHeight = '64',
-  headerMinHeightMobile = '56'
+  headerMinHeightMobile = '56',
+  cartItemsCount = 0,
+  handleUserLogin,
+  handleLogout = false,
+  activeMerchant = false
 }) => {
   const [searchValue, setSearchValue] = useState('')
   const [isMobile, setIsMobile] = useState(false)
   const {user} = useContext(AuthContext)
+  const router = useRouter()
 
   useEffect(() => {
     setIsMobile(window?.innerWidth < 768)
@@ -83,7 +89,9 @@ const Header1 = ({
           {/* Right Actions - Desktop */}
           <div className="flex items-center justify-end w-[30%]">
             {/* Account Icon */}
-            <div className="cursor-pointer p-2 rounded-lg hover:bg-gray-100 transition-colors">
+            <div 
+            onClick={() => user?router.push("/dashboard/userprofile"):handleUserLogin()}
+            className="cursor-pointer p-2 rounded-lg hover:bg-gray-100 transition-colors">
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-gray-600 hover:text-gray-900 transition-colors">
                 <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
                 <circle cx="12" cy="7" r="4"></circle>
@@ -91,16 +99,16 @@ const Header1 = ({
             </div>
 
             {/* Cart */}
-            <div className="relative cursor-pointer p-2 rounded-lg hover:bg-gray-100 transition-colors">
+            <Link href={"/cart"} className="relative cursor-pointer p-2 rounded-lg hover:bg-gray-100 transition-colors">
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-gray-600 hover:text-gray-900 transition-colors">
                 <circle cx="9" cy="21" r="1"></circle>
                 <circle cx="20" cy="21" r="1"></circle>
                 <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
               </svg>
               <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold w-5 h-5 rounded-full flex items-center justify-center border-2 border-white">
-                3
+                {cartItemsCount}
               </span>
-            </div>
+            </Link>
           </div>
         </div>
 
@@ -123,7 +131,9 @@ const Header1 = ({
           {/* Mobile Right Actions */}
           <div className="flex items-center justify-end gap-3">
             {/* Account Icon */}
-            <div className="cursor-pointer p-2 rounded-lg hover:bg-gray-100 transition-colors">
+            <div 
+            onClick={() => user?router.push("/dashboard/userprofile"):handleUserLogin()}
+            className="cursor-pointer p-2 rounded-lg hover:bg-gray-100 transition-colors">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-gray-600 hover:text-gray-900 transition-colors">
                 <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
                 <circle cx="12" cy="7" r="4"></circle>
@@ -131,7 +141,7 @@ const Header1 = ({
             </div>
 
             {/* Mobile Cart */}
-            <div className="relative cursor-pointer p-2 rounded-lg hover:bg-gray-100 transition-colors">
+            <Link href={"/cart"} className="relative cursor-pointer p-2 rounded-lg hover:bg-gray-100 transition-colors">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-gray-600 hover:text-gray-900 transition-colors">
                 <circle cx="9" cy="21" r="1"></circle>
                 <circle cx="20" cy="21" r="1"></circle>
@@ -140,7 +150,7 @@ const Header1 = ({
               <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold w-4 h-4 rounded-full flex items-center justify-center border-2 border-white text-xs">
                 3
               </span>
-            </div>
+            </Link>
           </div>
         </div>
 

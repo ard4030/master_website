@@ -66,7 +66,7 @@ const Header = () => {
     {
       !pathName.startsWith('/dashboard')  &&
       !pathName.startsWith('/sitebuilder') && 
-      !pathName.startsWith('/newsitebuilder') && 
+      !pathName.startsWith('/newsitebuilder') && (
       loading?
       <header className="sticky top-0 z-100 bg-white border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
@@ -83,6 +83,7 @@ const Header = () => {
       :
       activeMerchant &&
       findHeader()
+      )
       // <header className="sticky top-0 z-100 bg-white border-b border-gray-200 dana">
       //   <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
       //     {/* سمت راست - لوگو */}
