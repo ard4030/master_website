@@ -131,7 +131,9 @@ const Header1 = ({
           {/* Mobile Right Actions */}
           <div className="flex items-center justify-end gap-3">
             {/* Account Icon */}
-            <div className="cursor-pointer p-2 rounded-lg hover:bg-gray-100 transition-colors">
+            <div 
+            onClick={() => user?router.push("/dashboard/userprofile"):handleUserLogin()}
+            className="cursor-pointer p-2 rounded-lg hover:bg-gray-100 transition-colors">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-gray-600 hover:text-gray-900 transition-colors">
                 <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
                 <circle cx="12" cy="7" r="4"></circle>
@@ -139,7 +141,7 @@ const Header1 = ({
             </div>
 
             {/* Mobile Cart */}
-            <div className="relative cursor-pointer p-2 rounded-lg hover:bg-gray-100 transition-colors">
+            <Link href={"/cart"} className="relative cursor-pointer p-2 rounded-lg hover:bg-gray-100 transition-colors">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-gray-600 hover:text-gray-900 transition-colors">
                 <circle cx="9" cy="21" r="1"></circle>
                 <circle cx="20" cy="21" r="1"></circle>
@@ -148,7 +150,7 @@ const Header1 = ({
               <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold w-4 h-4 rounded-full flex items-center justify-center border-2 border-white text-xs">
                 3
               </span>
-            </div>
+            </Link>
           </div>
         </div>
 
