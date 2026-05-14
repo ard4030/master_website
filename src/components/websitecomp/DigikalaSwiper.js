@@ -4,7 +4,7 @@ import React, { useEffect, useMemo, useRef, useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { Swiper, SwiperSlide } from 'swiper/react'
-import { Navigation } from 'swiper/modules'
+import { Navigation, Autoplay } from 'swiper/modules'
 
 import 'swiper/css'
 import 'swiper/css/navigation'
@@ -14,8 +14,14 @@ const DigikalaSwiper = ({
   dataSourceType = 'manual',
   title = 'برترین های کاسیو',
   viewAllText = 'مشاهده همه',
-  viewAllLink = '#'
+  viewAllLink = '#',
+  bgColor = '#ffffff',
+  largeTextColor = '#111827',
+  smallTextColor = '#111827',
+  autoplayDelay = '5',
+  enableAutoplay = 'true'
 }) => {
+  const autoplayDelayMs = (parseInt(autoplayDelay) || 5) * 1000
   const pathName = usePathname()
   const [mounted, setMounted] = useState(false)
   const prevRef = useRef(null)
@@ -34,7 +40,7 @@ const DigikalaSwiper = ({
         id: 1,
         name: 'ساعت مچی دیجیتال کاسیو مدل A700WEVG-9ADF',
         image:
-          'https://images.unsplash.com/photo-1522312346375-d1a52e2b99b3?w=700&h=700&fit=crop',
+          '8a30c904ea07e074b57dd361030872c8465731a9_1653250408.webp',
         price: 12497000,
         oldPrice: 15240000,
         discountPercent: 18,
@@ -47,7 +53,7 @@ const DigikalaSwiper = ({
         id: 2,
         name: 'ساعت مچی دیجیتال مردانه کاسیو مدل G-B001MVB-8DR',
         image:
-          'https://images.unsplash.com/photo-1524592094714-0f0654e20314?w=700&h=700&fit=crop',
+          '77c6fef632053dfb55688d83f45c5c30fcff5ec0_1716454946.webp',
         price: 38984000,
         oldPrice: 48990000,
         discountPercent: 20,
@@ -60,7 +66,7 @@ const DigikalaSwiper = ({
         id: 3,
         name: 'ساعت مچی عقربه‌ای مردانه کاسیو مدل EQB-2000DB-1ADR',
         image:
-          'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=700&h=700&fit=crop',
+          'ae59fab854669a4975c4a390f37899489c2c99c7_1722847338.webp',
         price: 87996000,
         oldPrice: 109995000,
         discountPercent: 20,
@@ -73,7 +79,7 @@ const DigikalaSwiper = ({
         id: 4,
         name: 'ساعت مچی دیجیتال مردانه کاسیو مدل GPR-H1000-9DR',
         image:
-          'https://images.unsplash.com/photo-1542496658-e33a6d0d50f6?w=700&h=700&fit=crop',
+          'b2d0a98d0c0a42c9af5645136fe0cfc0b47263d9_1731491794.webp',
         price: 110624000,
         oldPrice: 138280000,
         discountPercent: 20,
@@ -86,7 +92,7 @@ const DigikalaSwiper = ({
         id: 5,
         name: 'ساعت مچی عقربه‌ای مردانه کاسیو مدل GST-B100D-1A',
         image:
-          'https://images.unsplash.com/photo-1509042239860-f550ce710b93?w=700&h=700&fit=crop',
+          '6d019e9e2a70a740853bc4159c687f587ff85342_1758982163.webp',
         price: 79200000,
         oldPrice: 99000000,
         discountPercent: 20,
@@ -99,7 +105,7 @@ const DigikalaSwiper = ({
         id: 6,
         name: 'ساعت مچی دیجیتال مردانه کاسیو مدل GBD-H2000-1ADR',
         image:
-          'https://images.unsplash.com/photo-1518548419970-58e3b4079ab2?w=700&h=700&fit=crop',
+          '6d019e9e2a70a740853bc4159c687f587ff85342_1758982163.webp',
         price: 87912000,
         oldPrice: 109890000,
         discountPercent: 20,
@@ -112,7 +118,7 @@ const DigikalaSwiper = ({
         id: 7,
         name: 'ساعت مچی دیجیتال کاسیو مدل A168WG-9WDF',
         image:
-          'https://images.unsplash.com/photo-1524805444758-089113d48a6d?w=700&h=700&fit=crop',
+          '6d019e9e2a70a740853bc4159c687f587ff85342_1758982163.webp',
         price: 15450000,
         oldPrice: 19312500,
         discountPercent: 20,
@@ -327,13 +333,20 @@ const DigikalaSwiper = ({
   }
 
   return (
-    <section className="w-full bg-white" dir="rtl">
+    <section className="w-full" dir="rtl" style={{backgroundColor: bgColor}}>
+      <style>{`
+        .digikala-swiper .swiper-button-next,
+        .digikala-swiper .swiper-button-prev {
+          display: none;
+        }
+      `}</style>
+
       <div className="max-w-7xl mx-auto px-4 md:px-6 py-6 md:py-8">
         <div className="bg-white border border-gray-200 rounded-2xl overflow-hidden">
           {/* Header */}
           <div className="flex items-center justify-between px-4 md:px-6 py-4 border-b border-gray-100">
             <div className="flex items-center gap-3">
-              <h2 className="text-base md:text-lg danaBold text-gray-900">{title}</h2>
+              <h2 className="text-base md:text-lg danaBold" style={{color: largeTextColor}}>{title}</h2>
               <span className="w-10 h-0.5 bg-red-500" />
             </div>
             {renderLink(
@@ -356,7 +369,7 @@ const DigikalaSwiper = ({
               </div>
             ) : (
               <Swiper
-                modules={[Navigation]}
+                modules={[Navigation, Autoplay]}
                 spaceBetween={0}
                 slidesPerView={2}
                 breakpoints={{
@@ -366,6 +379,7 @@ const DigikalaSwiper = ({
                   1280: { slidesPerView: 5 }
                 }}
                 loop={products.length > 7}
+                autoplay={enableAutoplay === 'true' ? { delay: autoplayDelayMs, disableOnInteraction: false } : false}
                 navigation={{ prevEl: prevRef.current, nextEl: nextRef.current }}
                 onSwiper={(swiper) => {
                   swiperRef.current = swiper

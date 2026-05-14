@@ -4,11 +4,170 @@ import React, { useEffect, useMemo, useRef, useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { Swiper, SwiperSlide } from 'swiper/react'
-import { Navigation } from 'swiper/modules'
+import { Navigation, Autoplay } from 'swiper/modules'
 
 import 'swiper/css'
 import 'swiper/css/navigation'
 
+// ─── Utility functions (module-level to prevent re-creation on every render) ──
+
+const getImageUrl = (imagePath) => {
+  if (!imagePath) return ''
+  if (String(imagePath).startsWith('http')) return imagePath
+  return `${process.env.NEXT_PUBLIC_LIARA_IMAGE_URL}${imagePath}`
+}
+
+const normalizeDigitsToEn = (raw) => {
+  if (raw === null || raw === undefined) return ''
+  return String(raw)
+    .replace(/[۰-۹]/g, (d) => String('۰۱۲۳۴۵۶۷۸۹'.indexOf(d)))
+    .replace(/[٠-٩]/g, (d) => String('٠١٢٣٤٥٦٧٨٩'.indexOf(d)))
+}
+
+const parseTimerToSeconds = (raw) => {
+  const text = String(raw || '').trim()
+  if (!text) return 0
+
+  const cleaned = normalizeDigitsToEn(text)
+    .replaceAll('：', ':')
+    .replaceAll('٫', ':')
+    .replaceAll('،', ':')
+
+  const parts = cleaned
+    .split(':')
+    .map((p) => p.trim())
+    .filter(Boolean)
+    .slice(-3)
+
+  const nums = parts.map((p) => {
+    const n = Number(p)
+    return Number.isFinite(n) ? Math.max(0, Math.floor(n)) : 0
+  })
+
+  let h = 0
+  let m = 0
+  let s = 0
+
+  if (nums.length === 3) {
+    ;[h, m, s] = nums
+  } else if (nums.length === 2) {
+    ;[m, s] = nums
+  } else if (nums.length === 1) {
+    ;[s] = nums
+  }
+
+  return h * 3600 + m * 60 + s
+}
+
+const parseNumberish = (value) => {
+  if (value === null || value === undefined) return null
+  if (typeof value === 'number') return Number.isFinite(value) ? value : null
+  const cleaned = normalizeDigitsToEn(value)
+    .replace(/[,٬\s]/g, '')
+    .trim()
+  if (!cleaned) return null
+  const num = Number(cleaned)
+  return Number.isFinite(num) ? num : null
+}
+
+const addCommas = (numStr) => numStr.replace(/\B(?=(\d{3})+(?!\d))/g, ',')
+const toPersianDigits = (raw) => String(raw).replace(/\d/g, (d) => '۰۱۲۳۴۵۶۷۸۹'[Number(d)])
+
+const formatNumberFa = (value) => {
+  const num = parseNumberish(value)
+  if (num === null) return value === null || value === undefined ? '' : String(value)
+
+  const sign = num < 0 ? '-' : ''
+  const abs = Math.abs(num)
+  const fixed = Number.isInteger(abs) ? String(Math.trunc(abs)) : abs.toFixed(1)
+  const [intPart, decPart] = fixed.split('.')
+  const withCommas = addCommas(intPart)
+  const joined = decPart ? `${withCommas}.${decPart}` : withCommas
+  return toPersianDigits(`${sign}${joined}`)
+}
+
+const renderLink = (href, className, children, ariaLabel) => {
+  if (!href) return <span className={className}>{children}</span>
+  if (String(href).startsWith('/')) {
+    return (
+      <Link href={href} className={className} aria-label={ariaLabel}>
+        {children}
+      </Link>
+    )
+  }
+  return (
+    <a href={href} className={className} aria-label={ariaLabel}>
+      {children}
+    </a>
+  )
+}
+
+const getProductHref = (product) => {
+  return (
+    product?.href ||
+    product?.link ||
+    ((product?._id || product?.id) ? `/product/${product._id || product.id}` : '#')
+  )
+}
+
+// ─── ProductCard (module-level — must NOT be inside the component to avoid
+//     remount on every parent re-render, which breaks Swiper slide content) ────
+const ProductCard = ({ product }) => {
+  const href = getProductHref(product)
+  const productName = product?.name || product?.title || 'محصول'
+  const image = product?.mainImage || product?.image || product?.imageUrl || product?.thumbnail
+  const price = product?.price
+  const oldPrice = product?.oldPrice
+  const discountPercent = product?.discountPercent
+
+  return renderLink(
+    href,
+    'block h-full',
+    <div className="h-full bg-white px-4 py-4 border-l-2 border-red-500">
+      <div className="flex items-center justify-center h-32 md:h-36 mb-3">
+        {image ? (
+          <img
+            src={getImageUrl(image)}
+            alt={String(productName)}
+            className="max-h-full w-auto object-contain"
+            draggable={false}
+          />
+        ) : (
+          <div className="w-full h-full bg-gray-100 rounded" />
+        )}
+      </div>
+
+      <h3 className="text-sm danaMed text-gray-800 leading-6 line-clamp-2 min-h-12">
+        {productName}
+      </h3>
+
+      <div className="mt-3 flex items-end justify-between">
+        <div className="flex flex-col items-end">
+          <div className="flex items-center gap-2">
+            <span className="text-base danaBold text-gray-900">
+              {price ? formatNumberFa(price) : '۰'}
+            </span>
+            <span className="text-xs text-gray-500 danaMed">تومان</span>
+          </div>
+          {oldPrice ? (
+            <span className="text-xs text-gray-400 line-through danaMed">
+              {formatNumberFa(oldPrice)}
+            </span>
+          ) : null}
+        </div>
+
+        {discountPercent ? (
+          <span className="shrink-0 bg-red-500 text-white danaBold text-xs rounded-full px-2 py-1">
+            {formatNumberFa(discountPercent)}%
+          </span>
+        ) : null}
+      </div>
+    </div>,
+    String(productName)
+  )
+}
+
+// ─── Main component ───────────────────────────────────────────────────────────
 const DigikalaOfferSwiper = ({
   data = null,
   dataSourceType = 'manual',
@@ -16,7 +175,15 @@ const DigikalaOfferSwiper = ({
   timerText = '۰۵ : ۰۸ : ۴۱',
   countdownSeconds = null,
   viewAllText = 'مشاهده همه',
-  viewAllLink = '#'
+  viewAllLink = '#',
+  bgColor = '#ffffff',
+  largeTextColor = '#111827',
+  smallTextColor = '#111827',
+  panelBgType = 'gradient',
+  panelBgColor = '#df324e',
+  panelBgColorEnd = '#c01b57',
+  autoplayDelay = '5',
+  enableAutoplay = 'true'
 }) => {
   const pathName = usePathname()
   const [mounted, setMounted] = useState(false)
@@ -25,19 +192,13 @@ const DigikalaOfferSwiper = ({
   const nextRef = useRef(null)
   const swiperRef = useRef(null)
 
-  const getImageUrl = (imagePath) => {
-    if (!imagePath) return ''
-    if (String(imagePath).startsWith('http')) return imagePath
-    return `${process.env.NEXT_PUBLIC_LIARA_IMAGE_URL}${imagePath}`
-  }
-
   const sampleProducts = useMemo(
     () => [
       {
         id: 1,
         name: 'لپ تاپ 15.6 اینچی لنوو مدل IdeaPad Slim 3',
         image:
-          'https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=900&h=900&fit=crop',
+          'sdfsdfsdf.png',
         price: 52699000,
         oldPrice: 98199000,
         discountPercent: 32
@@ -121,168 +282,6 @@ const DigikalaOfferSwiper = ({
     products = data
   }
 
-  useEffect(() => {
-    const swiper = swiperRef.current
-    if (!swiper || !prevRef.current || !nextRef.current) return
-
-    swiper.params.navigation.prevEl = prevRef.current
-    swiper.params.navigation.nextEl = nextRef.current
-
-    if (swiper.navigation) {
-      swiper.navigation.destroy()
-      swiper.navigation.init()
-      swiper.navigation.update()
-    }
-  }, [products.length, mounted])
-
-  const normalizeDigitsToEn = (raw) => {
-    if (raw === null || raw === undefined) return ''
-    return String(raw)
-      .replace(/[۰-۹]/g, (d) => String('۰۱۲۳۴۵۶۷۸۹'.indexOf(d)))
-      .replace(/[٠-٩]/g, (d) => String('٠١٢٣٤٥٦٧٨٩'.indexOf(d)))
-  }
-
-  const parseTimerToSeconds = (raw) => {
-    const text = String(raw || '').trim()
-    if (!text) return 0
-
-    const cleaned = normalizeDigitsToEn(text)
-      .replaceAll('：', ':')
-      .replaceAll('٫', ':')
-      .replaceAll('،', ':')
-
-    const parts = cleaned
-      .split(':')
-      .map((p) => p.trim())
-      .filter(Boolean)
-      .slice(-3)
-
-    const nums = parts.map((p) => {
-      const n = Number(p)
-      return Number.isFinite(n) ? Math.max(0, Math.floor(n)) : 0
-    })
-
-    let h = 0
-    let m = 0
-    let s = 0
-
-    if (nums.length === 3) {
-      ;[h, m, s] = nums
-    } else if (nums.length === 2) {
-      ;[m, s] = nums
-    } else if (nums.length === 1) {
-      ;[s] = nums
-    }
-
-    return h * 3600 + m * 60 + s
-  }
-
-  const parseNumberish = (value) => {
-    if (value === null || value === undefined) return null
-    if (typeof value === 'number') return Number.isFinite(value) ? value : null
-    const cleaned = normalizeDigitsToEn(value)
-      .replace(/[,٬\s]/g, '')
-      .trim()
-    if (!cleaned) return null
-    const num = Number(cleaned)
-    return Number.isFinite(num) ? num : null
-  }
-
-  const addCommas = (numStr) => numStr.replace(/\B(?=(\d{3})+(?!\d))/g, ',')
-  const toPersianDigits = (raw) => String(raw).replace(/\d/g, (d) => '۰۱۲۳۴۵۶۷۸۹'[Number(d)])
-
-  const formatNumberFa = (value) => {
-    const num = parseNumberish(value)
-    if (num === null) return value === null || value === undefined ? '' : String(value)
-
-    const sign = num < 0 ? '-' : ''
-    const abs = Math.abs(num)
-    const fixed = Number.isInteger(abs) ? String(Math.trunc(abs)) : abs.toFixed(1)
-    const [intPart, decPart] = fixed.split('.')
-    const withCommas = addCommas(intPart)
-    const joined = decPart ? `${withCommas}.${decPart}` : withCommas
-    return toPersianDigits(`${sign}${joined}`)
-  }
-
-  const renderLink = (href, className, children, ariaLabel) => {
-    if (!href) return <span className={className}>{children}</span>
-    if (String(href).startsWith('/')) {
-      return (
-        <Link href={href} className={className} aria-label={ariaLabel}>
-          {children}
-        </Link>
-      )
-    }
-    return (
-      <a href={href} className={className} aria-label={ariaLabel}>
-        {children}
-      </a>
-    )
-  }
-
-  const getProductHref = (product) => {
-    return (
-      product?.href ||
-      product?.link ||
-      ((product?._id || product?.id) ? `/product/${product._id || product.id}` : '#')
-    )
-  }
-
-  const ProductCard = ({ product, index }) => {
-    const href = getProductHref(product)
-    const productName = product?.name || product?.title || 'محصول'
-    const image = product?.mainImage || product?.image
-    const price = product?.price
-    const oldPrice = product?.oldPrice
-    const discountPercent = product?.discountPercent
-
-    return renderLink(
-      href,
-      'block h-full',
-      <div className="h-full bg-white px-4 py-4 border-l-2 border-red-500">
-        <div className="flex items-center justify-center h-32 md:h-36 mb-3">
-          {image ? (
-            <img
-              src={getImageUrl(image)}
-              alt={String(productName)}
-              className="max-h-full w-auto object-contain"
-              draggable={false}
-            />
-          ) : (
-            <div className="w-full h-full bg-gray-100 rounded" />
-          )}
-        </div>
-
-        <h3 className="text-sm danaMed text-gray-800 leading-6 line-clamp-2 min-h-12">
-          {productName}
-        </h3>
-
-        <div className="mt-3 flex items-end justify-between">
-          <div className="flex flex-col items-end">
-            <div className="flex items-center gap-2">
-              <span className="text-base danaBold text-gray-900">
-                {price ? formatNumberFa(price) : '۰'}
-              </span>
-              <span className="text-xs text-gray-500 danaMed">تومان</span>
-            </div>
-            {oldPrice ? (
-              <span className="text-xs text-gray-400 line-through danaMed">
-                {formatNumberFa(oldPrice)}
-              </span>
-            ) : null}
-          </div>
-
-          {discountPercent ? (
-            <span className="shrink-0 bg-red-500 text-white danaBold text-xs rounded-full px-2 py-1">
-              {formatNumberFa(discountPercent)}%
-            </span>
-          ) : null}
-        </div>
-      </div>,
-      String(productName)
-    )
-  }
-
   const startSeconds = useMemo(() => {
     if (countdownSeconds !== null && countdownSeconds !== undefined && String(countdownSeconds).trim() !== '') {
       const n = parseNumberish(countdownSeconds)
@@ -349,10 +348,23 @@ const DigikalaOfferSwiper = ({
     )
   }
 
+  const autoplayDelayNum = enableAutoplay === 'true' ? (parseInt(autoplayDelay) || 0) * 1000 : 0
+
+  const panelStyle = panelBgType === 'gradient'
+    ? { background: `linear-gradient(135deg, ${panelBgColor}, ${panelBgColorEnd})` }
+    : { backgroundColor: panelBgColor }
+
   return (
-    <section className="w-full bg-white" dir="rtl">
+    <section className="w-full" dir="rtl" style={{backgroundColor: bgColor}}>
+      <style>{`
+        .digikala-offer-swiper .swiper-button-next,
+        .digikala-offer-swiper .swiper-button-prev {
+          display: none;
+        }
+      `}</style>
+
       <div className="max-w-7xl mx-auto px-4 md:px-6 py-6 md:py-8">
-        <div className="rounded-2xl overflow-hidden bg-red-500">
+        <div className="rounded-2xl overflow-hidden" style={panelStyle}>
           <div className="flex pl-1">
             {/* Right panel */}
             <div className="w-40 sm:w-44 md:w-52 shrink-0 text-white flex flex-col items-center justify-between py-6 px-3">
@@ -363,12 +375,12 @@ const DigikalaOfferSwiper = ({
               </div>
 
               <div className="flex items-center gap-2" dir="ltr">
-                {renderTimerBox(timerParts[0], 'h')}
-                {renderTimerBox(timerParts[1], 'm')}
+                {renderTimerBox(timerParts[0], 'h')}:
+                {renderTimerBox(timerParts[1], 'm')}:
                 {renderTimerBox(timerParts[2], 's')}
               </div>
 
-              <div className="flex flex-col items-center gap-4">
+              <div className="flex flex-col items-center gap-4 mt-2">
                 <div className="flex items-center justify-center w-20 h-20 rounded-2xl bg-white/10">
                   <svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path d="M22 16C24.7614 16 27 18.2386 27 21C27 23.7614 24.7614 26 22 26C19.2386 26 17 23.7614 17 21C17 18.2386 19.2386 16 22 16Z" fill="white" opacity="0.9" />
@@ -390,8 +402,8 @@ const DigikalaOfferSwiper = ({
             </div>
 
             {/* Products */}
-            <div className="flex-1 relative py-4 pr-4">
-              <div className="bg-white rounded-xl overflow-hidden">
+            <div className="flex-1 min-w-0 relative py-4 pr-4">
+              <div className="bg-white rounded-xl overflow-hidden relative">
                 {!mounted ? (
                   <div className="flex overflow-hidden">
                     {products.slice(0, 4).map((p, idx) => (
@@ -402,7 +414,9 @@ const DigikalaOfferSwiper = ({
                   </div>
                 ) : (
                   <Swiper
-                    modules={[Navigation]}
+                    key={`offer-swiper-${products.length}`}
+                    dir="rtl"
+                    modules={[Navigation, Autoplay]}
                     spaceBetween={0}
                     slidesPerView={2}
                     breakpoints={{
@@ -411,15 +425,18 @@ const DigikalaOfferSwiper = ({
                       1024: { slidesPerView: 4 },
                       1280: { slidesPerView: 4 }
                     }}
-                    loop={products.length > 6}
-                    navigation={{ prevEl: null, nextEl: null }}
+                    loop={autoplayDelayNum > 0 && products.length >= 8}
+                    autoplay={autoplayDelayNum > 0 ? { delay: autoplayDelayNum, disableOnInteraction: false } : false}
+                    observer
+                    observeParents
+                    observeSlideChildren
                     onSwiper={(swiper) => {
                       swiperRef.current = swiper
                     }}
-                    className="digikala-offer-swiper"
+                    className="digikala-offer-swiper overflow-hidden!"
                   >
                     {products.map((p, idx) => (
-                      <SwiperSlide key={p?._id || p?.id || idx}>
+                      <SwiperSlide key={p?._id || p?.id || idx} className="h-auto!">
                         <ProductCard product={p} index={idx} />
                       </SwiperSlide>
                     ))}
@@ -430,10 +447,11 @@ const DigikalaOfferSwiper = ({
                   ref={prevRef}
                   type="button"
                   aria-label="قبلی"
-                  className="absolute left-2 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white shadow border border-gray-200 hidden md:flex items-center justify-center"
+                  className="absolute left-2 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white shadow border border-gray-200 hidden md:flex items-center justify-center z-10"
                   onClick={(e) => {
                     e.preventDefault()
                     e.stopPropagation()
+                    swiperRef.current?.slideNext()
                   }}
                 >
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -445,10 +463,11 @@ const DigikalaOfferSwiper = ({
                   ref={nextRef}
                   type="button"
                   aria-label="بعدی"
-                  className="absolute right-2 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white shadow border border-gray-200 hidden md:flex items-center justify-center"
+                  className="absolute right-2 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white shadow border border-gray-200 hidden md:flex items-center justify-center z-10"
                   onClick={(e) => {
                     e.preventDefault()
                     e.stopPropagation()
+                    swiperRef.current?.slidePrev()
                   }}
                 >
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">

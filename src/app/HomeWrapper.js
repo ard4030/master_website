@@ -16,51 +16,62 @@ import DigikalaOfferSwiper from '@/components/websitecomp/DigikalaOfferSwiper';
 import AboutUs from '@/components/websitecomp/AboutUs';
 import BannerTwo from '@/components/websitecomp/BannerTwo';
 import Footer2 from '@/components/websitecomp/Footer2';
+import SimpleBanner from '@/components/websitecomp/SimpleBanner';
+import Products2 from '@/components/websitecomp/Products2';
 
 
-function renderComponent(component) {
+function renderComponent(component, themeFont, themeColor) {
   if (!component) return null
 
   const { id, componentId, styles, instanceId, props } = component;
+
+  // اگر کامپوننت useThemeBg=true داشت و themeColor موجود بود،
+  // bgColor را با themeColor جایگزین کن. در غیر این صورت bgColor خودش حفظ می‌شود.
+  const shouldUseThemeBg = props?.useThemeBg === true || props?.useThemeBg === 'true'
+  const mergedProps = (themeColor && shouldUseThemeBg)
+    ? { ...props, bgColor: themeColor }
+    : props
+
+  const extraProps = { 'data-theme-font': themeFont }
   // console.log('>>>>>>>>>>',id);
   
 
   // کامپوننت‌های جدید (site builder)
   switch (id) {
     case 'products1':
-      return <Products1 key={instanceId} {...props} />
+      return <Products1 key={instanceId} {...mergedProps} {...extraProps} />
     case 'topsection1':
-      return <TopSection1 key={instanceId} {...props} />
+      return <TopSection1 key={instanceId} {...mergedProps} {...extraProps} />
      case 'productSwp2':
-      return <ProductSwp2 key={instanceId} {...props} />
+      return <ProductSwp2 key={instanceId} {...mergedProps} {...extraProps} />
      case 'productsSwp3':
-      return <ProductsSwp3 key={instanceId} {...props} />
+      return <ProductsSwp3 key={instanceId} {...mergedProps} {...extraProps} />
      case 'aboutMe':
-      return <AboutMe key={instanceId} {...props} />
+      return <AboutMe key={instanceId} {...mergedProps} {...extraProps} />
      case 'footer1':
-      return <Footer1 key={instanceId} {...props} />
+      return <Footer1 key={instanceId} {...mergedProps} {...extraProps} />
      case 'featuresSection':
-      return <FeaturesSection key={instanceId} {...props} />
+      return <FeaturesSection key={instanceId} {...mergedProps} {...extraProps} />
      case 'splitShowcase':
-      return <SplitShowcase key={instanceId} {...props} />
+      return <SplitShowcase key={instanceId} {...mergedProps} {...extraProps} />
      case 'categoriesSwiper':
-      return <CategoriesSwiper key={instanceId} {...props} />
+      return <CategoriesSwiper key={instanceId} {...mergedProps} {...extraProps} />
      case 'heroBannerSwiper':
-      return <HeroBannerSwiper key={instanceId} {...props} />
+      return <HeroBannerSwiper key={instanceId} {...mergedProps} {...extraProps} />
      case 'digikalaSwiper':
-      return <DigikalaSwiper key={instanceId} {...props} />
+      return <DigikalaSwiper key={instanceId} {...mergedProps} {...extraProps} />
      case 'digikalaOfferSwiper':
-      return <DigikalaOfferSwiper key={instanceId} {...props} />
+      return <DigikalaOfferSwiper key={instanceId} {...mergedProps} {...extraProps} />
      case 'simpleBanner':
-      return <SimpleBanner key={instanceId} {...props} />
+      return <SimpleBanner key={instanceId} {...mergedProps} {...extraProps} />
     case 'products2':
-      return <Products2 key={instanceId} {...props} /> 
+      return <Products2 key={instanceId} {...mergedProps} {...extraProps} /> 
      case 'aboutUs':
-      return <AboutUs key={instanceId} {...props} />
+      return <AboutUs key={instanceId} {...mergedProps} {...extraProps} />
      case 'bannerTwo':
-      return <BannerTwo key={instanceId} {...props} />      
+      return <BannerTwo key={instanceId} {...mergedProps} {...extraProps} />      
      case 'footer2':
-      return <Footer2 key={instanceId} {...props} />    
+      return <Footer2 key={instanceId} {...mergedProps} {...extraProps} />    
     default:
       return null
   }
@@ -69,6 +80,8 @@ function renderComponent(component) {
 export default function HomeWrapper({ homepageData }) {
   const activeTheme = homepageData?.data?.activeTheme
   const newTheme = homepageData?.data?.theme
+  const themeFont = activeTheme?.font || 'dana';
+  const themeColor = activeTheme?.colorTheme || false;
 
   const {setActiveMerchant,setLoading} = useContext(MerchantContext);
 
@@ -81,15 +94,17 @@ export default function HomeWrapper({ homepageData }) {
 
   // استفاده از تم جدید (اگر موجود باشد) یا تم قدیمی
   const componentsToRender = newTheme?.components || activeTheme?.components || []
-
+  
+  console.log(',,,,,,',componentsToRender,homepageData.data);
+  
   return (
     
-      <div className="w-full min-h-screen bg-white">
+      <div className="w-full min-h-screen bg-white" data-theme-font={themeFont}>
         {/* Render components from theme */}
         {componentsToRender && Array.isArray(componentsToRender) && componentsToRender.length > 0 ? (
-          <div>
+          <div data-theme-font={themeFont}>
             {componentsToRender.map((component, index) => (
-              renderComponent(component)
+              renderComponent(component, themeFont, themeColor)
             ))}
           </div>
         ) : (
