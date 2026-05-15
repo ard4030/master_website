@@ -20,7 +20,7 @@ const Header = () => {
   const pathName = usePathname()
   const { activeMerchant,loading } = useContext(MerchantContext)
 
-  console.log("hommm ",activeMerchant)
+  // console.log("hommm ",activeMerchant)
 
   // محاسبه تعداد کل آیتم ها در سبد
   const cartItemsCount = cart?.items?.reduce((total, item) => total + (item.quantity || 1), 0) || 0

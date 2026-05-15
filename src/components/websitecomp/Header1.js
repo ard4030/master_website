@@ -40,6 +40,8 @@ const Header1 = ({
     return isNaN(parsed) ? defaultValue : parsed
   }
 
+  const merchantLogo = activeMerchant?.merchant?.storeImage || activeMerchant?.storeImage
+
   return (
     <div style={{ display: 'flex', justifyContent: alignment === 'center' ? 'center' : alignment === 'flex-end' ? 'flex-end' : 'flex-start' }}>
       <header 
@@ -57,7 +59,7 @@ const Header1 = ({
             {/* Logo Container */}
             <div className="relative" style={{ width: `${safeParseInt(logoWidth, 50)}px`, height: `${safeParseInt(logoHeight, 50)}px` }}>
               <Image 
-                src={process.env.NEXT_PUBLIC_LIARA_IMAGE_URL + user?.storeImage} 
+                src={process.env.NEXT_PUBLIC_LIARA_IMAGE_URL + merchantLogo} 
                 alt="Store Logo" 
                 width={safeParseInt(logoWidth, 50)} 
                 height={safeParseInt(logoHeight, 50)}
