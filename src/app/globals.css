@@ -42,6 +42,108 @@
   src: url(../../public/assets/fonts/dana/ttf/dana\ demibold.ttf);
 }
 
+/*new fonts*/
+
+/* Vazir Font Faces */
+@font-face {
+  font-family: 'vazir-regular';
+  src: url(../../public/assets/fonts/vazir/Vazir-FD-WOL.eot);
+  src: url(../../public/assets/fonts/vazir/Vazir-FD-WOL.woff);
+  src: url(../../public/assets/fonts/vazir/Vazir-FD-WOL.woff2);
+  src: url(../../public/assets/fonts/vazir/Vazir-FD-WOL.ttf);
+}
+
+@font-face {
+  font-family: 'vazir-bold';
+  src: url(../../public/assets/fonts/vazir/Vazir-Bold-FD-WOL.eot);
+  src: url(../../public/assets/fonts/vazir/Vazir-Bold-FD-WOL.woff);
+  src: url(../../public/assets/fonts/vazir/Vazir-Bold-FD-WOL.woff2);
+  src: url(../../public/assets/fonts/vazir/Vazir-Bold-FD-WOL.ttf);
+}
+
+@font-face {
+  font-family: 'vazir-medium';
+  src: url(../../public/assets/fonts/vazir/Vazir-Medium-FD-WOL.eot);
+  src: url(../../public/assets/fonts/vazir/Vazir-Medium-FD-WOL.woff);
+  src: url(../../public/assets/fonts/vazir/Vazir-Medium-FD-WOL.woff2);
+  src: url(../../public/assets/fonts/vazir/Vazir-Medium-FD-WOL.ttf);
+}
+
+@font-face {
+  font-family: 'vazir-light';
+  src: url(../../public/assets/fonts/vazir/Vazir-Light-FD-WOL.eot);
+  src: url(../../public/assets/fonts/vazir/Vazir-Light-FD-WOL.woff);
+  src: url(../../public/assets/fonts/vazir/Vazir-Light-FD-WOL.woff2);
+  src: url(../../public/assets/fonts/vazir/Vazir-Light-FD-WOL.ttf);
+}
+
+@font-face {
+  font-family: 'vazir-thin';
+  src: url(../../public/assets/fonts/vazir/Vazir-Thin-FD-WOL.eot);
+  src: url(../../public/assets/fonts/vazir/Vazir-Thin-FD-WOL.woff);
+  src: url(../../public/assets/fonts/vazir/Vazir-Thin-FD-WOL.woff2);
+  src: url(../../public/assets/fonts/vazir/Vazir-Thin-FD-WOL.ttf);
+}
+
+/* Vazir Font Faces */
+@font-face {
+  font-family: 'mitra-regular';
+  src: url(../../public/assets/fonts/mitra/A\ Mitra\ 01.ttf);
+  /* src: url(../../public/assets/fonts/mitra/Vazir-FD-WOL.woff); */
+  /* src: url(../../public/assets/fonts/mitra/Vazir-FD-WOL.woff2); */
+  /* src: url(../../public/assets/fonts/mitra/Vazir-FD-WOL.ttf); */
+}
+
+@font-face {
+  font-family: 'mitra-regular2';
+  src: url(../../public/assets/fonts/mitra/A\ Mitra\ 02.ttf);
+  /* src: url(../../public/assets/fonts/mitra/Vazir-FD-WOL.woff); */
+  /* src: url(../../public/assets/fonts/mitra/Vazir-FD-WOL.woff2); */
+  /* src: url(../../public/assets/fonts/mitra/Vazir-FD-WOL.ttf); */
+}
+
+@font-face {
+  font-family: 'mitra-regular3';
+  src: url(../../public/assets/fonts/mitra/A\ Mitra\ 3.ttf);
+  /* src: url(../../public/assets/fonts/mitra/Vazir-FD-WOL.woff); */
+  /* src: url(../../public/assets/fonts/mitra/Vazir-FD-WOL.woff2); */
+  /* src: url(../../public/assets/fonts/mitra/Vazir-FD-WOL.ttf); */
+}
+
+@font-face {
+  font-family: 'mitra-regular4';
+  src: url(../../public/assets/fonts/mitra/A\ Mitra\ 04.ttf);
+  /* src: url(../../public/assets/fonts/mitra/Vazir-FD-WOL.woff); */
+  /* src: url(../../public/assets/fonts/mitra/Vazir-FD-WOL.woff2); */
+  /* src: url(../../public/assets/fonts/mitra/Vazir-FD-WOL.ttf); */
+}
+
+
+
+input:focus-visible{outline: none;}
+
+.primary{background: var(--primary);}
+
+/* Dana Font Classes */
+.dana{font-family: 'dana-regular'!important;}
+.danaBold{font-family: 'dana-bold'!important;}
+.danaMed{font-family: 'dana-medium'!important;}
+.danaDemiBold{font-family: 'dana-demi-bold'!important;}
+
+/* Vazir Font Classes */
+.vazir{font-family: 'vazir-regular'!important;}
+.vazirBold{font-family: 'vazir-bold'!important;}
+.vazirMed{font-family: 'vazir-medium'!important;}
+.vazirLight{font-family: 'vazir-light'!important;}
+.vazirThin{font-family: 'vazir-thin'!important;}
+
+
+/* Mitra Font Classes */
+.mitra{font-family: 'mitra-regular'!important;}
+.mitra2{font-family: 'mitra-regular2'!important;}
+.mitra3{font-family: 'mitra-regular3'!important;}
+.mitra4{font-family: 'mitra-regular4'!important;}
+
 input:focus-visible{outline: none;}
 
 .primary{background: var(--primary);}
@@ -50,6 +152,33 @@ input:focus-visible{outline: none;}
 .danaBold{font-family: 'dana-bold'!important;}
 .danaMed{font-family: 'dana-medium'!important;}
 .danaDemiBold{font-family: 'dana-demi-bold'!important;}
+
+
+[data-theme-font="vazir"] .dana,
+[data-theme-font="vazir"] .danaMed{font-family: 'vazir-regular'!important;}
+[data-theme-font="vazir"] .danaBold,
+[data-theme-font="vazir"] .danaDemiBold{font-family: 'vazir-bold'!important;}
+
+[data-theme-font="mitra"] .dana,
+[data-theme-font="mitra"] .danaMed,
+[data-theme-font="mitra"] .danaBold,
+[data-theme-font="mitra"] .danaDemiBold{font-family: 'mitra-regular'!important;}
+
+[data-theme-font="mitra2"] .dana,
+[data-theme-font="mitra2"] .danaMed,
+[data-theme-font="mitra2"] .danaBold,
+[data-theme-font="mitra2"] .danaDemiBold{font-family: 'mitra-regular2'!important;}
+
+[data-theme-font="mitra3"] .dana,
+[data-theme-font="mitra3"] .danaMed,
+[data-theme-font="mitra3"] .danaBold,
+[data-theme-font="mitra3"] .danaDemiBold{font-family: 'mitra-regular3'!important;}
+
+[data-theme-font="mitra4"] .dana,
+[data-theme-font="mitra4"] .danaMed,
+[data-theme-font="mitra4"] .danaBold,
+[data-theme-font="mitra4"] .danaDemiBold{font-family: 'mitra-regular4'!important;}
+
 
 body {
   background: var(--background);

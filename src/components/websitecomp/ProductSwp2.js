@@ -1,7 +1,7 @@
 'use client';
 import React, { useRef } from 'react'
 import { Swiper, SwiperSlide } from 'swiper/react';
-import { Navigation } from 'swiper/modules';
+import { Navigation, Autoplay } from 'swiper/modules';
 import { usePathname } from 'next/navigation';
 
 // Import Swiper styles
@@ -9,7 +9,7 @@ import 'swiper/css';
 import 'swiper/css/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
-// import ViewPrice from '../global/other/ViewPrice';
+import ViewPrice from '../global/other/ViewPrice';
 import { formatPrice } from '@/utils/functions';
 
 /**
@@ -23,8 +23,14 @@ const ProductSwp2 = ({
   data = null,
   dataSourceType = 'manual',
   title = 'برگر های خاص و خوشمزه',
-  subtitle = 'محصولات منتخب ما برای شما'
+  subtitle = 'محصولات منتخب ما برای شما',
+  bgColor = '#ffffff',
+  largeTextColor = '#111827',
+  smallTextColor = '#6b7280',
+  autoplayDelay = '5',
+  enableAutoplay = 'true'
 }) => {
+  const autoplayDelayMs = (parseInt(autoplayDelay) || 5) * 1000
   const pathName = usePathname()
   const prevRef = useRef(null)
   const nextRef = useRef(null)
@@ -90,7 +96,7 @@ const ProductSwp2 = ({
   if(pathName !== '/newsitebuilder') products = data || sampleProducts
 
   return (
-    <div className="w-full py-10 px-10 dana" dir="rtl">
+    <div className="w-full py-10 px-10 dana" dir="rtl" style={{backgroundColor: bgColor}}>
       <div className="relative">
         {/* دکمه قبلی */}
         <button
@@ -112,7 +118,7 @@ const ProductSwp2 = ({
         </button>
 
         <Swiper
-          modules={[Navigation]}
+          modules={[Navigation, Autoplay]}
           spaceBetween={30}
           slidesPerView={1}
           navigation={{ prevEl: prevRef.current, nextEl: nextRef.current }}
@@ -120,28 +126,30 @@ const ProductSwp2 = ({
             swiper.params.navigation.prevEl = prevRef.current
             swiper.params.navigation.nextEl = nextRef.current
           }}
-          loop={true}
+          loop={products.length >= 2}
+          autoplay={enableAutoplay === 'true' ? { delay: autoplayDelayMs, disableOnInteraction: false } : false}
         >
           {products.map((product) => (
             <SwiperSlide key={product.id || product._id}>
-              <div className="flex flex-col md:flex-row items-center justify-between gap-5 md:gap-14 px-10 md:px-20 py-10 md:py-14 bg-linear-to-br from-blue-50 via-yellow-50 to-orange-100 rounded-3xl min-h-80 md:min-h-96" dir="rtl">
+              <div className="flex flex-col md:flex-row items-center justify-between gap-10 md:gap-14 px-10 md:px-20 py-10 md:py-14 bg-linear-to-br from-blue-50 via-yellow-50 to-orange-100 rounded-3xl min-h-80 md:min-h-96" dir="rtl">
                 {/* بخش متن */}
                 <div className="flex flex-col justify-center flex-1 w-full md:w-auto">
                   {/* قیمت */}
                   <div className="flex items-baseline gap-1.5 mb-3">
-                    <span className="text-3xl md:text-2xl font-bold text-gray-600 tracking-tight leading-none">
+                    <span className="text-3xl md:text-2xl font-bold tracking-tight leading-none" style={{color: smallTextColor}}>
                       {formatPrice(product.price)}
+                      
                     </span>
-                    <span className="text-xs text-gray-500 font-light">تومان</span>
+                    <span className="text-xs font-light" style={{color: smallTextColor}}>تومان</span>
                   </div>
                   {/* خط جداکننده */}
                   <div className="w-8 h-0.5 bg-black/80 mb-3 rounded-full" />
                   {/* عنوان محصول */}
-                  <h2 className="text-3xl md:text-4xl font-bold text-black leading-snug mb-3">
+                  <h2 className="text-3xl md:text-4xl font-bold leading-snug mb-3" style={{color: largeTextColor}}>
                     {product.name || product.title}
                   </h2>
                   {/* توضیحات */}
-                  <p className="text-xs md:text-sm text-gray-500 leading-relaxed max-w-xs mb-6 line-clamp-3">
+                  <p className="text-xs md:text-sm leading-relaxed max-w-xs mb-6 line-clamp-3" style={{color: smallTextColor}}>
                     {product.description || product.shortDescription || 'بدون توضیحات'}
                   </p>
                   {/* دکمه خرید */}
@@ -154,7 +162,7 @@ const ProductSwp2 = ({
                 {/* بخش تصویر */}
                 <div className="relative flex items-center justify-center flex-1 w-full md:w-auto h-56 md:h-80" dir="rtl">
                   {product.badge && (
-                    <div className="absolute top-3 left-3 w-20 h-20 md:w-30 md:h-30 border-2 border-black rounded-full bg-white flex items-center justify-center font-bold text-xs text-black text-center p-2 z-10 shadow-md">
+                    <div className="absolute top-3 left-3 w-20 h-20 md:w-24 md:h-24 border-2 border-black rounded-full bg-white flex items-center justify-center font-bold text-xs text-black text-center p-2 z-10 shadow-md">
                       {product.badge}
                     </div>
                   )}

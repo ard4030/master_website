@@ -2,7 +2,7 @@
 
 import React from 'react'
 import { Swiper, SwiperSlide } from 'swiper/react'
-import { Navigation } from 'swiper/modules'
+import { Navigation, Autoplay } from 'swiper/modules'
 
 // Import Swiper styles
 import 'swiper/css'
@@ -20,81 +20,87 @@ const CategoriesSwiper = ({
     {
       id: 1,
       name: 'طلا',
-      image: 'https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=300&h=300&fit=crop'
+      image: '09a98a13c782e12a245930b4515d243b17734a33_1740299441.jpg'
     },
     {
       id: 2,
       name: 'مد و پوشاک',
-      image: 'https://images.unsplash.com/photo-1491553895911-0055eca6402d?w=300&h=300&fit=crop'
+      image: 'b3d4eaefebe67ab8d849296ea2e7e113cde8094c_1740299538.jpg'
     },
     {
       id: 3,
       name: 'آرایشی بهداشتی',
-      image: 'https://images.unsplash.com/photo-1556228578-8c89e6adf883?w=300&h=300&fit=crop'
+      image: '09a98a13c782e12a245930b4515d243b17734a33_1740299441.jpg'
     },
     {
       id: 4,
       name: 'لوازم خانگی برقی',
-      image: 'https://images.unsplash.com/photo-1574707267537-b85fab00c069?w=300&h=300&fit=crop'
+      image: '09a98a13c782e12a245930b4515d243b17734a33_1740299441.jpg'
     },
     {
       id: 5,
       name: 'خانه و آشپزخانه',
-      image: 'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=300&h=300&fit=crop'
+      image: '09a98a13c782e12a245930b4515d243b17734a33_1740299441.jpg'
     },
     {
       id: 6,
       name: 'گالی دیجیتال',
-      image: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=300&h=300&fit=crop'
+      image: '09a98a13c782e12a245930b4515d243b17734a33_1740299441.jpg'
     },
     {
       id: 7,
       name: 'لپ تاپ',
-      image: 'https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=300&h=300&fit=crop'
+      image: '09a98a13c782e12a245930b4515d243b17734a33_1740299441.jpg'
     },
     {
       id: 8,
       name: 'موبایل',
-      image: 'https://images.unsplash.com/photo-1511707267537-b85fab00c069?w=300&h=300&fit=crop'
+      image: '09a98a13c782e12a245930b4515d243b17734a33_1740299441.jpg'
     },
     {
       id: 9,
       name: 'اسباب بازی، کودک و نوزاد',
-      image: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=300&h=300&fit=crop'
+      image: '09a98a13c782e12a245930b4515d243b17734a33_1740299441.jpg'
     },
     {
       id: 10,
       name: 'سوپر مارکت آنلاین',
-      image: 'https://images.unsplash.com/photo-1553531088-d34b3fe76ebc?w=300&h=300&fit=crop'
+      image: '09a98a13c782e12a245930b4515d243b17734a33_1740299441.jpg'
     },
     {
       id: 11,
       name: 'کالا هدیه و کیفیت کارت',
-      image: 'https://images.unsplash.com/photo-1513364776144-60967b0f800f?w=300&h=300&fit=crop'
+      image: '09a98a13c782e12a245930b4515d243b17734a33_1740299441.jpg'
     },
     {
       id: 12,
       name: 'ورزش و سفر',
-      image: 'https://images.unsplash.com/photo-1461053409491-811de8da47db?w=300&h=300&fit=crop'
+      image: '09a98a13c782e12a245930b4515d243b17734a33_1740299441.jpg'
     },
     {
       id: 13,
       name: 'کتاب و هنر',
-      image: 'https://images.unsplash.com/photo-1507842072343-583f20270319?w=300&h=300&fit=crop'
+      image: '09a98a13c782e12a245930b4515d243b17734a33_1740299441.jpg'
     },
     {
       id: 14,
       name: 'ابزارات و تجهیزات',
-      image: 'https://images.unsplash.com/photo-1530124566582-a618bc2615dc?w=300&h=300&fit=crop'
+      image: '09a98a13c782e12a245930b4515d243b17734a33_1740299441.jpg'
     },
     {
       id: 15,
       name: 'سلامت و پزشکی',
-      image: 'https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=300&h=300&fit=crop'
+      image: '09a98a13c782e12a245930b4515d243b17734a33_1740299441.jpg'
     }
   ],
-  backgroundColor = 'bg-white'
+  backgroundColor = 'bg-white',
+  bgColor = '#ffffff',
+  largeTextColor = '#111827',
+  smallTextColor = '#111827',
+  autoplayDelay = '5',
+  enableAutoplay = 'true'
 }) => {
+  const autoplayDelayMs = (parseInt(autoplayDelay) || 5) * 1000
   // تابع کمکی برای تبدیل URL تصویر
   const getImageUrl = (imagePath) => {
     if (!imagePath) return ''
@@ -103,18 +109,18 @@ const CategoriesSwiper = ({
   }
 
   return (
-    <div className={`w-full ${backgroundColor} py-8 md:py-12`}>
+    <div className="w-full py-8 md:py-12" style={{backgroundColor: bgColor}}>
       <div className="max-w-7xl mx-auto px-4 md:px-6">
         {/* Title */}
         {title && (
-          <h2 className="text-2xl md:text-3xl danaBold text-gray-900 mb-8 text-center md:text-right">
+          <h2 className="text-2xl md:text-3xl danaBold mb-8 text-center md:text-right" style={{color: largeTextColor}}>
             {title}
           </h2>
         )}
 
         {/* Categories Swiper */}
         <Swiper
-          modules={[Navigation]}
+          modules={[Navigation, Autoplay]}
           spaceBetween={16}
           slidesPerView={2}
           breakpoints={{
@@ -137,6 +143,7 @@ const CategoriesSwiper = ({
           }}
           navigation
           loop={categories.length > 8}
+          autoplay={enableAutoplay === 'true' ? { delay: autoplayDelayMs, disableOnInteraction: false } : false}
           className="w-full"
         >
           {categories.map((category) => (

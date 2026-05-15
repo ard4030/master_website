@@ -1,11 +1,13 @@
 'use client';
-import React, { useState, useRef } from 'react'
+import React, { useState } from 'react'
 import { Swiper, SwiperSlide } from 'swiper/react';
+import { Navigation, Autoplay } from 'swiper/modules';
 import { usePathname } from 'next/navigation';
-import { HiChevronLeft, HiChevronRight } from 'react-icons/hi';
 
 // Import Swiper styles
 import 'swiper/css';
+import 'swiper/css/navigation';
+import { formatPrice } from '@/utils/functions';
 
 /**
  * کامپوننت محصولات لغزنده - استایل 3
@@ -16,16 +18,21 @@ import 'swiper/css';
  * @param {String} description - توضیحات بخش
  */
 const ProductsSwp3 = ({ 
+  bgColor = '#1f2937',
+  largeTextColor = '#111827',
+  smallTextColor = '#6b7280',
+  autoplayDelay = '5',
+  enableAutoplay = 'true',
   data = null,
   dataSourceType = 'manual',
   title = 'بازار هفتر',
   subtitle = 'فروش ویژه پاییزه',
   description = 'بازار خرید و فروش هنر دستساخته ها و اشیای ارزشمند'
 }) => {
+  const autoplayDelayMs = enableAutoplay === 'true' ? (parseInt(autoplayDelay) || 5) * 1000 : 0
   const pathName = usePathname()
   const [activeMainSlide, setActiveMainSlide] = useState(0)
   const [selectedProductIndex, setSelectedProductIndex] = useState(0)
-  const swiperRef = useRef(null)
 
   // تابع کمکی برای تبدیل URL تصویر
   const getImageUrl = (imagePath) => {
@@ -109,37 +116,50 @@ const ProductsSwp3 = ({
   };
 
   return (
-    <div className="w-full bg-white overflow-hidden dana">
+    <div style={{backgroundColor:bgColor}} className="w-full overflow-hidden dana">
       <div className="max-w-7xl mx-auto">
         {/* Hero Section */}
         <div className="py-12 md:py-20 px-6 md:px-12">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-12 items-center mb-6">
             {/* Left Content */}
             <div className="flex flex-col justify-center space-y-6 text-right order-2 lg:order-1" dir="rtl">
-              <div className="text-sm text-gray-600 tracking-wider">
+              <div className="text-sm tracking-wider" style={{color: smallTextColor}}>
                 {subtitle}
               </div>
               
-              <h1 className="text-3xl md:text-6xl font-bold text-black leading-tight">
+              <h1 className="text-5xl md:text-6xl font-bold leading-tight" style={{color: largeTextColor}}>
                 {selectedProduct?.title || title}
               </h1>
               
-              <p className="text-gray-600 text-base leading-relaxed max-w-md">
+              <p className="text-base leading-relaxed max-w-md" style={{color: smallTextColor}}>
                 {selectedProduct?.description || description}
               </p>
 
-              <div className="flex items-center gap-6">
+              <div className="flex items-center gap-6 pt-4">
                 <button className="px-6 py-2 rounded-full border-2 border-blue-600 bg-blue-600 text-white text-sm font-semibold hover:bg-blue-700 transition-colors flex items-center gap-2">
-                  <span>فروشنده شو</span>
+                  <span>ثبت سفارش</span>
                   <span>←</span>
                 </button>
                 {selectedProduct?.price && (
-                  <div className="text-lg font-bold text-blue-600">
-                    {parseInt(selectedProduct.price).toLocaleString('fa-IR')} تومان
+                  <div className=" dana">
+                    <span className="text-3xl md:text-2xl font-bold tracking-tight leading-none" style={{color: smallTextColor}}>
+                      {formatPrice(selectedProduct.price)}
+                    </span>
+                    <span className="text-xs font-light" style={{color: smallTextColor}}>تومان</span>
                   </div>
                 )}
               </div>
 
+              {/* Decorative dots */}
+              <div className="flex items-center gap-3 pt-4">
+                <span className="text-gray-300">•</span>
+                <span className="text-gray-300">•</span>
+                <span className="text-gray-300">•</span>
+                <span className="text-gray-300">•</span>
+                <span className="text-gray-300">•</span>
+                <span className="text-gray-300">•</span>
+                <span className="text-gray-300">•</span>
+              </div>
             </div>
 
             {/* Right Content - Hero Image */}
@@ -155,40 +175,21 @@ const ProductsSwp3 = ({
           </div>
 
           {/* Products Grid Below */}
-          <div className="mt-4 md:mt-10">
-            <div className="text-right mb-8 text-sm text-gray-600" dir="rtl">
-               محصولات دیگر:
-            </div>
+          <div className="">
+            <div className="text-right mb-8 text-sm" dir="rtl" style={{color: smallTextColor}}>محصولات مشابه</div>
             
-            <div className="relative">
-              {/* دکمه قبلی */}
-              <button
-                onClick={() => swiperRef.current?.slidePrev()}
-                className="absolute right-[-5] top-1/2 -translate-y-1/2 z-10 -mr-3 flex items-center justify-center bg-gray-100 hover:bg-gray-300 text-black rounded-full shadow-md transition-all duration-200 hover:scale-105 w-6 h-6 md:w-8 md:h-8"
-                aria-label="قبلی"
-              >
-                <HiChevronRight className="w-3 h-3 md:w-4 md:h-4 text-black shrink-0" />
-              </button>
-
-              {/* دکمه بعدی */}
-              <button
-                onClick={() => swiperRef.current?.slideNext()}
-                className="absolute left-[-5] top-1/2 -translate-y-1/2 z-10 -ml-3 flex items-center justify-center bg-gray-100 hover:bg-gray-300 text-black rounded-full shadow-md transition-all duration-200 hover:scale-105 w-6 h-6 md:w-8 md:h-8"
-                aria-label="بعدی"
-              >
-                <HiChevronLeft className="w-3 h-3 md:w-4 md:h-4 text-black shrink-0" />
-              </button>
-
             <Swiper
-              onSwiper={(swiper) => { swiperRef.current = swiper }}
-              spaceBetween={12}
-              slidesPerView={2.5}
+              modules={[Navigation, Autoplay]}
+              spaceBetween={24}
+              slidesPerView={3}
               breakpoints={{
                 640: { slidesPerView: 4 },
                 1024: { slidesPerView: 5 }
               }}
-              loop={true}
-              className="w-full px-1"
+              navigation
+              loop={products.length >= 6}
+              autoplay={enableAutoplay === 'true' ? { delay: autoplayDelayMs, disableOnInteraction: false } : false}
+              className="w-full"
             >
               {products.map((product, index) => (
                 <SwiperSlide key={product.id || product._id}>
@@ -209,7 +210,7 @@ const ProductsSwp3 = ({
                     </div>
 
                     {/* Product Info */}
-                    <h3 className="text-sm font-semibold text-gray-900 mb-2">
+                    <h3 className="text-sm font-semibold mb-2" style={{color: largeTextColor}}>
                       {product.name || product.title}
                     </h3>
 
@@ -217,14 +218,16 @@ const ProductsSwp3 = ({
                       —
                     </p>
 
-                    <p className={`text-xs ${selectedProductIndex === index ? 'text-blue-600 font-semibold' : 'text-gray-500'}`}>
+                    <p
+                      className={`text-xs ${selectedProductIndex === index ? 'text-blue-600 font-semibold' : ''}`}
+                      style={selectedProductIndex !== index ? {color: smallTextColor} : {}}
+                    >
                       {product.price ? parseInt(product.price).toLocaleString('fa-IR') : '۰'} تومان
                     </p>
                   </div>
                 </SwiperSlide>
               ))}
             </Swiper>
-            </div>
           </div>
         </div>
       </div>

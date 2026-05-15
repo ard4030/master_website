@@ -4,9 +4,18 @@ import { Swiper, SwiperSlide } from 'swiper/react';
 
 // Import Swiper styles
 import 'swiper/css';
-const ProductSwiper = () => {
+const ProductSwiper = ({
+  bgColor = '#ffffff',
+  largeTextColor = '#111827',
+  smallTextColor = '#6b7280',
+  autoplayDelay = '5',
+  title = 'محصولات',
+  subtitle = 'محصولات منتخب',
+  data = null,
+  dataSourceType = 'manual'
+}) => {
   return (
-    <div>
+    <div style={{backgroundColor: bgColor}}>
         <div className='swiperParent'>
             <Swiper
                 spaceBetween={50}

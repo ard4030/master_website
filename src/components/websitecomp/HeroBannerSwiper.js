@@ -17,8 +17,12 @@ import 'swiper/css/navigation'
  */
 const HeroBannerSwiper = ({
   slides: slidesProp = null,
-  autoplayDelay = 4500,
-  textPosition = 'left'
+  autoplayDelay = '5',
+  enableAutoplay = 'true',
+  textPosition = 'left',
+  bgColor = '#ffffff',
+  largeTextColor = '#111827',
+  smallTextColor = '#111827'
 }) => {
   const prevRef = useRef(null)
   const nextRef = useRef(null)
@@ -63,7 +67,29 @@ const HeroBannerSwiper = ({
   }
 
   return (
-    <section className="w-full bg-white">
+    <section className="w-full" style={{backgroundColor: bgColor}}>
+      <style>{`
+        .hero-banner-swiper .swiper-pagination {
+          bottom: 18px;
+        }
+        .hero-banner-swiper .swiper-pagination-bullet {
+          width: 6px;
+          height: 6px;
+          opacity: 0.4;
+          background: #111827;
+          margin: 0 5px !important;
+        }
+        .hero-banner-swiper .swiper-pagination-bullet-active {
+          width: 18px;
+          border-radius: 9999px;
+          opacity: 0.9;
+        }
+        .hero-banner-swiper .swiper-button-next,
+        .hero-banner-swiper .swiper-button-prev {
+          display: none;
+        }
+      `}</style>
+
       <div className="relative w-full">
         <Swiper
           modules={[Autoplay, Pagination, Navigation]}
@@ -71,8 +97,8 @@ const HeroBannerSwiper = ({
           loop={slides.length > 1}
           onSwiper={(swiper) => { swiperRef.current = swiper }}
           autoplay={
-            slides.length > 1
-              ? { delay: Number(autoplayDelay) || 4500, disableOnInteraction: false, pauseOnMouseEnter: true }
+            slides.length > 1 && enableAutoplay === 'true'
+              ? { delay: (Number(autoplayDelay) || 5) * 1000, disableOnInteraction: false, pauseOnMouseEnter: true }
               : false
           }
           pagination={{ clickable: true }}
