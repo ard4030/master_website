@@ -15,24 +15,15 @@ const ProductImageGallery = ({ mainImage = '', galleryImages = [] }) => {
     : ['/api/placeholder/500/400?text=Laptop'];
 
   return (
-    <div className="flex gap-4 dana" dir="rtl">
-      {/* عکس بزرگ وسط */}
-      <div className="flex-1 bg-gray-100 border-2 border-gray-200 rounded-lg overflow-hidden flex items-center justify-center">
-        <img
-          src={selectedImage < images.length ? images[selectedImage] : images[0]}
-          alt="محصول"
-          className="w-full h-96 object-contain"
-        />
-      </div>
-
-      {/* تصاویر کوچک سمت چپ */}
+    <div className="flex flex-col-reverse md:flex-row gap-4 dana md:gap-4" dir="rtl">
+      {/* تصاویر کوچک */}
       {images && images.length > 0 && (
-        <div className="flex flex-col gap-3">
+        <div className="flex md:flex-col gap-2 md:gap-3 overflow-x-auto md:overflow-x-visible pb-2 md:pb-0 flex-1 md:flex-none">
           {images.slice(0, 7).map((img, index) => (
             <button
               key={index}
               onClick={() => setSelectedImage(index)}
-              className={`w-20 h-20 rounded-lg border-2 overflow-hidden transition ${
+              className={`flex-shrink-0 w-16 h-16 md:w-20 md:h-20 rounded-lg border-2 overflow-hidden transition ${
                 selectedImage === index
                   ? 'border-blue-600'
                   : 'border-gray-200 hover:border-gray-400'
@@ -47,6 +38,15 @@ const ProductImageGallery = ({ mainImage = '', galleryImages = [] }) => {
           ))}
         </div>
       )}
+
+      {/* عکس بزرگ */}
+      <div className="flex-1 bg-gray-100 border-2 border-gray-200 rounded-lg overflow-hidden flex items-center justify-center">
+        <img
+          src={selectedImage < images.length ? images[selectedImage] : images[0]}
+          alt="محصول"
+          className="w-full h-60 md:h-96 object-contain"
+        />
+      </div>
     </div>
   );
 };
