@@ -1,26 +1,56 @@
 'use client';
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import Image from 'next/image';
-import { Swiper, SwiperSlide } from 'swiper/react';
+import { Swiper, SwiperSlide, useSwiper } from 'swiper/react';
 import { Navigation, Pagination } from 'swiper/modules';
 import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
 import { FiChevronLeft, FiChevronRight } from 'react-icons/fi';
+import GalleryModal4 from './GalleryModal4';
 
-const ProductImageGallery4 = ({ mainImage = '', galleryImages = [] }) => {
+const ProductImageGallery4 = ({ mainImage = '', galleryImages = [], title = '' }) => {
   const [selectedImage, setSelectedImage] = useState(0);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [modalIndex, setModalIndex] = useState(0);
+
+  const openModal = (index) => {
+    setModalIndex(index);
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => setIsModalOpen(false);
+
+  const prevModal = useCallback(() => {
+    setModalIndex((prev) => (prev === 0 ? images.length - 1 : prev - 1));
+  }, []);
+
+  const nextModal = useCallback(() => {
+    setModalIndex((prev) => (prev === images.length - 1 ? 0 : prev + 1));
+  }, []);
+
+  useEffect(() => {
+    if (!isModalOpen) return;
+    const handler = (e) => {
+      if (e.key === 'Escape') closeModal();
+      if (e.key === 'ArrowRight') prevModal();
+      if (e.key === 'ArrowLeft') nextModal();
+    };
+    window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
+  }, [isModalOpen, prevModal, nextModal]);
 
   const imageUrl = process.env.NEXT_PUBLIC_LIARA_IMAGE_URL || '';
 
   const images =
     galleryImages && galleryImages.length > 0
-      ? galleryImages.map((img) => `${imageUrl}${img}`)
+      ? galleryImages.map((img) => `${img}`)
       : mainImage
       ? [`${imageUrl}${mainImage}`]
       : [];
 
   return (
+    <>
     <div className="flex flex-col gap-3 dana" dir="rtl">
 
       {/* ── موبایل: Swiper ── */}
@@ -33,12 +63,15 @@ const ProductImageGallery4 = ({ mainImage = '', galleryImages = [] }) => {
           }}
           pagination={{ clickable: true }}
           loop={images.length > 1}
+          onSlideChange={(swiper) => setSelectedImage(swiper.realIndex)}
           className="rounded-xl overflow-hidden bg-gray-50 w-full aspect-square"
         >
           {images.length > 0 ? (
             images.map((img, i) => (
               <SwiperSlide key={i}>
-                <div className="relative w-full aspect-square">
+                <div
+                onClick={() => openModal(i)}
+                className="relative w-full aspect-square cursor-pointer">
                   <Image
                     src={img}
                     alt={`تصویر ${i + 1}`}
@@ -96,7 +129,7 @@ const ProductImageGallery4 = ({ mainImage = '', galleryImages = [] }) => {
             {images.slice(0, 5).map((img, index) => (
               <button
                 key={index}
-                onClick={() => setSelectedImage(index)}
+                onClick={() => { setSelectedImage(index); openModal(index); }}
                 className={`relative w-16 h-16 rounded-lg border-2 overflow-hidden transition-all ${
                   selectedImage === index
                     ? 'border-blue-500 shadow-sm'
@@ -117,7 +150,21 @@ const ProductImageGallery4 = ({ mainImage = '', galleryImages = [] }) => {
       </div>
 
     </div>
+
+    {/* ── مودال گالری ── */}
+    <GalleryModal4
+      isOpen={isModalOpen}
+      onClose={closeModal}
+      images={images}
+      modalIndex={modalIndex}
+      setModalIndex={setModalIndex}
+      title={title}
+      prevModal={prevModal}
+      nextModal={nextModal}
+    />
+    </>
   );
 };
 
 export default ProductImageGallery4;
+

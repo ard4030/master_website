@@ -4,14 +4,19 @@ import ProductOptions4 from './ProductOptions4';
 import ProductPrice4 from './ProductPrice4';
 import ProductImageGallery4 from './ProductImageGallery4';
 import ProductCategory from './ProductCategory';
-import { FiShare2, FiHeart, FiPlus, FiTrash2, FiMinus } from 'react-icons/fi';
+import { FiShare2, FiHeart, FiPlus, FiTrash2, FiMinus, FiChevronDown, FiChevronUp } from 'react-icons/fi';
 import { IoBarChartOutline } from 'react-icons/io5';
 import { CartContext } from '@/context/CartContext';
 import { isCart } from '@/utils/functions';
+import InfoBox from '@/components/global/other/InfoBox';
+import ReviewModal4 from './ReviewModal4';
 
 const ProductLayout4 = ({ idPage, product }) => {
+  console.log(product);
+  
   const [showFullDesc, setShowFullDesc] = useState(false);
   const [matchVariant, setMatchVariant] = useState(null);
+  const [reviewOpen, setReviewOpen] = useState(false);
   const { addToCart, cart, increaseQuantity, decreaseQuantity, loading } = useContext(CartContext);
 
   const description = product?.description || product?.shortDescription || '';
@@ -84,12 +89,32 @@ const ProductLayout4 = ({ idPage, product }) => {
       </div>
       <button
         onClick={() => setShowFullDesc((p) => !p)}
-        className="text-blue-500 danaMed text-sm mt-1"
+        className="text-blue-500 danaMed text-sm mt-1 flex items-center gap-1"
       >
-        {showFullDesc ? 'نمایش کمتر ▲' : 'نمایش بیشتر ▼'}
+        {showFullDesc ? (
+          <><FiChevronUp size={14} /> نمایش کمتر</>
+        ) : (
+          <><FiChevronDown size={14} /> نمایش بیشتر</>
+        )}
       </button>
     </div>
   );
+
+  const attrView = (attArr) => {
+    return(
+                <div className="border-t pt-3 mt-1 border-gray-300">
+                  <h2 className="text-sm danaBold text-gray-900 mb-3">مشخصات</h2>
+                  <div className="grid grid-cols-2 gap-x-4 gap-y-2">
+                    {attArr.map((attr, idx) => (
+                      <div key={idx} className="flex flex-col gap-1 bg-neutral-50 rounded-md p-2">
+                        <span className="text-[10px] text-gray-400 danaMed">{attr.label}</span>
+                        <span className="text-xs danaMed text-gray-800">{attr.value}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+    )
+  }
 
   return (
     <div className="min-h-screen bg-white dana" dir="rtl">
@@ -131,6 +156,9 @@ const ProductLayout4 = ({ idPage, product }) => {
 
           {sharedOptions}
           <div className="mt-3 flex flex-col gap-2">{sharedMeta}</div>
+              {attributesProducts?.length > 0 && (
+              attrView(attributesProducts)
+              )}
           {sharedDescription}
         </div>
       </div>
@@ -186,7 +214,7 @@ const ProductLayout4 = ({ idPage, product }) => {
                   variantId: matchVariant?._id || null,
                 })
               }
-              className="w-full bg-blue-600 text-white py-3 rounded-xl danaMed text-sm hover:bg-blue-700 transition"
+              className="w-full bg-[#0084ff] text-white py-3 rounded-xl danaMed text-sm hover:bg-blue-700 transition"
             >
               افزودن به سبد
             </button>
@@ -197,47 +225,44 @@ const ProductLayout4 = ({ idPage, product }) => {
       {/* ══════════════ دسکتاپ ══════════════ */}
       <div className="hidden md:block">
         <div className="bg-pink-50 border-b border-pink-100 px-6 py-2 text-center">
-          <span className="text-pink-600 danaMed text-sm">پیشنهاد شکفت‌انگیز</span>
+          <span className="text-pink-600 danaMed text-sm">پیشنهاد شگفت‌انگیز</span>
         </div>
 
         <div className="max-w-6xl mx-auto px-4 py-6">
           <div className="grid grid-cols-12 gap-3 mb-8">
             {/* ستون اول: گالری */}
-            <div className="col-span-5">
+            <div className="col-span-5 relative">
               <ProductImageGallery4
                 mainImage={product?.mainImage || ''}
                 galleryImages={product?.galleryImages || []}
               />
+              {/* آیکون‌های overlay روی گالری */}
+              <div className="absolute top-2 left-2 flex flex-col gap-1.5 z-10">
+                <button className="w-8 h-8 flex items-center justify-center bg-white/80 backdrop-blur-sm border border-gray-200 rounded-lg text-gray-500 hover:border-gray-400 hover:bg-white transition shadow-sm">
+                  <FiShare2 size={16} />
+                </button>
+                <button className="w-8 h-8 flex items-center justify-center bg-white/80 backdrop-blur-sm border border-gray-200 rounded-lg text-gray-500 hover:border-gray-400 hover:bg-white transition shadow-sm">
+                  <IoBarChartOutline size={16} />
+                </button>
+              </div>
+              <InfoBox text="لطفاً هنگام دریافت سفارش، از لحظه باز کردن بسته‌بندی تا نمایش کامل کالا، به‌صورت پیوسته فیلم‌برداری کنید. این ویدئو تنها مدرک قابل استناد برای بررسی هرگونه ایراد، آسیب یا مغایرت احتمالی است و ارائه آن الزامی می‌باشد." />
             </div>
 
             {/* ستون دوم: اطلاعات */}
             <div className="col-span-4 flex flex-col gap-3">
-              <div className="flex justify-start gap-2">
-                <button className="p-2 border border-gray-200 rounded-lg text-gray-500 hover:border-gray-400 transition">
-                  <FiShare2 size={18} />
-                </button> 
-                <button className="p-2 border border-gray-200 rounded-lg text-gray-500 hover:border-gray-400 transition">
-                  <IoBarChartOutline size={18} />
-                </button>
-              </div>
-              <h1 className="text-base danaBold text-gray-900 leading-8">
+              {product?.brand && (
+                <span className="text-sm danaMed text-gray-500 border-b border-gray-200 pb-2">
+                  {product.brand}
+                </span>
+              )}              
+              <h1 className="text-lg danaBold text-gray-900 leading-8">
                 {product?.name || 'نام محصول'}
               </h1>
               {sharedOptions}
               {sharedMeta}
 
               {attributesProducts?.length > 0 && (
-                <div className="border-t pt-3 mt-1">
-                  <h2 className="text-sm danaBold text-gray-900 mb-3">مشخصات</h2>
-                  <div className="grid grid-cols-2 gap-x-4 gap-y-2">
-                    {attributesProducts.map((attr, idx) => (
-                      <div key={idx} className="flex flex-col gap-1 bg-neutral-50 rounded-md p-2">
-                        <span className="text-[10px] text-gray-400 danaMed">{attr.label}</span>
-                        <span className="text-xs danaMed text-gray-800">{attr.value}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
+              attrView(attributesProducts)
               )}
             </div>
 
@@ -266,7 +291,11 @@ const ProductLayout4 = ({ idPage, product }) => {
                 onClick={() => setShowFullDesc((p) => !p)}
                 className="text-blue-500 danaMed text-sm mt-2 flex items-center gap-1"
               >
-                {showFullDesc ? 'نمایش کمتر ▲' : 'نمایش بیشتر ▼'}
+                {showFullDesc ? (
+                  <><FiChevronUp size={14} /> نمایش کمتر</>
+                ) : (
+                  <><FiChevronDown size={14} /> نمایش بیشتر</>
+                )}
               </button>
             </div>
           )}
@@ -275,7 +304,10 @@ const ProductLayout4 = ({ idPage, product }) => {
           <div className="border-t pt-6">
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-base danaBold text-gray-900">نظرات</h2>
-              <button className="text-blue-500 danaMed text-sm border border-blue-400 rounded-lg px-3 py-1 hover:bg-blue-50 transition">
+              <button
+                onClick={() => setReviewOpen(true)}
+                className="text-blue-500 danaMed text-sm border border-blue-400 rounded-lg px-3 py-1 hover:bg-blue-50 transition"
+              >
                 افزودن نظر
               </button>
             </div>
@@ -286,11 +318,20 @@ const ProductLayout4 = ({ idPage, product }) => {
               برای ثبت نظر، لازم است ابتدا وارد حساب کاربری خود شوید.
             </p>
             <div className="flex justify-center mt-4">
-              <button className="border border-gray-300 rounded-lg px-8 py-2 text-sm danaMed text-gray-700 hover:border-gray-400 transition">
+              <button
+                onClick={() => setReviewOpen(true)}
+                className="border border-gray-300 rounded-lg px-8 py-2 text-sm danaMed text-gray-700 hover:border-gray-400 transition"
+              >
                 افزودن نظر
               </button>
             </div>
           </div>
+
+          <ReviewModal4
+            isOpen={reviewOpen}
+            onClose={() => setReviewOpen(false)}
+            product={product}
+          />
         </div>
       </div>
 

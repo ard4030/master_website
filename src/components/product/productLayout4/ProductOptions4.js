@@ -4,23 +4,25 @@ import React, { useEffect, useState } from 'react';
 const ProductOptions4 = ({ isVariants, variants, variantsFull, product, onMatchVariantChange }) => {
   const [activeVariant, setActiveVariant] = useState(null);
 
+  const checkActive = (name, value) => activeVariant?.[name] === value;
+
+  const changeVariant = (name, value) => {
+    setActiveVariant((prev) => ({ ...prev, [name]: value }));
+  };
+
   useEffect(() => {
-    if (isVariants && variants?.length > 0) {
+    if (isVariants && variantsFull?.length > 0) {
       const act = {};
-      variants[0].attributes.forEach((el) => {
-        act[el.name] = el.value;
+      variantsFull.forEach((item) => {
+        if (item.values?.length > 0) {
+          act[item.name] = item.values[0].value;
+        }
       });
       setActiveVariant(act);
     } else {
       onMatchVariantChange?.({ price: product?.price, stockQuantity: product?.stockQuantity, compareAtPrice: product?.compareAtPrice });
     }
   }, []);
-
-  const checkActive = (name, value) => activeVariant?.[name] === value;
-
-  const changeVariant = (name, value) => {
-    setActiveVariant((prev) => ({ ...prev, [name]: value }));
-  };
 
   useEffect(() => {
     if (!activeVariant || !variants?.length) return;
@@ -32,7 +34,7 @@ const ProductOptions4 = ({ isVariants, variants, variantsFull, product, onMatchV
     onMatchVariantChange?.(matched ?? null);
   }, [activeVariant]);
 
-  if (!variantsFull?.length) return null;
+  if (!isVariants || !variantsFull?.length) return null;
 
   return (
     <div className="dana flex flex-col gap-3" dir="rtl">

@@ -2,7 +2,7 @@
 import React from 'react';
 import Modal from '@mui/material/Modal';
 import { motion, AnimatePresence } from 'framer-motion';
-import useIsMobile from '../hooks/isMobileHook';
+import useIsMobile from '../../hooks/isMobileHook';
 
 const backdropVariants = {
   hidden: { opacity: 0 },
