@@ -363,38 +363,47 @@ const DigikalaOfferSwiper = ({
         }
       `}</style>
 
-      <div className="max-w-7xl mx-auto px-4 md:px-6 py-6 md:py-8">
-        <div className="rounded-2xl overflow-hidden" style={panelStyle}>
-          <div className="flex pl-1">
+      <div className="w-full md:max-w-7xl md:mx-auto md:px-6 md:py-8">
+        <div className="md:rounded-2xl overflow-hidden" style={panelStyle}>
+          <div className="flex flex-col md:flex-row pl-0 md:pl-1">
             {/* Right panel */}
-            <div className="w-40 sm:w-44 md:w-52 shrink-0 text-white flex flex-col items-center justify-between py-6 px-3">
-              <div className="text-center">
-                <h3 className="danaBold text-xl leading-8 whitespace-pre-line">
+            <div className="w-full md:w-52 shrink-0 text-white flex flex-wrap flex-row md:flex-col items-center justify-between gap-3 md:gap-6 py-4 md:py-6 px-4 md:px-3">
+              {/* Title */}
+              <div className="text-center shrink-0">
+                <h3 className="danaBold text-base md:text-xl leading-6 md:leading-8 whitespace-pre-line hidden md:block">
                   {panelTitle}
+                </h3>
+                <h3 className="danaBold text-base leading-6 md:hidden">
+                  {String(panelTitle).replace(/\n/g, ' ')}
                 </h3>
               </div>
 
-              <div className="flex items-center gap-2" dir="ltr">
-                {renderTimerBox(timerParts[0], 'h')}:
-                {renderTimerBox(timerParts[1], 'm')}:
+              {/* Timer */}
+              <div className="flex items-center gap-1.5 md:gap-2 shrink-0" dir="ltr">
+                {renderTimerBox(timerParts[0], 'h')}
+                <span className="danaBold">:</span>
+                {renderTimerBox(timerParts[1], 'm')}
+                <span className="danaBold">:</span>
                 {renderTimerBox(timerParts[2], 's')}
               </div>
 
-              <div className="flex flex-col items-center gap-4 mt-2">
-                <div className="flex items-center justify-center w-20 h-20 rounded-2xl bg-white/10">
-                  <svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M22 16C24.7614 16 27 18.2386 27 21C27 23.7614 24.7614 26 22 26C19.2386 26 17 23.7614 17 21C17 18.2386 19.2386 16 22 16Z" fill="white" opacity="0.9" />
-                    <path d="M42 38C44.7614 38 47 40.2386 47 43C47 45.7614 44.7614 48 42 48C39.2386 48 37 45.7614 37 43C37 40.2386 39.2386 38 42 38Z" fill="white" opacity="0.9" />
-                    <path d="M18 48L46 16" stroke="white" strokeWidth="5" strokeLinecap="round" opacity="0.9" />
-                  </svg>
-                </div>
+              {/* Decorative icon — desktop only */}
+              <div className="hidden md:flex items-center justify-center w-20 h-20 rounded-2xl bg-white/10">
+                <svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M22 16C24.7614 16 27 18.2386 27 21C27 23.7614 24.7614 26 22 26C19.2386 26 17 23.7614 17 21C17 18.2386 19.2386 16 22 16Z" fill="white" opacity="0.9" />
+                  <path d="M42 38C44.7614 38 47 40.2386 47 43C47 45.7614 44.7614 48 42 48C39.2386 48 37 45.7614 37 43C37 40.2386 39.2386 38 42 38Z" fill="white" opacity="0.9" />
+                  <path d="M18 48L46 16" stroke="white" strokeWidth="5" strokeLinecap="round" opacity="0.9" />
+                </svg>
+              </div>
 
+              {/* View all link */}
+              <div className="shrink-0 flex-2">
                 {renderLink(
                   viewAllLink,
-                  'danaBold text-sm flex items-center gap-2 hover:opacity-90',
+                  'danaBold text-xs md:text-sm flex items-center gap-1 md:gap-2 hover:opacity-90 whitespace-nowrap',
                   <>
                     <span>{viewAllText}</span>
-                    <span className="text-lg">‹</span>
+                    <span className="text-base md:text-lg">‹</span>
                   </>,
                   String(viewAllText || 'مشاهده همه')
                 )}
@@ -402,7 +411,7 @@ const DigikalaOfferSwiper = ({
             </div>
 
             {/* Products */}
-            <div className="flex-1 min-w-0 relative py-4 pr-4">
+            <div className="w-full md:flex-1 min-w-0 relative p-3 pl-0 right-2 sm:right-0 md:py-4 md:pr-4 md:pl-0">
               <div className="bg-white rounded-xl overflow-hidden relative">
                 {!mounted ? (
                   <div className="flex overflow-hidden">

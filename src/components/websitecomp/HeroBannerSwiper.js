@@ -152,7 +152,7 @@ const HeroBannerSwiper = ({
         </Swiper>
 
         {/* دکمه‌های ناوبری - ثابت روی کل اسلایدر */}
-        <div className="absolute bottom-4 right-4 z-30 px-6 flex items-center gap-2">
+        <div className="hidden sm:flex absolute bottom-4 right-4 z-30 px-6 items-center gap-2">
           <button
             ref={prevRef}
             type="button"

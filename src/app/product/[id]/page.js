@@ -2,6 +2,7 @@ import React from 'react'
 import ProductLayout from '@/components/product/productLayout/ProductLayout'
 import ProductLayout2 from '@/components/product/productLayout2/ProductLayout2';
 import ProductLayout3 from '@/components/product/productLayout3/ProductLayout3';
+import ProductLayout4 from '@/components/product/productLayout4/ProductLayout4';
 
 const page = async ({params}) => {
     const id = (await params).id;
@@ -30,6 +31,10 @@ const page = async ({params}) => {
         break;
       case 'productlayout3':  
         render = <ProductLayout3 idPage={id} product={productData.data.product} />
+        break
+
+      case 'productlayout4':  
+        render = <ProductLayout4 idPage={id} product={productData.data.product} />
         break
       default:
         render = <ProductLayout idPage={id} product={productData.data.product} />

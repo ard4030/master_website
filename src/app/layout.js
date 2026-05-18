@@ -5,8 +5,8 @@ import { MerchantProvider } from "@/context/MerchantContext";
 import { CartProvider } from "@/context/CartContext";
 import { OrderProvider } from "@/context/OrderContext";
 import { ToastContainer } from "react-toastify";
-import Header from "@/components/header/Header";
 import Header1 from "@/components/websitecomp/Header1";
+import Header from "@/components/header/Header";
 
 export const metadata = {
   title: "Create Next App",
@@ -34,8 +34,8 @@ export default function RootLayout({ children }) {
             <CartProvider>
               <OrderProvider>
                 <div>
-                  {/* <Header1 /> */}
-                  <Header/>
+                  <Header1 />
+                  {/* <Header/> */}
                   {children}
                 </div>
               </OrderProvider>
