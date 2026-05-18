@@ -3,6 +3,7 @@ import React from 'react';
 import ProductImageGallery from './ProductImageGallery';
 import ProductInfo from './ProductInfo';
 import ProductOptions from './ProductOptions';
+import ProductOptionsMobile from './ProductOptionsMobile';
 import ProductButtons from './ProductButtons';
 import SellerCard from './SellerCard';
 import ProductTabs from './ProductTabs';
@@ -41,12 +42,12 @@ const ProductLayout3 = ({ idPage, product }) => {
       </div>
 
       {/* Main Content */}
-      <div className="max-w-[85%] mx-auto px-4 py-8">
+      <div className="w-full md:max-w-[85%] mx-auto px-4 md:px-0 py-8 pb-70 md:pb-8">
         {/* Product Section */}
-        <div className="grid grid-cols-12 gap-8 mb-12">
+        <div className="flex flex-col-reverse lg:flex-row gap-8 mb-12">
           
           {/* Right: Gallery - 65% (Mobile: top, Desktop: right) */}
-          <div className="col-span-12 lg:col-span-8 order-first lg:order-last">
+          <div className="w-full lg:w-[65%]">
             <ProductImageGallery 
               mainImage={productData.mainImage}
               galleryImages={productData.galleryImages}
@@ -54,9 +55,10 @@ const ProductLayout3 = ({ idPage, product }) => {
           </div>
 
           {/* Left: Product Details - 35% (Mobile: bottom, Desktop: left) */}
-          <div className="col-span-12 lg:col-span-4 space-y-4 order-last lg:order-first">
+          <div className="w-full lg:w-[35%] space-y-4">
             <ProductInfo product={productData} />
-            <div className="flex gap-3 items-start">
+            {/* Desktop Version */}
+            <div className="hidden md:flex gap-3 items-start">
               <div className="flex-1">
                 <ProductOptions
                   product={product} 
@@ -70,15 +72,25 @@ const ProductLayout3 = ({ idPage, product }) => {
 
         </div>
 
+        {/* Mobile Bottom Bar - Product Options */}
+        <div className="md:hidden mb-20">
+          <ProductOptionsMobile
+            product={product} 
+            isVariants={product.isVariants} 
+            variants={product.variants} 
+            variantsFull={product.variantsFull}
+          />
+        </div>
+
         {/* Tabs and Ratings Section */}
-        <div className="grid grid-cols-12 gap-8">
+        <div className="flex flex-col lg:flex-row gap-8">
           {/* Left: Tabs - 65% */}
-          <div className="col-span-12 lg:col-span-8">
+          <div className="w-full lg:w-[65%]">
             <ProductTabs />
           </div>
 
           {/* Right: Ratings - 35% */}
-          <div className="col-span-12 lg:col-span-4">
+          <div className="w-full lg:w-[35%]">
             <ProductRatings />
           </div>
         </div>
