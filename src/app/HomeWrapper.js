@@ -18,6 +18,7 @@ import BannerTwo from '@/components/websitecomp/BannerTwo';
 import Footer2 from '@/components/websitecomp/Footer2';
 import SimpleBanner from '@/components/websitecomp/SimpleBanner';
 import Products2 from '@/components/websitecomp/Products2';
+import ProductsSwiperBasic from '@/components/websitecomp/ProductSwiperBasic';
 
 
 function renderComponent(component, themeFont, themeColor) {
@@ -72,6 +73,8 @@ function renderComponent(component, themeFont, themeColor) {
       return <BannerTwo key={instanceId} {...mergedProps} {...extraProps} />      
      case 'footer2':
       return <Footer2 key={instanceId} {...mergedProps} {...extraProps} />    
+     case 'productsSwiperBasic':
+      return <ProductsSwiperBasic key={instanceId} {...mergedProps} {...extraProps} />    
     default:
       return null
   }

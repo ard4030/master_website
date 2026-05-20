@@ -49,6 +49,9 @@ const ProductImageGallery4 = ({ mainImage = '', galleryImages = [], title = '' }
       ? [`${imageUrl}${mainImage}`]
       : [];
 
+      console.log('52',images);
+      
+
   return (
     <>
     <div className="flex flex-col gap-3 dana" dir="rtl">

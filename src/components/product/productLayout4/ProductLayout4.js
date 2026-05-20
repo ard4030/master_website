@@ -4,6 +4,7 @@ import ProductOptions4 from './ProductOptions4';
 import ProductPrice4 from './ProductPrice4';
 import ProductImageGallery4 from './ProductImageGallery4';
 import ProductCategory from './ProductCategory';
+import ProductAttributes4 from './ProductAttributes4';
 import { FiShare2, FiHeart, FiPlus, FiTrash2, FiMinus, FiChevronDown, FiChevronUp } from 'react-icons/fi';
 import { IoBarChartOutline } from 'react-icons/io5';
 import { CartContext } from '@/context/CartContext';
@@ -29,16 +30,19 @@ const ProductLayout4 = ({ idPage, product }) => {
       : 0;
 
       // بعدا داینامیک باید بگیریم
-  const attributesProducts = [
-    { label: 'پردازنده', value: 'اگزینوس ۲۴۰۰ (۴ نانومتری)' },
-    { label: 'ظرفیت حافظه داخلی', value: '۲۵۶ گیگابایت' },
-    { label: 'حافظه رم', value: '۸ گیگابایت' },
-    { label: 'ظرفیت باتری', value: '۴۹۰۰ میلی آمپر' },
-    { label: 'کیفیت دوربین اصلی', value: '۵۰ مگاپیکسل' },
-    { label: 'فناوری صفحه نمایش', value: 'Dynamic LTPO AMOLED 2X' },
-    { label: 'سیستم عامل', value: 'Android 14' },
-    { label: 'ابعاد', value: '۱۴۷.۰ × ۷۰.۶ × ۷.۶ میلیمتر' },
-  ]
+  const attributesProducts = {
+    category: 'مشخصات فنی',
+    items: [
+      { name: 'پردازنده', value: 'اگزینوس ۲۴۰۰ (۴ نانومتری)', high: true },
+      { name: 'ظرفیت حافظه داخلی', value: '۲۵۶ گیگابایت', high: true },
+      { name: 'حافظه رم', value: '۸ گیگابایت', high: true },
+      { name: 'ظرفیت باتری', value: '۴۹۰۰ میلی آمپر', high: true },
+      { name: 'کیفیت دوربین اصلی', value: '۵۰ مگاپیکسل', high: false },
+      { name: 'فناوری صفحه نمایش', value: 'Dynamic LTPO AMOLED 2X', high: false },
+      { name: 'سیستم عامل', value: 'Android 14', high: false },
+      { name: 'ابعاد', value: '۱۴۷.۰ × ۷۰.۶ × ۷.۶ میلیمتر', high: false },
+    ],
+  }
 
   const cartItem =
     !loading && matchVariant
@@ -100,21 +104,7 @@ const ProductLayout4 = ({ idPage, product }) => {
     </div>
   );
 
-  const attrView = (attArr) => {
-    return(
-                <div className="border-t pt-3 mt-1 border-gray-300">
-                  <h2 className="text-sm danaBold text-gray-900 mb-3">مشخصات</h2>
-                  <div className="grid grid-cols-2 gap-x-4 gap-y-2">
-                    {attArr.map((attr, idx) => (
-                      <div key={idx} className="flex flex-col gap-1 bg-neutral-50 rounded-md p-2">
-                        <span className="text-[10px] text-gray-400 danaMed">{attr.label}</span>
-                        <span className="text-xs danaMed text-gray-800">{attr.value}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-    )
-  }
+
 
   return (
     <div className="min-h-screen bg-white dana" dir="rtl">
@@ -156,10 +146,63 @@ const ProductLayout4 = ({ idPage, product }) => {
 
           {sharedOptions}
           <div className="mt-3 flex flex-col gap-2">{sharedMeta}</div>
-              {attributesProducts?.length > 0 && (
-              attrView(attributesProducts)
-              )}
+              {product?.specifications?.length > 0 && 
+                product?.specifications.map((spec, idx) => (
+                <ProductAttributes4
+                  key={idx}
+                  category={spec.category}
+                  items={spec.items}
+                  highOnly
+                />
+              ))
+              }
           {sharedDescription}
+
+          {/* مشخصات فنی کامل */}
+          {product?.specifications?.length > 0 && (
+            <div className="border-t pt-5 mt-1">
+              {product.specifications.map((spec, idx) => (
+                <ProductAttributes4
+                  key={idx}
+                  category={spec.category}
+                  items={spec.items}
+                />
+              ))}
+            </div>
+          )}
+
+          {/* نظرات */}
+          <div className="border-t pt-5 mt-1">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-sm danaBold text-gray-900">نظرات</h2>
+              <button
+                onClick={() => setReviewOpen(true)}
+                className="text-blue-500 danaMed text-sm border border-blue-400 rounded-lg px-3 py-1 hover:bg-blue-50 transition"
+              >
+                افزودن نظر
+              </button>
+            </div>
+            <p className="text-sm text-gray-500 danaMed text-center py-2">
+              شما هم درباره این محصول نظر خود را بنویسید.
+            </p>
+            <p className="text-xs text-gray-400 danaMed text-center">
+              برای ثبت نظر، لازم است ابتدا وارد حساب کاربری خود شوید.
+            </p>
+            <div className="flex justify-center mt-4">
+              <button
+                onClick={() => setReviewOpen(true)}
+                className="border border-gray-300 rounded-lg px-8 py-2 text-sm danaMed text-gray-700 hover:border-gray-400 transition"
+              >
+                افزودن نظر
+              </button>
+            </div>
+          </div>
+
+          <ReviewModal4
+            isOpen={reviewOpen}
+            onClose={() => setReviewOpen(false)}
+            product={product}
+          />
         </div>
       </div>
 
@@ -261,9 +304,16 @@ const ProductLayout4 = ({ idPage, product }) => {
               {sharedOptions}
               {sharedMeta}
 
-              {attributesProducts?.length > 0 && (
-              attrView(attributesProducts)
-              )}
+              {product?.specifications?.length > 0 && 
+                product?.specifications.map((spec, idx) => (
+                <ProductAttributes4
+                  key={idx}
+                  category={spec.category}
+                  items={spec.items}
+                  highOnly
+                />
+              ))
+              }
             </div>
 
             {/* ستون سوم: قیمت sticky */}
@@ -299,6 +349,18 @@ const ProductLayout4 = ({ idPage, product }) => {
               </button>
             </div>
           )}
+
+          {/* مشخصات فنی (در صورت وجود) */}
+          {product?.specifications?.length > 0 && 
+            product?.specifications.map((spec, idx) => (
+              <ProductAttributes4
+                key={idx}
+                category={spec.category}
+                items={spec.items}
+                
+              />
+            ))
+          }
 
           {/* نظرات */}
           <div className="border-t pt-6">
