@@ -98,7 +98,7 @@ export default function HomeWrapper({ homepageData }) {
   // استفاده از تم جدید (اگر موجود باشد) یا تم قدیمی
   const componentsToRender = newTheme?.components || activeTheme?.components || []
   
-  console.log(',,,,,,',componentsToRender,homepageData.data);
+  // console.log(',,,,,,',componentsToRender,homepageData.data);
   
   return (
     
