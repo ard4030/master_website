@@ -22,6 +22,7 @@ import ProductsSwiperBasic from '@/components/websitecomp/ProductSwiperBasic';
 import Footer3 from '@/components/websitecomp/Footer3';
 import Slider1Offer from '@/components/websitecomp/Slider1Offer';
 import Slider1 from '@/components/websitecomp/Slider1';
+import Slider2 from '@/components/websitecomp/Slider2';
 
 
 function renderComponent(component, themeFont, themeColor) {
@@ -84,6 +85,8 @@ function renderComponent(component, themeFont, themeColor) {
       return <Slider1Offer key={instanceId} {...mergedProps} {...extraProps} />
       case 'slider1':
       return <Slider1 key={instanceId} {...mergedProps} {...extraProps} />
+      case 'slider2':
+      return <Slider2 key={instanceId} {...mergedProps} {...extraProps} />
     default:
       return null
   }
