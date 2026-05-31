@@ -53,21 +53,26 @@ const CartPage = () => {
 
     switch (currentStep) {
       case 1:
-        return <StepOne />
+        return <StepOne onContinue={() => handleStepChange(2)} />
       case 2:
-        return <StepTwo />
+        return (
+          <StepTwo
+            onContinue={() => handleStepChange(3)}
+            onBack={() => setCurrentStep(1)}
+          />
+        )
       case 3:
         return <StepThree />
       case 4:
         return <StepFour />
       default:
-        return <StepOne />
+        return <StepOne onContinue={() => handleStepChange(2)} />
     }
   }
 
   return (
     <div className="min-h-screen bg-gray-50 py-12 px-4 dana">
-      <div className="max-w-4xl mx-auto">
+      <div className="max-w-6xl mx-auto">
         {/* Steps */}
         <StepIndicator steps={steps} currentStep={currentStep} setCurrentStep={handleStepChange} />
 
@@ -75,23 +80,25 @@ const CartPage = () => {
         {renderStep()}
 
         {/* دکمه‌های ناوبری */}
-        <div className="flex justify-between mt-8">
-          <button
-            onClick={() => setCurrentStep(Math.max(1, currentStep - 1))}
-            disabled={currentStep === 1}
-            className="px-6 py-3 border border-gray-300 text-gray-600 rounded-lg hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors dana"
-          >
-            بازگشت
-          </button>
+        {currentStep > 2 && (
+          <div className="flex justify-between mt-8">
+            <button
+              onClick={() => setCurrentStep(Math.max(1, currentStep - 1))}
+              disabled={currentStep === 1}
+              className="px-6 py-3 border border-gray-300 text-gray-600 rounded-lg hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors dana"
+            >
+              بازگشت
+            </button>
 
-          <button
-            onClick={() => handleStepChange(Math.min(4, currentStep + 1))}
-            disabled={currentStep === 4}
-            className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors danaBold"
-          >
-            ادامه
-          </button>
-        </div>
+            <button
+              onClick={() => handleStepChange(Math.min(4, currentStep + 1))}
+              disabled={currentStep === 4}
+              className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors danaBold"
+            >
+              ادامه
+            </button>
+          </div>
+        )}
       </div>
 
       {/* مدال لاگین */}

@@ -4,6 +4,7 @@ import { AuthProvider } from "@/context/AuthContext";
 import { MerchantProvider } from "@/context/MerchantContext";
 import { CartProvider } from "@/context/CartContext";
 import { OrderProvider } from "@/context/OrderContext";
+import { ViewProvider } from "@/context/ViewContext";
 import { ToastContainer } from "react-toastify";
 import Header1 from "@/components/websitecomp/Header1";
 import Header from "@/components/header/Header";
@@ -33,11 +34,13 @@ export default function RootLayout({ children }) {
           <AuthProvider>
             <CartProvider>
               <OrderProvider>
-                <div>
-                  <Header1 />
-                  {/* <Header/> */}
-                  {children}
-                </div>
+                <ViewProvider>
+                  <div>
+                    <Header1 />
+                    {/* <Header/> */}
+                    {children}
+                  </div>
+                </ViewProvider>
               </OrderProvider>
             </CartProvider>
           </AuthProvider>

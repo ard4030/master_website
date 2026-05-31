@@ -1,7 +1,7 @@
 'use client';
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import Image from 'next/image';
-import { Swiper, SwiperSlide, useSwiper } from 'swiper/react';
+import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation, Pagination } from 'swiper/modules';
 import 'swiper/css';
 import 'swiper/css/navigation';
@@ -14,6 +14,34 @@ const ProductImageGallery4 = ({ mainImage = '', galleryImages = [], title = '' }
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalIndex, setModalIndex] = useState(0);
 
+  const imageUrl = process.env.NEXT_PUBLIC_LIARA_IMAGE_URL || '';
+
+  const images = useMemo(() => {
+    const isAbsolute = (value) =>
+      /^(?:[a-z][a-z0-9+.-]*:)?\/\//i.test(value) || /^(data:|blob:)/i.test(value);
+
+    const joinUrl = (base, path) => {
+      if (!path) return '';
+      if (isAbsolute(path)) return path;
+      if (!base) return path;
+      const cleanBase = String(base).replace(/\/+$/, '');
+      const cleanPath = String(path).replace(/^\/+/, '');
+      return `${cleanBase}/${cleanPath}`;
+    };
+
+    const result = [];
+    const mainSrc = mainImage ? joinUrl(imageUrl, mainImage) : '';
+    if (mainSrc) result.push(mainSrc);
+
+    const gallery = Array.isArray(galleryImages) ? galleryImages : [];
+    for (const img of gallery) {
+      const src = img ? joinUrl(imageUrl, String(img)) : '';
+      if (src && !result.includes(src)) result.push(src);
+    }
+
+    return result;
+  }, [mainImage, galleryImages, imageUrl]);
+  
   const openModal = (index) => {
     setModalIndex(index);
     setIsModalOpen(true);
@@ -22,12 +50,14 @@ const ProductImageGallery4 = ({ mainImage = '', galleryImages = [], title = '' }
   const closeModal = () => setIsModalOpen(false);
 
   const prevModal = useCallback(() => {
+    if (images.length < 2) return;
     setModalIndex((prev) => (prev === 0 ? images.length - 1 : prev - 1));
-  }, []);
+  }, [images.length]);
 
   const nextModal = useCallback(() => {
+    if (images.length < 2) return;
     setModalIndex((prev) => (prev === images.length - 1 ? 0 : prev + 1));
-  }, []);
+  }, [images.length]);
 
   useEffect(() => {
     if (!isModalOpen) return;
@@ -40,17 +70,9 @@ const ProductImageGallery4 = ({ mainImage = '', galleryImages = [], title = '' }
     return () => window.removeEventListener('keydown', handler);
   }, [isModalOpen, prevModal, nextModal]);
 
-  const imageUrl = process.env.NEXT_PUBLIC_LIARA_IMAGE_URL || '';
-
-  const images =
-    galleryImages && galleryImages.length > 0
-      ? galleryImages.map((img) => `${img}`)
-      : mainImage
-      ? [`${imageUrl}${mainImage}`]
-      : [];
-
-      console.log('52',images);
-      
+  useEffect(() => {
+    if (selectedImage >= images.length) setSelectedImage(0);
+  }, [images.length, selectedImage]);
 
   return (
     <>

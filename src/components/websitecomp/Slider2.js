@@ -57,7 +57,7 @@ const Slider2 = ({
   // لینک محصول
   const getProductLink = (product) => {
     const id = product._id || product.id;
-    return `/product/view/${id}`;
+    return `/product/${id}`;
   };
 
   const sampleProducts = [
@@ -167,7 +167,7 @@ const Slider2 = ({
       >
         <div className="bg-white p-3 md:p-4 rounded-br-[25px] rounded-t-[25px]">
           <div
-            className="w-full aspect-square rounded-[25px] overflow-hidden mb-3 flex items-center justify-center"
+            className={`w-full aspect-square rounded-[25px] overflow-hidden mb-3 flex items-center justify-center`}
           >
             {(product.image || product.mainImage) && (
               <img
@@ -227,8 +227,7 @@ const Slider2 = ({
 
         <div className="flex items-center gap-0 pb-4 h-21 justify-between">
           <div
-            className="cartView shadow w-16 right-2 h-16 top-4 
-          relative rounded-[20px] flex justify-center items-center bg-white"
+            className="cartView shadow w-16 right-2 h-16 top-4 relative rounded-[20px] flex justify-center items-center bg-white"
           >
             <IoMdCart size={22} />
           </div>

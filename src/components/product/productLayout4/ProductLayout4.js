@@ -14,6 +14,7 @@ import ReviewModal4 from './ReviewModal4';
 
 const ProductLayout4 = ({ idPage, product }) => {
   console.log(product);
+  const openCart = true;
   
   const [showFullDesc, setShowFullDesc] = useState(false);
   const [matchVariant, setMatchVariant] = useState(null);

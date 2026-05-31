@@ -5,13 +5,17 @@ const ViewContext = createContext()
 
 export const ViewProvider = ({ children }) => {
   const [view, setView] = useState('default')
-  const [isLoading, setIsLoading] = useState(false)
+  const [isLoading, setIsLoading] = useState(false);
+  const [loadingObj, setLoadingObj] = useState({
+    countProduct : false,
+  });
 
   const value = {
     view,
     setView,
     isLoading,
     setIsLoading,
+    loadingObj, setLoadingObj
   }
 
   return (

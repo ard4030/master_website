@@ -55,7 +55,7 @@ const Slider1 = ({
   // لینک محصول
   const getProductLink = (product) => {
     const id = product._id || product.id;
-    return `/product/view/${id}`;
+    return `/product/${id}`;
   };
 
   const sampleProducts = [
@@ -249,8 +249,7 @@ const Slider1 = ({
                       className="block"
                     >
                       <div className="bg-white border-l-1 border-gray-200 p-3 md:p-4 ">
-                        <div className="w-full aspect-square rounded-2xl overflow-hidden mb-3
-                         flex items-center justify-center">
+                        <div className="w-full aspect-square rounded-2xl overflow-hidden mb-3 flex items-center justify-center">
                           {(product.image || product.mainImage) && (
                             <img
                               src={getImageUrl(product.mainImage || product.image)}
