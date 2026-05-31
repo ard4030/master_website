@@ -34,13 +34,13 @@ const SelectMap = ({ isOpen, onClose, onConfirm, initialPosition }) => {
 
           {/* محتوای اسکرول */}
           <div className="flex-1 min-h-0 overflow-y-auto p-4 overscroll-contain">
-            {/* <MapNeshan
+            <MapNeshan
               initialPosition={initialPosition}
               onConfirm={(picked) => {
                 onConfirm?.(picked)
                 onClose?.()
               }}
-            /> */}
+            />
           </div>
         </div>
       </AnimLayout>
