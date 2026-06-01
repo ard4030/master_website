@@ -13,6 +13,7 @@ const ProductImageGallery4 = ({ mainImage = '', galleryImages = [], title = '' }
   const [selectedImage, setSelectedImage] = useState(0);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalIndex, setModalIndex] = useState(0);
+  const [mobileSwiper, setMobileSwiper] = useState(null);
 
   const imageUrl = process.env.NEXT_PUBLIC_LIARA_IMAGE_URL || '';
 
@@ -29,13 +30,33 @@ const ProductImageGallery4 = ({ mainImage = '', galleryImages = [], title = '' }
       return `${cleanBase}/${cleanPath}`;
     };
 
+    const pickPath = (value) => {
+      if (!value) return '';
+      if (typeof value === 'string') return value;
+      if (typeof value !== 'object') return '';
+      return (
+        value.url ||
+        value.src ||
+        value.path ||
+        value.filePath ||
+        value.image ||
+        value.imageUrl ||
+        value.location ||
+        ''
+      );
+    };
+
     const result = [];
-    const mainSrc = mainImage ? joinUrl(imageUrl, mainImage) : '';
+    const mainSrc = mainImage ? joinUrl(imageUrl, pickPath(mainImage)) : '';
     if (mainSrc) result.push(mainSrc);
 
-    const gallery = Array.isArray(galleryImages) ? galleryImages : [];
+    const gallery =
+      Array.isArray(galleryImages)
+        ? galleryImages
+        : (galleryImages ? [galleryImages] : []);
+
     for (const img of gallery) {
-      const src = img ? joinUrl(imageUrl, String(img)) : '';
+      const src = joinUrl(imageUrl, pickPath(img));
       if (src && !result.includes(src)) result.push(src);
     }
 
@@ -48,6 +69,16 @@ const ProductImageGallery4 = ({ mainImage = '', galleryImages = [], title = '' }
   };
 
   const closeModal = () => setIsModalOpen(false);
+
+  const goToMobileSlide = (index) => {
+    setSelectedImage(index);
+    if (!mobileSwiper) return;
+    if (images.length > 1) {
+      mobileSwiper.slideToLoop(index);
+      return;
+    }
+    mobileSwiper.slideTo(index);
+  };
 
   const prevModal = useCallback(() => {
     if (images.length < 2) return;
@@ -88,6 +119,7 @@ const ProductImageGallery4 = ({ mainImage = '', galleryImages = [], title = '' }
           }}
           pagination={{ clickable: true }}
           loop={images.length > 1}
+          onSwiper={setMobileSwiper}
           onSlideChange={(swiper) => setSelectedImage(swiper.realIndex)}
           className="rounded-xl overflow-hidden bg-gray-50 w-full aspect-square"
         >
@@ -127,6 +159,30 @@ const ProductImageGallery4 = ({ mainImage = '', galleryImages = [], title = '' }
               <FiChevronLeft size={18} />
             </button>
           </>
+        )}
+
+        {images.length > 1 && (
+          <div className="mt-3 flex gap-2 overflow-x-auto pb-1 px-4">
+            {images.map((img, index) => (
+              <button
+                key={`mobile-thumb-${index}`}
+                onClick={() => goToMobileSlide(index)}
+                className={`relative w-14 h-14 shrink-0 rounded-lg border-2 overflow-hidden transition-all ${
+                  selectedImage === index
+                    ? 'border-blue-500 shadow-sm'
+                    : 'border-gray-200'
+                }`}
+              >
+                <Image
+                  src={img}
+                  alt={`تصویر کوچک ${index + 1}`}
+                  fill
+                  sizes="56px"
+                  className="object-cover"
+                />
+              </button>
+            ))}
+          </div>
         )}
       </div>
 

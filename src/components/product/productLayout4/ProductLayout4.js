@@ -11,17 +11,41 @@ import { CartContext } from '@/context/CartContext';
 import { isCart } from '@/utils/functions';
 import InfoBox from '@/components/global/other/InfoBox';
 import ReviewModal4 from './ReviewModal4';
+import BroadCromp from '@/components/global/broadCromp/BroadCromp';
+import CircularProgress from '@mui/material/CircularProgress';
+import ContinueShopping from '@/components/global/continueShopping/CotinueShopping';
 
 const ProductLayout4 = ({ idPage, product }) => {
   console.log(product);
   const openCart = true;
+
+  // این مقدار بعدا از سرور میاد
+  const activeOpenSide = true;
+
   
   const [showFullDesc, setShowFullDesc] = useState(false);
   const [matchVariant, setMatchVariant] = useState(null);
   const [reviewOpen, setReviewOpen] = useState(false);
+  const [mobileAddLoading, setMobileAddLoading] = useState(false);
+  const [openContinueModal, setOpenContinueModal] = useState(false);
   const { addToCart, cart, increaseQuantity, decreaseQuantity, loading } = useContext(CartContext);
 
   const description = product?.description || product?.shortDescription || '';
+  const categoryLabel =
+    Array.isArray(product?.category)
+      ? (typeof product.category[0] === 'string'
+          ? product.category[0]
+          : product.category[0]?.name || product.category[0]?.title)
+      : (typeof product?.category === 'string'
+          ? product.category
+          : product?.category?.name || product?.category?.title);
+
+  const breadcrumbItems = [
+    { label: 'خانه', href: '/' },
+    ...(categoryLabel ? [{ label: categoryLabel, href: '/product' }] : []),
+    { label: product?.name || 'جزئیات محصول' },
+  ];
+  const hasGalleryImages = Array.isArray(product?.galleryImages) && product.galleryImages.length > 0;
 
   const price = matchVariant?.price || 0;
   const compareAtPrice = matchVariant?.compareAtPrice || product?.compareAtPrice || 0;
@@ -54,6 +78,26 @@ const ProductLayout4 = ({ idPage, product }) => {
           items: cart?.items,
         })
       : null;
+
+  const openContinueIfEnabled = () => {
+    if (!activeOpenSide) return;
+    setOpenContinueModal(true);
+  };
+
+  const handleMobileAddToCart = async () => {
+    if (mobileAddLoading || !matchVariant) return;
+    try {
+      setMobileAddLoading(true);
+      await addToCart({
+        _id: product._id,
+        isVariants: product?.isVariants,
+        variantId: matchVariant?._id || null,
+      });
+      openContinueIfEnabled();
+    } finally {
+      setMobileAddLoading(false);
+    }
+  };
 
   /* ── محتوای مشترک بین موبایل و دسکتاپ ── */
   const sharedOptions = (
@@ -109,11 +153,26 @@ const ProductLayout4 = ({ idPage, product }) => {
 
   return (
     <div className="min-h-screen bg-white dana" dir="rtl">
+      <div className="bg-pink-50 border-b border-pink-100 px-4 md:px-6 py-2 text-center">
+        <span className="text-pink-600 danaMed text-sm">پیشنهاد شگفت‌انگیز</span>
+      </div>
+
+      <ContinueShopping
+        open={openContinueModal}
+        onClose={() => setOpenContinueModal(false)}
+        productList={cart?.items || []}
+      />
+
+
+      <div className="max-w-6xl mx-auto p-4 ">
+        <BroadCromp items={breadcrumbItems} />
+      </div>
+
 
       {/* ══════════════ موبایل ══════════════ */}
       <div className="md:hidden">
         {/* تصویر - sticky زیر همه لایه‌ها */}
-        <div className="sticky top-0 z-0 bg-gray-50 h-72">
+        <div className="sticky top-0 z-0 bg-gray-50">
           <ProductImageGallery4
             mainImage={product?.mainImage || ''}
             galleryImages={product?.galleryImages || []}
@@ -121,12 +180,9 @@ const ProductLayout4 = ({ idPage, product }) => {
         </div>
 
         {/* کارت محتوا - روی تصویر اسکرول می‌شود */}
-        <div className="relative z-10 bg-white rounded-t-3xl -mt-6 pb-32 px-4 pt-5 shadow-[0_-4px_16px_rgba(0,0,0,0.08)]">
-          {/* نوار فروش ویژه */}
-          <div className="flex justify-end border-b border-blue-100 pb-2 mb-3">
-            <span className="text-blue-600 danaMed text-sm">فروش ویژه</span>
-          </div>
-
+        <div className={`relative z-10 bg-white rounded-t-3xl pb-32 px-4 pt-5 shadow-[0_-4px_16px_rgba(0,0,0,0.08)] ${
+          hasGalleryImages ? 'mt-2' : '-mt-6'
+        }`}>
           {/* آیکون‌ها */}
           <div className="flex items-center justify-between mb-3">
             <div className="flex gap-3 text-gray-500">
@@ -251,16 +307,15 @@ const ProductLayout4 = ({ idPage, product }) => {
             </div>
           ) : (
             <button
-              onClick={() =>
-                addToCart({
-                  _id: product._id,
-                  isVariants: product?.isVariants,
-                  variantId: matchVariant?._id || null,
-                })
-              }
-              className="w-full bg-[#0084ff] text-white py-3 rounded-xl danaMed text-sm hover:bg-blue-700 transition"
+              onClick={handleMobileAddToCart}
+              disabled={mobileAddLoading}
+              className="w-full bg-[#0084ff] text-white py-3 rounded-xl danaMed text-sm hover:bg-blue-700 transition disabled:opacity-80 disabled:cursor-not-allowed flex items-center justify-center"
             >
-              افزودن به سبد
+              {mobileAddLoading ? (
+                <CircularProgress size={20} thickness={4.5} sx={{ color: '#ffffff' }} />
+              ) : (
+                'افزودن به سبد'
+              )}
             </button>
           )}
         </div>
@@ -268,10 +323,6 @@ const ProductLayout4 = ({ idPage, product }) => {
 
       {/* ══════════════ دسکتاپ ══════════════ */}
       <div className="hidden md:block">
-        <div className="bg-pink-50 border-b border-pink-100 px-6 py-2 text-center">
-          <span className="text-pink-600 danaMed text-sm">پیشنهاد شگفت‌انگیز</span>
-        </div>
-
         <div className="max-w-6xl mx-auto px-4 py-6">
           <div className="grid grid-cols-12 gap-3 mb-8">
             {/* ستون اول: گالری */}
@@ -323,6 +374,7 @@ const ProductLayout4 = ({ idPage, product }) => {
                 product={product}
                 matchVariant={matchVariant}
                 isVariants={product?.isVariants}
+                onAddSuccess={openContinueIfEnabled}
               />
             </div>
           </div>

@@ -1,4 +1,5 @@
 'use client'
+import { section } from 'framer-motion/client'
 import React from 'react'
 import {
   FaTruck, FaShieldHalved, FaTag, FaHeadset,
@@ -56,7 +57,9 @@ const AboutUs = ({
     ]
 
   return (
-    <section className='block sm:flex bg-white border-t border-b font-medium dana border-gray-200 justify-between items-center max-w-7xl mx-auto px-4 md:px-6 py-6 md:py-8'>
+    
+    <section className='w-full bg-white '>
+    <div className='block sm:flex bg-white border-t border-b font-medium dana border-gray-200 justify-between items-center max-w-7xl mx-auto px-4 md:px-6 py-6 md:py-8'>
         {
             properties.map((item,index) => {
                 return(
@@ -73,6 +76,7 @@ const AboutUs = ({
                     </div>
                 )
             })}
+    </div>
     </section>
   )
 }

@@ -74,31 +74,22 @@ const CartPage = () => {
     <div className="min-h-screen bg-gray-50 py-12 px-4 dana">
       <div className="max-w-6xl mx-auto">
         {/* Steps */}
-        <StepIndicator steps={steps} currentStep={currentStep} setCurrentStep={handleStepChange} />
+        {/* <StepIndicator steps={steps} currentStep={currentStep} setCurrentStep={handleStepChange} /> */}
 
-        {/* محتوای مرحله */}
-        {renderStep()}
-
-        {/* دکمه‌های ناوبری */}
-        {currentStep > 2 && (
-          <div className="flex justify-between mt-8">
+        {/* دکمه بازگشت بالا */}
+        {currentStep > 1 && (
+          <div className="mb-5 flex justify-start">
             <button
               onClick={() => setCurrentStep(Math.max(1, currentStep - 1))}
-              disabled={currentStep === 1}
-              className="px-6 py-3 border border-gray-300 text-gray-600 rounded-lg hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors dana"
+              className="danaBold px-5 py-2.5 rounded-xl border border-blue-200 bg-white text-blue-700 hover:bg-blue-50 hover:border-blue-300 shadow-sm hover:shadow transition-all"
             >
-              بازگشت
-            </button>
-
-            <button
-              onClick={() => handleStepChange(Math.min(4, currentStep + 1))}
-              disabled={currentStep === 4}
-              className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors danaBold"
-            >
-              ادامه
+              بازگشت به مرحله قبل
             </button>
           </div>
         )}
+
+        {/* محتوای مرحله */}
+        {renderStep()}
       </div>
 
       {/* مدال لاگین */}

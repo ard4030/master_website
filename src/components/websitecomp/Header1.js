@@ -41,6 +41,8 @@ const Header1 = ({
   }
 
   const merchantLogo = activeMerchant?.merchant?.storeImage || activeMerchant?.storeImage
+  console.log('44',activeMerchant);
+  
 
   return (
     <div style={{ display: 'flex', justifyContent: alignment === 'center' ? 'center' : alignment === 'flex-end' ? 'flex-end' : 'flex-start' }}>

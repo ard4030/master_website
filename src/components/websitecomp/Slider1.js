@@ -154,7 +154,7 @@ const Slider1 = ({
       className="w-full overflow-hidden dana"
       dir="rtl"
     >
-      <div className="max-w-7xl mx-auto py-6 px-4 md:py-8 md:px-6 lg:py-10 lg:px-10">
+      <div className="max-w-7xl mx-auto py-6 px-4 md:py-8 md:px-6 lg:py-10 lg:px-4">
         {(title || subtitle || titleIcon) && (
           <div className="flex items-center gap-2 mb-5">
             {titleIcon ? <span className="text-lg">{titleIcon}</span> : null}
@@ -172,8 +172,7 @@ const Slider1 = ({
         <div className="relative p-1">
           <button
             onClick={() => swiperRef.current?.slidePrev()}
-            className="absolute right-7 top-1/2 -translate-y-1/2 z-20 w-12 h-12 md:w-14 md:h-14 rounded-full flex items-center justify-center text-white shadow-lg"
-            style={{ backgroundColor: "#f00687" }}
+            className="absolute right-[-1rem] bg-white top-1/2 -translate-y-1/2 z-20 w-12 h-12 md:w-10 md:h-10 rounded-full flex items-center justify-center text-black shadow-lg"
             aria-label="قبلی"
           >
 
@@ -192,8 +191,7 @@ const Slider1 = ({
 
           <button
             onClick={() => swiperRef.current?.slideNext()}
-            className="absolute left-7 top-1/2 -translate-y-1/2 z-20 w-12 h-12 md:w-14 md:h-14 rounded-full flex items-center justify-center text-white shadow-lg"
-            style={{ backgroundColor: "#f00687" }}
+            className="absolute left-[-1rem] top-1/2 bg-white -translate-y-1/2 z-20 w-12 h-12 md:w-10 md:h-10 rounded-full flex items-center justify-center text-black shadow-lg"
             aria-label="بعدی"
           >
             <svg
@@ -208,7 +206,7 @@ const Slider1 = ({
             </svg>
           </button>
 
-          <div className="mx-7 md:mx-12 rounded-[22px] shadow-sm overflow-hidden">
+          <div className="w-full rounded-[22px] shadow-sm overflow-hidden">
             <Swiper
               modules={[Navigation, Autoplay, FreeMode]}
               spaceBetween={0}

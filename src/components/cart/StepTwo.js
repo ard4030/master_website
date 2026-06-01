@@ -181,17 +181,17 @@ const StepTwo = ({ onContinue, onBack }) => {
   const finalTotal =
     Number(cart?.totalAmount) || subtotal - productsDiscount + shippingPrice
   const isFreeShipping = shippingPrice === 0
+  const canContinue = Boolean(order?.address && order?.shippingMethod)
 
-  // console.log(activeMerchant);
+  console.log('',activeMerchant);
   
   const merchantName =
     activeMerchant?.merchant?.storeName || activeMerchant?.name || 'فروشگاه'
-  const merchantCity =
-    order?.address?.city || activeMerchant?.merchant?.city || 'شهر فروشنده'
+  const merchantCity = 'شهر فروشنده'
 
   // ===== رندر =====
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 dana" dir="rtl">
+    <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 dana pb-[calc(148px+env(safe-area-inset-bottom))] lg:pb-0" dir="rtl">
       {/* ============ ستون راست ============ */}
       <div className="lg:col-span-2 flex flex-col gap-4">
         {/* هدر مرحله */}
@@ -330,7 +330,7 @@ const StepTwo = ({ onContinue, onBack }) => {
         <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
             {/* هدر غرفه */}
             <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
-              <span className="danaBold text-sm text-gray-800">{merchantName}</span>
+              <span className="danaBold text-sm text-gray-800">سرویس های ارسال:</span>
               <span className="text-xs text-gray-500">
                 ارسال از: <span className="text-gray-700">{merchantCity}</span>
               </span>
@@ -385,7 +385,7 @@ const StepTwo = ({ onContinue, onBack }) => {
       </div>
 
       {/* ============ ستون چپ: جزئیات قیمت ============ */}
-      <aside className="lg:col-span-1">
+      <aside className="hidden lg:block lg:col-span-1">
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-5 lg:sticky lg:top-4">
           <h3 className="danaBold text-gray-800 text-base mb-4 text-left">
             جزئیات قیمت
@@ -423,13 +423,61 @@ const StepTwo = ({ onContinue, onBack }) => {
 
           <button
             onClick={() => onContinue?.()}
-            disabled={!order?.address || !order?.shippingMethod}
+            disabled={!canContinue}
             className="mt-5 w-full bg-orange-500 hover:bg-orange-600 active:scale-[0.99] text-white py-3 rounded-lg danaBold text-sm transition-all shadow-sm hover:shadow-md disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:bg-orange-500"
           >
             تایید و ادامه
           </button>
         </div>
       </aside>
+
+      <div className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-white border-t border-gray-200 px-4 py-3 shadow-[0_-6px_18px_rgba(15,23,42,0.12)]">
+        <details className="group mb-3 rounded-lg border border-gray-200 bg-gray-50/70">
+          <summary className="list-none cursor-pointer px-3 py-2.5 flex items-center justify-between text-sm text-gray-700 danaMed">
+            <span>مشاهده جزئیات روش ارسال</span>
+            <span className="transition-transform group-open:rotate-180">⌄</span>
+          </summary>
+          <div className="px-3 pb-3 pt-1 border-t border-gray-200 space-y-2 text-sm">
+            <Row label="مجموع قیمت محصولات" value={subtotal} suffix="تومان" />
+            <Row
+              label="تخفیف محصولات"
+              value={productsDiscount}
+              suffix="تومان"
+              valueClass="text-red-500"
+              prefix={productsDiscount > 0 ? '-' : ''}
+            />
+            <div className="flex items-center justify-between pt-1">
+              <span className="text-gray-600">هزینه ارسال</span>
+              {isFreeShipping ? (
+                <span className="danaBold text-green-600">رایگان</span>
+              ) : (
+                <span className="danaMed text-gray-800">
+                  {Math.floor(shippingPrice).toLocaleString('fa-IR')}
+                  <span className="text-xs text-gray-500 mr-1">تومان</span>
+                </span>
+              )}
+            </div>
+          </div>
+        </details>
+
+        <div className="flex items-center justify-between gap-3">
+          <div className="text-right">
+            <p className="text-xs text-gray-500 danaMed">جمع مبلغ پرداختنی:</p>
+            <p className="danaBold text-gray-900 text-xl leading-7">
+              {Math.floor(finalTotal).toLocaleString('fa-IR')}
+              <span className="text-xs text-gray-500 danaMed mr-1">تومان</span>
+            </p>
+          </div>
+
+          <button
+            onClick={() => onContinue?.()}
+            disabled={!canContinue}
+            className="min-w-42 bg-orange-500 hover:bg-orange-600 text-white py-3 px-6 rounded-xl danaBold text-sm transition-all shadow-sm disabled:opacity-60 disabled:cursor-not-allowed"
+          >
+            تایید و ادامه
+          </button>
+        </div>
+      </div>
 
       {/* ============ مدال افزودن آدرس ============ */}
       <ModalLayout

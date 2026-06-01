@@ -23,6 +23,7 @@ const StepThree = () => {
   const discountAmount = Number(cart?.discountAmount || 0)
   const finalAmount = Number(cart?.finalAmount || 0)
   const hasGateways = Boolean(order?.paymentGateways?.length)
+  const canSubmit = Boolean(order?.paymentGateway && hasGateways)
 
   useEffect(() => {
     if (order?.discountCode) {
@@ -167,7 +168,7 @@ const StepThree = () => {
   }
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 dana" dir="rtl">
+    <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 dana pb-[calc(148px+env(safe-area-inset-bottom))] lg:pb-0" dir="rtl">
       <div className="lg:col-span-2 flex flex-col gap-4">
         <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
           <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
@@ -178,28 +179,28 @@ const StepThree = () => {
           </div>
 
           <div className="p-5 space-y-4">
-            <div className="bg-gray-50 rounded-lg p-4">
-              <h3 className="danaBold text-gray-700 mb-3">محصولات سفارش</h3>
-              <div className="space-y-2">
+            <div className="bg-white/90 rounded-2xl p-4 md:p-5 border border-gray-200 shadow-[0_8px_20px_rgba(15,23,42,0.04)]">
+              <h3 className="danaBold text-gray-800 mb-3 text-sm md:text-base">محصولات سفارش</h3>
+              <div className="space-y-2.5">
                 {items.length > 0 ? (
                   items.map((item, index) => (
                     <div
                       key={item._id || item.id || `item-${index}`}
-                      className="flex justify-between items-start text-sm dana pb-2 border-b last:border-b-0"
+                      className="flex justify-between items-start gap-3 text-sm dana p-3 rounded-xl bg-white border border-gray-100"
                     >
                       <div className="flex-1 min-w-0">
-                        <p className="text-gray-700 truncate">
+                        <p className="text-gray-800 truncate leading-6">
                           {item.name} × {item.quantity || 1}
                         </p>
                         {item.msg && <p className="text-xs text-red-600 mt-1">{item.msg}</p>}
                       </div>
-                      <span className="text-gray-800 danaBold mr-3 shrink-0">
+                      <span className="text-gray-900 danaBold mr-2 shrink-0 text-xs sm:text-sm">
                         {(Number(item.price || 0) * Number(item.quantity || 1)).toLocaleString('fa-IR')} تومان
                       </span>
                     </div>
                   ))
                 ) : (
-                  <p className="text-gray-500 text-sm">هیچ محصولی برای نمایش وجود ندارد</p>
+                  <p className="text-gray-500 text-sm bg-gray-50 rounded-xl px-3 py-4 text-center">هیچ محصولی برای نمایش وجود ندارد</p>
                 )}
               </div>
             </div>
@@ -293,7 +294,7 @@ const StepThree = () => {
         </div>
       </div>
 
-      <aside className="lg:col-span-1">
+      <aside className="hidden lg:block lg:col-span-1">
         <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-5 lg:sticky lg:top-4 space-y-5">
           <div>
             <h3 className="text-base danaBold text-gray-800 mb-3">خلاصه فاکتور</h3>
@@ -348,13 +349,80 @@ const StepThree = () => {
 
           <button
             onClick={submitOrder}
-            disabled={!order?.paymentGateway || !hasGateways}
+            disabled={!canSubmit}
             className="w-full px-6 py-3 bg-green-600 text-white rounded-lg danaBold hover:bg-green-700 transition-colors text-sm disabled:bg-gray-400 disabled:cursor-not-allowed"
           >
             تکمیل سفارش و پرداخت
           </button>
         </div>
       </aside>
+
+      <div className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-white border-t border-gray-200 px-4 py-3 shadow-[0_-6px_18px_rgba(15,23,42,0.12)]">
+        <details className="group mb-3 rounded-lg border border-gray-200 bg-gray-50/70">
+          <summary className="list-none cursor-pointer px-3 py-2.5 flex items-center justify-between text-sm text-gray-700 danaMed">
+            <span>مشاهده جزئیات پرداخت</span>
+            <span className="transition-transform group-open:rotate-180">⌄</span>
+          </summary>
+          <div className="px-3 pb-3 pt-1 border-t border-gray-200 space-y-2 text-sm">
+            <PriceRow label="جمع محصولات" value={totalAmount} />
+            <PriceRow label="هزینه ارسال" value={shippingPrice} />
+            {cart?.isCodeDiscounted && (
+              <PriceRow label="تخفیف کد" value={discountAmount} valueClass="text-red-500" prefix="-" />
+            )}
+
+            <div className="pt-2 border-t border-gray-200">
+              <h4 className="danaBold text-gray-800 text-sm mb-2">کد تخفیف</h4>
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  value={discountCode}
+                  onChange={(e) => setDiscountCode(e.target.value)}
+                  placeholder="کد تخفیف"
+                  className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm dana focus:outline-none focus:ring-2 focus:ring-orange-100 focus:border-orange-400 disabled:bg-gray-50"
+                  dir="rtl"
+                  disabled={cart?.isCodeDiscounted}
+                />
+                {!cart?.isCodeDiscounted ? (
+                  <button
+                    onClick={validateCouponCode}
+                    disabled={isValidatingCode}
+                    className="px-4 py-2 bg-orange-500 text-white rounded-lg danaBold hover:bg-orange-600 transition-colors text-sm disabled:bg-gray-400 disabled:cursor-not-allowed"
+                  >
+                    {isValidatingCode ? '...' : 'اعمال'}
+                  </button>
+                ) : (
+                  <button
+                    onClick={removeCouponCode}
+                    className="px-4 py-2 bg-red-500 text-white rounded-lg danaBold hover:bg-red-600 transition-colors text-sm"
+                  >
+                    حذف
+                  </button>
+                )}
+              </div>
+              {codeError && <p className="text-red-600 text-xs dana mt-2">{codeError}</p>}
+              {codeSuccess && <p className="text-green-600 text-xs dana mt-2">{codeSuccess}</p>}
+            </div>
+          </div>
+        </details>
+
+        <div className="flex items-center justify-between gap-3">
+          <div className="text-right">
+            <p className="text-xs text-gray-500 danaMed">جمع مبلغ پرداختنی:</p>
+            <p className="danaBold text-gray-900 text-xl leading-7">
+              {Math.floor(finalAmount).toLocaleString('fa-IR')}
+              <span className="text-xs text-gray-500 danaMed mr-1">تومان</span>
+            </p>
+          </div>
+
+          <button
+            onClick={submitOrder}
+            disabled={!canSubmit}
+            className="min-w-42 bg-orange-500 hover:bg-orange-600 text-white py-3 px-6 rounded-xl danaBold text-sm transition-all shadow-sm disabled:opacity-60 disabled:cursor-not-allowed"
+          >
+            پرداخت
+          </button>
+        </div>
+      </div>
     </div>
   )
 }

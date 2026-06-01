@@ -60,7 +60,7 @@ const StepOne = ({ onContinue }) => {
   }
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 dana" dir="rtl">
+    <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 dana pb-[calc(148px+env(safe-area-inset-bottom))] lg:pb-0" dir="rtl">
       {/* ===== ستون راست: محصولات ===== */}
       <div className="lg:col-span-2 bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
         {/* هدر غرفه */}
@@ -140,7 +140,7 @@ const StepOne = ({ onContinue }) => {
       </div>
 
       {/* ===== ستون چپ: جزئیات قیمت ===== */}
-      <aside className="lg:col-span-1">
+      <aside className="hidden lg:block lg:col-span-1">
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-5 lg:sticky lg:top-4">
           <h3 className="danaBold text-gray-800 text-base mb-4 text-left">
             جزئیات قیمت
@@ -174,6 +174,43 @@ const StepOne = ({ onContinue }) => {
           </button>
         </div>
       </aside>
+
+      <div className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-white border-t border-gray-200 px-4 py-3 shadow-[0_-6px_18px_rgba(15,23,42,0.12)]">
+        <details className="group mb-3 rounded-lg border border-gray-200 bg-gray-50/70">
+          <summary className="list-none cursor-pointer px-3 py-2.5 flex items-center justify-between text-sm text-gray-700 danaMed">
+            <span>مشاهده جزئیات فاکتور</span>
+            <span className="transition-transform group-open:rotate-180">⌄</span>
+          </summary>
+          <div className="px-3 pb-3 pt-1 border-t border-gray-200 space-y-2 text-sm">
+            <Row label="مجموع قیمت محصولات" value={subtotal} suffix="تومان" />
+            <Row
+              label="تخفیف محصولات"
+              value={productsDiscount}
+              suffix="تومان"
+              valueClass="text-red-500"
+              prefix={productsDiscount > 0 ? '-' : ''}
+            />
+            <Row label="مجموع هزینه ارسال" value={shippingTotal} suffix="تومان" />
+          </div>
+        </details>
+
+        <div className="flex items-center justify-between gap-3">
+          <div className="text-right">
+            <p className="text-xs text-gray-500 danaMed">مبلغ قابل پرداخت:</p>
+            <p className="danaBold text-gray-900 text-xl leading-7">
+              {Math.floor(finalTotal).toLocaleString('fa-IR')}
+              <span className="text-xs text-gray-500 danaMed mr-1">تومان</span>
+            </p>
+          </div>
+
+          <button
+            onClick={() => onContinue?.()}
+            className="min-w-42 bg-orange-500 hover:bg-orange-600 text-white py-3 px-6 rounded-xl danaBold text-sm transition-all shadow-sm"
+          >
+            تایید و ادامه
+          </button>
+        </div>
+      </div>
     </div>
   )
 }

@@ -16,7 +16,7 @@ const staticInsurance = {
   detailsUrl: '#',
 };
 
-const ProductPrice4 = ({ product, matchVariant, isVariants }) => {
+const ProductPrice4 = ({ product, matchVariant, isVariants, onAddSuccess }) => {
   const { addToCart, cart, increaseQuantity, decreaseQuantity, loading } = useContext(CartContext);
   const { loadingObj, setLoadingObj } = useView();
   const [insuranceAdded, setInsuranceAdded] = useState(false);
@@ -35,10 +35,13 @@ const ProductPrice4 = ({ product, matchVariant, isVariants }) => {
     }
   };
 
-  const handleAdd = () =>
-    withCountLoading('add', () =>
+  const handleAdd = async () => {
+    await withCountLoading('add', () =>
       addToCart({ _id: product._id, isVariants, variantId: matchVariant?._id || null })
     );
+
+    if (typeof onAddSuccess === 'function') onAddSuccess();
+  };
 
   const handleIncrease = (productId, variantId) =>
     withCountLoading('inc', () => increaseQuantity(productId, variantId));
@@ -67,7 +70,7 @@ const ProductPrice4 = ({ product, matchVariant, isVariants }) => {
       : null;
 
   return (
-    <div className="border border-gray-200 bg-neutral-50 rounded-xl p-4 flex flex-col gap-4shadow-xs">
+    <div className="border border-gray-200 bg-neutral-50 rounded-xl p-4 flex flex-col gap-4 shadow-xs">
       {/* قیمت */}
       <div className="flex flex-col gap-1">
         {discountPercent > 0 && (
