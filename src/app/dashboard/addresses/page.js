@@ -3,7 +3,8 @@
 import React, { useState, useEffect } from 'react'
 import { MdAdd, MdDelete, MdEdit } from 'react-icons/md'
 import { apiRequest } from '@/utils/functions'
-import { toast } from 'react-toastify'
+import { toast } from 'sonner'
+// import { toast } from 'react-toastify'
 
 const AddressesPage = () => {
   const [addresses, setAddresses] = useState([])

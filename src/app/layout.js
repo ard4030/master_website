@@ -6,6 +6,7 @@ import { CartProvider } from "@/context/CartContext";
 import { OrderProvider } from "@/context/OrderContext";
 import { ViewProvider } from "@/context/ViewContext";
 import { ToastContainer } from "react-toastify";
+import { Toaster, toast } from 'sonner';
 import Header1 from "@/components/websitecomp/Header1";
 import Header from "@/components/header/Header";
 
@@ -18,7 +19,8 @@ export default function RootLayout({ children }) {
   return (
     <html lang="fa" dir="rtl">
       <body className={` antialiased`}>
-        <ToastContainer 
+        <Toaster position="top-center" richColors />
+        {/* <ToastContainer 
           position="top-right"
           autoClose={3000}
           hideProgressBar={false}
@@ -28,7 +30,7 @@ export default function RootLayout({ children }) {
           pauseOnHover
           draggable
           theme="light"
-         />
+         /> */}
 
         <MerchantProvider>
           <AuthProvider>

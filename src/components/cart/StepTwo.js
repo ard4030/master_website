@@ -13,7 +13,9 @@ import {
   FiPlus,
 } from 'react-icons/fi'
 import { apiRequest } from '@/utils/functions'
-import { toast } from 'react-toastify'
+// import { toast } from 'react-toastify'
+import { toast } from 'sonner'
+
 import OrderContext from '@/context/OrderContext'
 import { CartContext } from '@/context/CartContext'
 import { MerchantContext } from '@/context/MerchantContext'
@@ -532,6 +534,8 @@ const AddressFormModal = ({ formData, setFormData, onCancel, onSave, isSaving })
   const [cities, setCities] = useState([])
   const [loadingStates, setLoadingStates] = useState(false)
   const [loadingCities, setLoadingCities] = useState(false)
+  const [statesLoadError, setStatesLoadError] = useState(false)
+  const [citiesLoadError, setCitiesLoadError] = useState(false)
   const [isMapOpen, setIsMapOpen] = useState(false)
 
   // دریافت موقعیت از نقشه و پر کردن فیلدها
@@ -553,6 +557,7 @@ const AddressFormModal = ({ formData, setFormData, onCancel, onSave, isSaving })
     const fetchStates = async () => {
       try {
         setLoadingStates(true)
+        setStatesLoadError(false)
         const res = await fetch(STATES_API)
         const data = await res.json()
         if (cancelled) return
@@ -569,7 +574,10 @@ const AddressFormModal = ({ formData, setFormData, onCancel, onSave, isSaving })
             .filter(Boolean)
         )
       } catch {
-        if (!cancelled) toast.error('خطا در دریافت لیست استان‌ها')
+        if (!cancelled) {
+          setStatesLoadError(true)
+          toast.error('خطا در دریافت لیست استان‌ها، لطفا استان را دستی وارد کنید')
+        }
       } finally {
         if (!cancelled) setLoadingStates(false)
       }
@@ -584,11 +592,13 @@ const AddressFormModal = ({ formData, setFormData, onCancel, onSave, isSaving })
   useEffect(() => {
     if (!formData.state) {
       setCities([])
+      setCitiesLoadError(false)
       return
     }
     const fetchCities = async () => {
       try {
         setLoadingCities(true)
+        setCitiesLoadError(false)
         const res = await fetch(
           `${CITIES_API}?state=${encodeURIComponent(formData.state)}`
         )
@@ -598,7 +608,9 @@ const AddressFormModal = ({ formData, setFormData, onCancel, onSave, isSaving })
           : data?.cities || []
         setCities(list.map((c) => c.name).filter(Boolean))
       } catch {
-        toast.error('خطا در دریافت لیست شهرها')
+        setCitiesLoadError(true)
+        setCities([])
+        toast.error('خطا در دریافت لیست شهرها، لطفا شهر را دستی وارد کنید')
       } finally {
         setLoadingCities(false)
       }
@@ -678,27 +690,46 @@ const AddressFormModal = ({ formData, setFormData, onCancel, onSave, isSaving })
 
         {/* استان و شهر */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          <Dropdown
-            label="استان"
-            required
-            placeholder="انتخاب استان"
-            value={formData.state}
-            options={states}
-            loading={loadingStates}
-            onChange={(v) =>
-              setFormData({ ...formData, state: v, city: '' })
-            }
-          />
-          <Dropdown
-            label="شهر"
-            required
-            placeholder={formData.state ? 'انتخاب شهر' : 'ابتدا استان را انتخاب کنید'}
-            value={formData.city}
-            options={cities}
-            loading={loadingCities}
-            disabled={!formData.state}
-            onChange={(v) => setFormData({ ...formData, city: v })}
-          />
+          {statesLoadError ? (
+            <Field
+              label="استان"
+              placeholder="نام استان را وارد کنید"
+              value={formData.state}
+              onChange={(v) => setFormData({ ...formData, state: v, city: '' })}
+            />
+          ) : (
+            <Dropdown
+              label="استان"
+              required
+              placeholder="انتخاب استان"
+              value={formData.state}
+              options={states}
+              loading={loadingStates}
+              onChange={(v) =>
+                setFormData({ ...formData, state: v, city: '' })
+              }
+            />
+          )}
+
+          {citiesLoadError ? (
+            <Field
+              label="شهر"
+              placeholder="نام شهر را وارد کنید"
+              value={formData.city}
+              onChange={(v) => setFormData({ ...formData, city: v })}
+            />
+          ) : (
+            <Dropdown
+              label="شهر"
+              required
+              placeholder={formData.state ? 'انتخاب شهر' : 'ابتدا استان را انتخاب کنید'}
+              value={formData.city}
+              options={cities}
+              loading={loadingCities}
+              disabled={!formData.state}
+              onChange={(v) => setFormData({ ...formData, city: v })}
+            />
+          )}
         </div>
 
         {/* کد پستی */}

@@ -1,14 +1,16 @@
 "use client"
 import { createContext, useState, useEffect } from "react";
 import { apiRequest, getOrCreateDeviceId } from "@/utils/functions";
-import { toast } from "react-toastify";
+// import { toast } from "react-toastify";
+import { toast } from 'sonner'
+
 
 export const CartContext = createContext();
 export const CartProvider = ({ children }) => {
 
     const [isLoading, setIsLoading] = useState(false);
     const [cart, setCart] = useState(null);
-
+const [showSuggestions, setShowSuggestions] = useState(false);
     // دریافت کارت هنگام mount
     useEffect(() => {
         getCart();
@@ -109,7 +111,10 @@ export const CartProvider = ({ children }) => {
     };
 
     return (
-        <CartContext.Provider value={{ addToCart, getCart, increaseQuantity, decreaseQuantity, cart, isLoading , setCart }}>
+        <CartContext.Provider value={{ 
+            addToCart, getCart, increaseQuantity, decreaseQuantity, cart, isLoading , setCart,
+            showSuggestions, setShowSuggestions
+             }}>
             {children}
         </CartContext.Provider>
     );

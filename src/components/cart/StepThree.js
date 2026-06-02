@@ -5,7 +5,9 @@ import { FiCheckCircle, FiCreditCard, FiMapPin, FiTruck } from 'react-icons/fi'
 import OrderContext from '@/context/OrderContext'
 import { CartContext } from '@/context/CartContext'
 import { apiRequest, getOrCreateDeviceId } from '@/utils/functions'
-import { toast } from 'react-toastify'
+// import { toast } from 'react-toastify'
+import { toast } from 'sonner'
+
 
 const StepThree = () => {
   const { order, setOrder } = useContext(OrderContext)

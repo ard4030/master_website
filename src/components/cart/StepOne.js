@@ -105,7 +105,8 @@ const StepOne = ({ onContinue }) => {
             const qty = item.quantity || 1
             const lineTotal = (Number(item.price) || 0) * qty
             const lowStock = item.stockQuantity && item.stockQuantity <= qty
-
+            // console.log('item',item);
+            
             return (
               <CartItem
                 key={itemId}
