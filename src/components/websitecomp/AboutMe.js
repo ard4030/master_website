@@ -2,6 +2,38 @@
 
 import React, { useState } from 'react'
 import Link from 'next/link'
+import { motion, useAnimationControls, useInView } from 'framer-motion'
+
+const ANIMATION_PRESETS = {
+  none: {
+    hidden: { opacity: 1 },
+    visible: { opacity: 1 }
+  },
+  fade: {
+    hidden: { opacity: 0 },
+    visible: { opacity: 1 }
+  },
+  slideUp: {
+    hidden: { opacity: 0, y: 36 },
+    visible: { opacity: 1, y: 0 }
+  },
+  slideRight: {
+    hidden: { opacity: 0, x: -42 },
+    visible: { opacity: 1, x: 0 }
+  },
+  slideLeft: {
+    hidden: { opacity: 0, x: 42 },
+    visible: { opacity: 1, x: 0 }
+  },
+  zoomIn: {
+    hidden: { opacity: 0, scale: 0.88 },
+    visible: { opacity: 1, scale: 1 }
+  },
+  blurUp: {
+    hidden: { opacity: 0, y: 20, filter: 'blur(8px)' },
+    visible: { opacity: 1, y: 0, filter: 'blur(0px)' }
+  }
+}
 
 /**
  * کامپوننت بخش درباره من
@@ -22,9 +54,40 @@ const AboutMe = ({
   ctaText = 'VIEW PORTFOLIO',
   ctaLink = '#',
   secondaryCtaText = 'با من تماس بگیرید',
-  secondaryCtaLink = '#'
+  secondaryCtaLink = '#',
+  contentAnimationType = 'slideRight',
+  contentAnimationDelay = '0.05',
+  contentAnimationDuration = '0.75',
+  subtitleAnimationType = 'fade',
+  subtitleAnimationDelay = '0.15',
+  subtitleAnimationDuration = '0.6',
+  titleAnimationType = 'slideUp',
+  titleAnimationDelay = '0.25',
+  titleAnimationDuration = '0.7',
+  descriptionAnimationType = 'fade',
+  descriptionAnimationDelay = '0.35',
+  descriptionAnimationDuration = '0.65',
+  ctaAnimationType = 'zoomIn',
+  ctaAnimationDelay = '0.45',
+  ctaAnimationDuration = '0.6',
+  imageAnimationType = 'slideLeft',
+  imageAnimationDelay = '0.15',
+  imageAnimationDuration = '0.8'
 }) => {
   const [activeSlide, setActiveSlide] = useState(0)
+  const sectionRef = React.useRef(null)
+  const animationControls = useAnimationControls()
+  const isInView = useInView(sectionRef, {
+    once: true,
+    amount: 0.3,
+    margin: '0px 0px -10% 0px'
+  })
+
+  React.useEffect(() => {
+    if (isInView) {
+      animationControls.start('visible')
+    }
+  }, [isInView, animationControls])
 
   // تابع کمکی برای تبدیل URL تصویر
   const getImageUrl = (imagePath) => {
@@ -33,31 +96,58 @@ const AboutMe = ({
     return `${process.env.NEXT_PUBLIC_LIARA_IMAGE_URL}${imagePath}`
   }
 
+  const parseTiming = (value, fallback) => {
+    const parsed = Number.parseFloat(value)
+    if (Number.isNaN(parsed)) return fallback
+    return Math.max(0, parsed)
+  }
+
+  const getMotionConfig = (type, delayValue, durationValue) => {
+    const preset = ANIMATION_PRESETS[type] || ANIMATION_PRESETS.fade
+    return {
+      initial: 'hidden',
+      animate: animationControls,
+      variants: preset,
+      transition: {
+        delay: parseTiming(delayValue, 0),
+        duration: parseTiming(durationValue, 0.75),
+        ease: [0.22, 1, 0.36, 1]
+      }
+    }
+  }
+
+  const contentMotion = getMotionConfig(contentAnimationType, contentAnimationDelay, contentAnimationDuration)
+  const subtitleMotion = getMotionConfig(subtitleAnimationType, subtitleAnimationDelay, subtitleAnimationDuration)
+  const titleMotion = getMotionConfig(titleAnimationType, titleAnimationDelay, titleAnimationDuration)
+  const descriptionMotion = getMotionConfig(descriptionAnimationType, descriptionAnimationDelay, descriptionAnimationDuration)
+  const ctaMotion = getMotionConfig(ctaAnimationType, ctaAnimationDelay, ctaAnimationDuration)
+  const imageMotion = getMotionConfig(imageAnimationType, imageAnimationDelay, imageAnimationDuration)
+
   return (
-    <div className="w-full bg-white overflow-hidden dana">
+    <div ref={sectionRef} className="w-full bg-white overflow-hidden dana">
       <div className="max-w-7xl mx-auto">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-0 items-center min-h-screen lg:min-h-96">
           {/* Left Content - Text Section */}
-          <div className="flex flex-col justify-center space-y-6 px-6 sm:px-8 md:px-12 py-12 md:py-20 order-2 lg:order-1">
+          <motion.div className="flex flex-col justify-center space-y-6 px-6 sm:px-8 md:px-12 py-12 md:py-20 order-2 lg:order-1" {...contentMotion}>
             {/* Subtitle */}
-            <div className="text-sm text-gray-600 tracking-wider font-light leading-relaxed max-w-sm">
+            <motion.div className="text-sm text-gray-600 tracking-wider font-light leading-relaxed max-w-sm" {...subtitleMotion}>
               {subtitle}
-            </div>
+            </motion.div>
 
             {/* Main Title */}
-            <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold text-black leading-tight">
+            <motion.h1 className="text-5xl md:text-6xl lg:text-7xl font-bold text-black leading-tight" {...titleMotion}>
               {title}
-            </h1>
+            </motion.h1>
 
             {/* Description - Hidden on small screens if not needed */}
             {description && (
-              <p className="text-gray-600 text-base leading-relaxed max-w-md hidden md:block">
+              <motion.p className="text-gray-600 text-base leading-relaxed max-w-md hidden md:block" {...descriptionMotion}>
                 {description}
-              </p>
+              </motion.p>
             )}
 
             {/* CTA Button */}
-            <div className="flex items-center gap-6 pt-4">
+            <motion.div className="flex items-center gap-6 pt-4" {...ctaMotion}>
               <Link
                 href={ctaLink}
                 className="px-6 md:px-8 py-3 border-2 border-black text-black rounded-md font-semibold hover:bg-black hover:text-white transition-colors duration-300 text-sm md:text-base tracking-wider"
@@ -80,11 +170,11 @@ const AboutMe = ({
                   />
                 ))}
               </div>
-            </div>
-          </div>
+            </motion.div>
+          </motion.div>
 
           {/* Right Content - Image Section */}
-          <div className="flex justify-center items-center h-96 lg:h-screen order-1 lg:order-2 bg-white">
+          <motion.div className="flex justify-center items-center h-96 lg:h-screen order-1 lg:order-2 bg-white" {...imageMotion}>
             <div className="relative w-full h-full flex items-center justify-center overflow-hidden">
               {imageUrl && (
                 <img
@@ -94,7 +184,7 @@ const AboutMe = ({
                 />
               )}
             </div>
-          </div>
+          </motion.div>
         </div>
       </div>
     </div>

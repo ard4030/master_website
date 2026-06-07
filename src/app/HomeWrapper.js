@@ -23,6 +23,9 @@ import Footer3 from '@/components/websitecomp/Footer3';
 import Slider1Offer from '@/components/websitecomp/Slider1Offer';
 import Slider1 from '@/components/websitecomp/Slider1';
 import Slider2 from '@/components/websitecomp/Slider2';
+import About2 from '@/components/websitecomp/About2';
+import Comments from '@/components/websitecomp/Comments';
+import Questions from '@/components/websitecomp/Questions';
 
 
 function renderComponent(component, themeFont, themeColor) {
@@ -87,6 +90,12 @@ function renderComponent(component, themeFont, themeColor) {
       return <Slider1 key={instanceId} {...mergedProps} {...extraProps} />
       case 'slider2':
       return <Slider2 key={instanceId} {...mergedProps} {...extraProps} />
+      case 'about2':
+      return <About2 key={instanceId} {...mergedProps} {...extraProps} />
+      case 'comments':
+      return <Comments key={instanceId} {...mergedProps} {...extraProps} />
+      case 'questions':
+      return <Questions key={instanceId} {...mergedProps} {...extraProps} />
     default:
       return null
   }

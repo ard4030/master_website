@@ -4,6 +4,8 @@ import React, { useEffect, useRef } from 'react'
 import Link from 'next/link'
 import { Swiper, SwiperSlide } from 'swiper/react'
 import { Autoplay, Pagination, Navigation } from 'swiper/modules'
+import { motion } from 'framer-motion'
+import { useViewportMotion } from './animationUtils'
 
 import 'swiper/css'
 import 'swiper/css/pagination'
@@ -22,8 +24,18 @@ const HeroBannerSwiper = ({
   textPosition = 'left',
   bgColor = '#ffffff',
   largeTextColor = '#111827',
-  smallTextColor = '#111827'
+  smallTextColor = '#111827',
+  sectionAnimationType = 'fade',
+  sectionAnimationDelay = '0.05',
+  sectionAnimationDuration = '0.7'
 }) => {
+  const { sectionRef, motionProps } = useViewportMotion({
+    animationType: sectionAnimationType,
+    animationDelay: sectionAnimationDelay,
+    animationDuration: sectionAnimationDuration,
+    amount: 0.2
+  })
+
   const prevRef = useRef(null)
   const nextRef = useRef(null)
   const swiperRef = useRef(null)
@@ -67,7 +79,7 @@ const HeroBannerSwiper = ({
   }
 
   return (
-    <section className="w-full" style={{backgroundColor: bgColor}}>
+    <motion.section ref={sectionRef} className="w-full" style={{backgroundColor: bgColor}} {...motionProps}>
       <style>{`
         .hero-banner-swiper .swiper-pagination {
           bottom: 18px;
@@ -179,7 +191,7 @@ const HeroBannerSwiper = ({
           </button>
         </div>
       </div>
-    </section>
+    </motion.section>
   )
 }
 

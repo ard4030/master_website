@@ -1,15 +1,47 @@
 "use client";
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Autoplay, FreeMode } from "swiper/modules";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
+import { motion, useAnimationControls, useInView } from "framer-motion";
 
 // Import Swiper styles
 import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/free-mode";
 import { formatPrice } from "@/utils/functions";
+
+const ANIMATION_PRESETS = {
+  none: {
+    hidden: { opacity: 1 },
+    visible: { opacity: 1 },
+  },
+  fade: {
+    hidden: { opacity: 0 },
+    visible: { opacity: 1 },
+  },
+  slideUp: {
+    hidden: { opacity: 0, y: 32 },
+    visible: { opacity: 1, y: 0 },
+  },
+  slideRight: {
+    hidden: { opacity: 0, x: -36 },
+    visible: { opacity: 1, x: 0 },
+  },
+  slideLeft: {
+    hidden: { opacity: 0, x: 36 },
+    visible: { opacity: 1, x: 0 },
+  },
+  zoomIn: {
+    hidden: { opacity: 0, scale: 0.92 },
+    visible: { opacity: 1, scale: 1 },
+  },
+  blurUp: {
+    hidden: { opacity: 0, y: 16, filter: "blur(8px)" },
+    visible: { opacity: 1, y: 0, filter: "blur(0px)" },
+  },
+};
 
 /**
  * کامپوننت محصولات لغزنده - استایل ساده
@@ -32,12 +64,58 @@ const ProductsSwiperBasic = ({
   subtitle = "",
   description = "",
   titleIcon = "⌚",
+  sectionAnimationType = "fade",
+  sectionAnimationDelay = "0",
+  sectionAnimationDuration = "0.65",
+  headerAnimationType = "slideUp",
+  headerAnimationDelay = "0.12",
+  headerAnimationDuration = "0.65",
+  sliderAnimationType = "slideUp",
+  sliderAnimationDelay = "0.2",
+  sliderAnimationDuration = "0.7",
+  cardsAnimationType = "blurUp",
+  cardsAnimationDelay = "0.28",
+  cardsAnimationDuration = "0.58",
+  cardsAnimationStagger = "0.07",
 }) => {
   const autoplayDelayMs =
     enableAutoplay === "true" ? (parseInt(autoplayDelay) || 5) * 1000 : 0;
   const pathName = usePathname();
   const swiperRef = useRef(null);
   const [isDragging, setIsDragging] = useState(false);
+  const sectionRef = useRef(null);
+  const animationControls = useAnimationControls();
+  const isInView = useInView(sectionRef, {
+    once: true,
+    amount: 0.2,
+    margin: "0px 0px -10% 0px",
+  });
+
+  useEffect(() => {
+    if (isInView) {
+      animationControls.start("visible");
+    }
+  }, [isInView, animationControls]);
+
+  const parseTiming = (value, fallback) => {
+    const parsed = Number.parseFloat(value);
+    if (Number.isNaN(parsed)) return fallback;
+    return Math.max(0, parsed);
+  };
+
+  const getMotionConfig = (type, delayValue, durationValue, extraDelay = 0) => {
+    const preset = ANIMATION_PRESETS[type] || ANIMATION_PRESETS.fade;
+    return {
+      initial: "hidden",
+      animate: animationControls,
+      variants: preset,
+      transition: {
+        delay: parseTiming(delayValue, 0) + extraDelay,
+        duration: parseTiming(durationValue, 0.7),
+        ease: [0.22, 1, 0.36, 1],
+      },
+    };
+  };
 
   // تابع کمکی برای تبدیل URL تصویر
   const getImageUrl = (imagePath) => {
@@ -136,16 +214,40 @@ const ProductsSwiperBasic = ({
   if (pathName !== "/newsitebuilder") products = data || sampleProducts;
 
   const maxSlidesPerView = 4;
+  const sectionMotion = getMotionConfig(
+    sectionAnimationType,
+    sectionAnimationDelay,
+    sectionAnimationDuration
+  );
+  const headerMotion = getMotionConfig(
+    headerAnimationType,
+    headerAnimationDelay,
+    headerAnimationDuration
+  );
+  const sliderMotion = getMotionConfig(
+    sliderAnimationType,
+    sliderAnimationDelay,
+    sliderAnimationDuration
+  );
+  const getCardMotion = (index) =>
+    getMotionConfig(
+      cardsAnimationType,
+      cardsAnimationDelay,
+      cardsAnimationDuration,
+      parseTiming(cardsAnimationStagger, 0.07) * index
+    );
 
   return (
-    <div
+    <motion.div
+      ref={sectionRef}
       style={{ backgroundColor: bgColor }}
       className="w-full overflow-hidden dana"
       dir="rtl"
-    >tessssts
+      {...sectionMotion}
+    >
       <div className="max-w-7xl mx-auto py-6 px-3 md:py-8 md:px-4 lg:py-10 lg:px-6">
         {/* Header */}
-        <div className="flex items-center justify-between mb-6">
+        <motion.div className="flex items-center justify-between mb-6" {...headerMotion}>
           {/* Title */}
           <div className="flex items-center gap-2">
             {titleIcon && <span className="text-2xl">{titleIcon}</span>}
@@ -195,43 +297,45 @@ const ProductsSwiperBasic = ({
               </svg>
             </button>
           </div>
-        </div>
+        </motion.div>
 
         {/* Products Swiper */}
-        <Swiper
-          modules={[Navigation, Autoplay, FreeMode]}
-          spaceBetween={16}
-          slidesPerView={1.5}
-          breakpoints={{
-            768: { slidesPerView: 2.5 },
-            1024: { slidesPerView: maxSlidesPerView },
-          }}
-          freeMode={{ enabled: true, sticky: false }}
-          grabCursor={true}
-          loop={products.length > maxSlidesPerView}
-          autoplay={
-            enableAutoplay === "true"
-              ? { delay: autoplayDelayMs, disableOnInteraction: false }
-              : false
-          }
-          onSwiper={(swiper) => {
-            swiperRef.current = swiper;
-          }}
-          onSliderMove={() => setIsDragging(true)}
-          onTouchEnd={() => setTimeout(() => setIsDragging(false), 100)}
-          className="w-full"
-          dir="rtl"
-        >
-          {products.map((product) => (
-            <SwiperSlide key={product.id || product._id}>
-              <Link
-                href={getProductLink(product)}
-                onClick={(e) => {
-                  if (isDragging) e.preventDefault();
-                }}
-                className="block group"
-              >
-                <div className="border border-gray-200 rounded-xl p-4 transition-all duration-300 hover:shadow-lg hover:border-gray-300 bg-white relative overflow-hidden">
+        <motion.div {...sliderMotion}>
+          <Swiper
+            modules={[Navigation, Autoplay, FreeMode]}
+            spaceBetween={16}
+            slidesPerView={1.5}
+            breakpoints={{
+              768: { slidesPerView: 2.5 },
+              1024: { slidesPerView: maxSlidesPerView },
+            }}
+            freeMode={{ enabled: true, sticky: false }}
+            grabCursor={true}
+            loop={products.length > maxSlidesPerView}
+            autoplay={
+              enableAutoplay === "true"
+                ? { delay: autoplayDelayMs, disableOnInteraction: false }
+                : false
+            }
+            onSwiper={(swiper) => {
+              swiperRef.current = swiper;
+            }}
+            onSliderMove={() => setIsDragging(true)}
+            onTouchEnd={() => setTimeout(() => setIsDragging(false), 100)}
+            className="w-full"
+            dir="rtl"
+          >
+            {products.map((product, index) => (
+              <SwiperSlide key={product.id || product._id}>
+                <motion.div {...getCardMotion(index)}>
+                  <Link
+                    href={getProductLink(product)}
+                    onClick={(e) => {
+                      if (isDragging) e.preventDefault();
+                    }}
+                    className="block group"
+                  >
+                    <div className="border border-gray-200 rounded-xl p-4 transition-all duration-300 hover:shadow-lg hover:border-gray-300 bg-white relative overflow-hidden">
                   {/* Product Image */}
                   <div className="w-full aspect-square rounded-lg overflow-hidden mb-4 flex items-center justify-center bg-gray-50">
                     {(product.image || product.mainImage) && (
@@ -294,13 +398,15 @@ const ProductsSwiperBasic = ({
                       تومان
                     </span>
                   </div>
-                </div>
-              </Link>
-            </SwiperSlide>
-          ))}
-        </Swiper>
+                    </div>
+                  </Link>
+                </motion.div>
+              </SwiperSlide>
+            ))}
+          </Swiper>
+        </motion.div>
       </div>
-    </div>
+    </motion.div>
   );
 };
 

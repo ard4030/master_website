@@ -73,6 +73,8 @@ const AddressesPage = () => {
       toast.error('لطفاً تمام فیلدها را پر کنید')
       return
     }
+    console.log('76',formData);
+    
 
     setIsSaving(true)
 
@@ -80,6 +82,8 @@ const AddressesPage = () => {
       // ویرایش
       const response = await apiRequest(`/addresses/${editingId}`, 'PUT', formData)
       if (response.success) {
+    console.log('76',formData);
+
         toast.success('آدرس با موفقیت ویرایش شد')
         fetchAddresses()
         handleCloseModal()

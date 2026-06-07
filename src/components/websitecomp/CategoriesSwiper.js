@@ -3,6 +3,8 @@
 import React from 'react'
 import { Swiper, SwiperSlide } from 'swiper/react'
 import { Navigation, Autoplay } from 'swiper/modules'
+import { motion } from 'framer-motion'
+import { useViewportMotion } from './animationUtils'
 
 // Import Swiper styles
 import 'swiper/css'
@@ -98,9 +100,18 @@ const CategoriesSwiper = ({
   largeTextColor = '#111827',
   smallTextColor = '#111827',
   autoplayDelay = '5',
-  enableAutoplay = 'true'
+  enableAutoplay = 'true',
+  sectionAnimationType = 'fade',
+  sectionAnimationDelay = '0.05',
+  sectionAnimationDuration = '0.7'
 }) => {
   const autoplayDelayMs = (parseInt(autoplayDelay) || 5) * 1000
+  const { sectionRef, motionProps } = useViewportMotion({
+    animationType: sectionAnimationType,
+    animationDelay: sectionAnimationDelay,
+    animationDuration: sectionAnimationDuration,
+    amount: 0.25
+  })
   // تابع کمکی برای تبدیل URL تصویر
   const getImageUrl = (imagePath) => {
     if (!imagePath) return ''
@@ -109,7 +120,7 @@ const CategoriesSwiper = ({
   }
 
   return (
-    <div className="w-full py-8 md:py-12" style={{backgroundColor: bgColor}}>
+    <motion.div ref={sectionRef} className="w-full py-8 md:py-12" style={{backgroundColor: bgColor}} {...motionProps}>
       <div className="max-w-7xl mx-auto px-4 md:px-6">
         {/* Title */}
         {title && (
@@ -169,7 +180,7 @@ const CategoriesSwiper = ({
           ))}
         </Swiper>
       </div>
-    </div>
+    </motion.div>
   )
 }
 

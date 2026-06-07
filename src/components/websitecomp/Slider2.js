@@ -1,9 +1,10 @@
 "use client";
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Autoplay, FreeMode } from "swiper/modules";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
+import { motion, useAnimationControls, useInView } from "framer-motion";
 
 // Import Swiper styles
 import "swiper/css";
@@ -12,6 +13,37 @@ import "swiper/css/free-mode";
 import { formatPrice } from "@/utils/functions";
 import { FaBasketShopping, FaChevronLeft, FaChevronRight } from "react-icons/fa6";
 import { IoMdCart } from "react-icons/io";
+
+const ANIMATION_PRESETS = {
+  none: {
+    hidden: { opacity: 1 },
+    visible: { opacity: 1 },
+  },
+  fade: {
+    hidden: { opacity: 0 },
+    visible: { opacity: 1 },
+  },
+  slideUp: {
+    hidden: { opacity: 0, y: 32 },
+    visible: { opacity: 1, y: 0 },
+  },
+  slideRight: {
+    hidden: { opacity: 0, x: -36 },
+    visible: { opacity: 1, x: 0 },
+  },
+  slideLeft: {
+    hidden: { opacity: 0, x: 36 },
+    visible: { opacity: 1, x: 0 },
+  },
+  zoomIn: {
+    hidden: { opacity: 0, scale: 0.92 },
+    visible: { opacity: 1, scale: 1 },
+  },
+  blurUp: {
+    hidden: { opacity: 0, y: 16, filter: "blur(8px)" },
+    visible: { opacity: 1, y: 0, filter: "blur(0px)" },
+  },
+};
 
 /**
  * کامپوننت محصولات لغزنده - استایل ساده
@@ -34,12 +66,58 @@ const Slider2 = ({
   subtitle = "",
   description = "",
   titleIcon = "⌚",
+  sectionAnimationType = "fade",
+  sectionAnimationDelay = "0",
+  sectionAnimationDuration = "0.65",
+  headerAnimationType = "slideUp",
+  headerAnimationDelay = "0.12",
+  headerAnimationDuration = "0.65",
+  sliderAnimationType = "slideUp",
+  sliderAnimationDelay = "0.2",
+  sliderAnimationDuration = "0.7",
+  cardsAnimationType = "blurUp",
+  cardsAnimationDelay = "0.28",
+  cardsAnimationDuration = "0.58",
+  cardsAnimationStagger = "0.07",
 }) => {
   const autoplayDelayMs =
     enableAutoplay === "true" ? (parseInt(autoplayDelay) || 5) * 1000 : 0;
   const pathName = usePathname();
   const swiperRef = useRef(null);
   const [isDragging, setIsDragging] = useState(false);
+  const sectionRef = useRef(null);
+  const animationControls = useAnimationControls();
+  const isInView = useInView(sectionRef, {
+    once: true,
+    amount: 0.2,
+    margin: "0px 0px -10% 0px",
+  });
+
+  useEffect(() => {
+    if (isInView) {
+      animationControls.start("visible");
+    }
+  }, [isInView, animationControls]);
+
+  const parseTiming = (value, fallback) => {
+    const parsed = Number.parseFloat(value);
+    if (Number.isNaN(parsed)) return fallback;
+    return Math.max(0, parsed);
+  };
+
+  const getMotionConfig = (type, delayValue, durationValue, extraDelay = 0) => {
+    const preset = ANIMATION_PRESETS[type] || ANIMATION_PRESETS.fade;
+    return {
+      initial: "hidden",
+      animate: animationControls,
+      variants: preset,
+      transition: {
+        delay: parseTiming(delayValue, 0) + extraDelay,
+        duration: parseTiming(durationValue, 0.7),
+        ease: [0.22, 1, 0.36, 1],
+      },
+    };
+  };
 
   const formatPercentFa = (value) => {
     const num = Number(value);
@@ -155,110 +233,136 @@ const Slider2 = ({
     768: { slidesPerView: 2.4, spaceBetween: 20 },
     1024: { slidesPerView: 4, spaceBetween: 22 },
   };
+  const sectionMotion = getMotionConfig(
+    sectionAnimationType,
+    sectionAnimationDelay,
+    sectionAnimationDuration
+  );
+  const headerMotion = getMotionConfig(
+    headerAnimationType,
+    headerAnimationDelay,
+    headerAnimationDuration
+  );
+  const sliderMotion = getMotionConfig(
+    sliderAnimationType,
+    sliderAnimationDelay,
+    sliderAnimationDuration
+  );
+  const getCardMotion = (index) =>
+    getMotionConfig(
+      cardsAnimationType,
+      cardsAnimationDelay,
+      cardsAnimationDuration,
+      parseTiming(cardsAnimationStagger, 0.07) * index
+    );
 
-  const CardSlider = (product, discountPercent, oldPrice) => {
+  const CardSlider = (product, discountPercent, oldPrice, index) => {
     return (
-      <Link
-        href={getProductLink(product)}
-        onClick={(e) => {
-          if (isDragging) e.preventDefault();
-        }}
-        className="block"
-      >
-        <div className="bg-white p-3 md:p-4 rounded-br-[25px] rounded-t-[25px]">
-          <div
-            className={`w-full aspect-square rounded-[25px] overflow-hidden mb-3 flex items-center justify-center`}
-          >
-            {(product.image || product.mainImage) && (
-              <img
-                src={getImageUrl(product.mainImage || product.image)}
-                alt={product.name || product.title}
-                className="w-[85%] h-[85%] object-contain"
-                draggable={false}
-              />
-            )}
-          </div>
-
-          <h3
-            className="text-sm md:text-[15px] danaBold text-center leading-7 mb-3 line-clamp-1"
-            style={{ color: largeTextColor }}
-          >
-            {product.name || product.title}
-          </h3>
-
-          <div
-            className="flex pt-4 items-end grid grid-cols-12 justify-between gap-2  pt-2 border-gray-300"
-            dir="rtl"
-          >
-            <div className="text-right col-span-4 grid flex flex-col items-end gap-1">
-              {formatPercentFa(discountPercent) ? (
-                <span
-                  className="inline-flex h-7 min-w-12 px-3 rounded-full items-center justify-center text-white text-sm italic danaBold"
-                  style={{ backgroundColor: "#6f2bd8", fontStyle: "italic" }}
-                >
-                  {formatPercentFa(discountPercent)}
-                </span>
-              ) : null}
-              {oldPrice ? (
-                <p className="text-xs danaBold text-[#c97b7b] line-through decoration-2 decoration-[#e15656]">
-                  {formatPrice(oldPrice)}
-                </p>
-              ) : null}
+      <motion.div {...getCardMotion(index)}>
+        <Link
+          href={getProductLink(product)}
+          onClick={(e) => {
+            if (isDragging) e.preventDefault();
+          }}
+          className="block"
+        >
+          <div className="bg-white p-3 md:p-4 rounded-br-[25px] rounded-t-[25px]">
+            <div
+              className={`w-full aspect-square rounded-[25px] overflow-hidden mb-3 flex items-center justify-center`}
+            >
+              {(product.image || product.mainImage) && (
+                <img
+                  src={getImageUrl(product.mainImage || product.image)}
+                  alt={product.name || product.title}
+                  className="w-[85%] h-[85%] object-contain"
+                  draggable={false}
+                />
+              )}
             </div>
 
-            <div className="text-left col-span-8 flex flex-wrap items-end gap-1">
-              <div className="leading-none w-full">
+            <h3
+              className="text-sm md:text-[15px] danaBold text-center leading-7 mb-3 line-clamp-1"
+              style={{ color: largeTextColor }}
+            >
+              {product.name || product.title}
+            </h3>
+
+            <div
+              className="flex pt-4 items-end grid grid-cols-12 justify-between gap-2 pt-2 border-gray-300"
+              dir="rtl"
+            >
+              <div className="text-right col-span-4 grid flex flex-col items-end gap-1">
+                {formatPercentFa(discountPercent) ? (
+                  <span
+                    className="inline-flex h-7 min-w-12 px-3 rounded-full items-center justify-center text-white text-sm italic danaBold"
+                    style={{ backgroundColor: "#6f2bd8", fontStyle: "italic" }}
+                  >
+                    {formatPercentFa(discountPercent)}
+                  </span>
+                ) : null}
+                {oldPrice ? (
+                  <p className="text-xs danaBold text-[#c97b7b] line-through decoration-2 decoration-[#e15656]">
+                    {formatPrice(oldPrice)}
+                  </p>
+                ) : null}
+              </div>
+
+              <div className="text-left col-span-8 flex flex-wrap items-end gap-1">
+                <div className="leading-none w-full">
+                  <span
+                    className="text-[24px] md:text-[24px] danaBold"
+                    style={{ color: priceColor }}
+                  >
+                    {product.price ? formatPrice(product.price) : "۰"}
+                  </span>
+                </div>
                 <span
-                  className="text-[24px] md:text-[24px] danaBold"
-                  style={{ color: priceColor }}
+                  className="text-sm w-full danaBold mt-1 inline-block"
+                  style={{ color: smallTextColor }}
                 >
-                  {product.price ? formatPrice(product.price) : "۰"}
+                  تومان
                 </span>
               </div>
-              <span
-                className="text-sm w-full danaBold mt-1 inline-block"
-                style={{ color: smallTextColor }}
-              >
-                تومان
-              </span>
             </div>
           </div>
-        </div>
 
-        <div className="flex items-center gap-0 pb-4 h-21 justify-between">
-          <div
-            className="cartView shadow w-16 right-2 h-16 top-4 relative rounded-[20px] flex justify-center items-center bg-white"
-          >
-            <IoMdCart size={22} />
+          <div className="flex items-center gap-0 pb-4 h-21 justify-between">
+            <div
+              className="cartView shadow w-16 right-2 h-16 top-4 relative rounded-[20px] flex justify-center items-center bg-white"
+            >
+              <IoMdCart size={22} />
+            </div>
+            <div className="w-[15%] md:w-[10%] lg:w-[5%]"></div>
+            <div className="bottomBox relative rounded-b-[25px] bg-white h-21 w-[65%]">
+              <span
+                style={{
+                  width: "35px",
+                  height: "35px",
+                  right: "-25px",
+                  background: "transparent",
+                  backgroundImage:
+                    "radial-gradient(circle at bottom right, transparent 25px, var(--wh-card-bg, #ffffff) 26px)",
+                }}
+                className="absolute"
+              ></span>
+            </div>
           </div>
-          <div className="w-[15%] md:w-[10%] lg:w-[5%]"></div>
-          <div className="bottomBox relative rounded-b-[25px] bg-white h-21 w-[65%]">
-            <span
-              style={{
-                width: "35px",
-                height: "35px",
-                right: "-25px",
-                background: "transparent",
-                backgroundImage:
-                  "radial-gradient(circle at bottom right, transparent 25px, var(--wh-card-bg, #ffffff) 26px)",
-              }}
-              className="absolute"
-            ></span>
-          </div>
-        </div>
-      </Link>
+        </Link>
+      </motion.div>
     );
   };
 
   return (
-    <div
+    <motion.div
+      ref={sectionRef}
       style={{ backgroundColor: bgColor }}
       className="w-full overflow-hidden dana"
       dir="rtl"
+      {...sectionMotion}
     >
       <div className={`max-w-7xl mx-auto ${containerPadCls}`}>
         {(title || subtitle || titleIcon) && (
-          <div className="flex items-center gap-2 mb-5">
+          <motion.div className="flex items-center gap-2 mb-5" {...headerMotion}>
             {titleIcon ? <span className="text-lg">{titleIcon}</span> : null}
             <h2
               className="text-lg md:text-xl danaBold"
@@ -271,16 +375,17 @@ const Slider2 = ({
                 {subtitle}
               </p>
             ) : null}
-          </div>
+          </motion.div>
         )}
 
-        <div
+        <motion.div
           style={{
 
             background: "#ffffff",
             background:"linear-gradient(180deg,rgba(247, 247, 247, 1) 0%, rgba(214, 214, 214, 1) 50%, rgba(247, 247, 247, 1) 100%)",
           }}
           className="relative p-1 py-12 rounded-[25px]"
+          {...sliderMotion}
         >
           <button
             onClick={() => swiperRef.current?.slidePrev()}
@@ -324,7 +429,7 @@ const Slider2 = ({
               className="w-full"
               dir="rtl"
             >
-              {products.map((product) => {
+              {products.map((product, index) => {
                 const oldPrice =
                   product.oldPrice ||
                   product.old_price ||
@@ -338,15 +443,15 @@ const Slider2 = ({
 
                 return (
                   <SwiperSlide key={product.id || product._id}>
-                    {CardSlider(product, discountPercent, oldPrice)}
+                    {CardSlider(product, discountPercent, oldPrice, index)}
                   </SwiperSlide>
                 );
               })}
             </Swiper>
           </div>
-        </div>
+        </motion.div>
       </div>
-    </div>
+    </motion.div>
   );
 };
 

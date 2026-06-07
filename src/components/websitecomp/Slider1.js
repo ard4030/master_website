@@ -1,15 +1,47 @@
 "use client";
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Autoplay, FreeMode } from "swiper/modules";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
+import { motion, useAnimationControls, useInView } from "framer-motion";
 
 // Import Swiper styles
 import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/free-mode";
 import { formatPrice } from "@/utils/functions";
+
+const ANIMATION_PRESETS = {
+  none: {
+    hidden: { opacity: 1 },
+    visible: { opacity: 1 },
+  },
+  fade: {
+    hidden: { opacity: 0 },
+    visible: { opacity: 1 },
+  },
+  slideUp: {
+    hidden: { opacity: 0, y: 32 },
+    visible: { opacity: 1, y: 0 },
+  },
+  slideRight: {
+    hidden: { opacity: 0, x: -36 },
+    visible: { opacity: 1, x: 0 },
+  },
+  slideLeft: {
+    hidden: { opacity: 0, x: 36 },
+    visible: { opacity: 1, x: 0 },
+  },
+  zoomIn: {
+    hidden: { opacity: 0, scale: 0.92 },
+    visible: { opacity: 1, scale: 1 },
+  },
+  blurUp: {
+    hidden: { opacity: 0, y: 16, filter: "blur(8px)" },
+    visible: { opacity: 1, y: 0, filter: "blur(0px)" },
+  },
+};
 
 /**
  * کامپوننت محصولات لغزنده - استایل ساده
@@ -32,12 +64,58 @@ const Slider1 = ({
   subtitle = "",
   description = "",
   titleIcon = "⌚",
+  sectionAnimationType = "fade",
+  sectionAnimationDelay = "0",
+  sectionAnimationDuration = "0.65",
+  headerAnimationType = "slideUp",
+  headerAnimationDelay = "0.12",
+  headerAnimationDuration = "0.65",
+  sliderAnimationType = "slideUp",
+  sliderAnimationDelay = "0.2",
+  sliderAnimationDuration = "0.7",
+  cardsAnimationType = "blurUp",
+  cardsAnimationDelay = "0.28",
+  cardsAnimationDuration = "0.58",
+  cardsAnimationStagger = "0.07",
 }) => {
   const autoplayDelayMs =
     enableAutoplay === "true" ? (parseInt(autoplayDelay) || 5) * 1000 : 0;
   const pathName = usePathname();
   const swiperRef = useRef(null);
   const [isDragging, setIsDragging] = useState(false);
+  const sectionRef = useRef(null);
+  const animationControls = useAnimationControls();
+  const isInView = useInView(sectionRef, {
+    once: true,
+    amount: 0.2,
+    margin: "0px 0px -10% 0px",
+  });
+
+  useEffect(() => {
+    if (isInView) {
+      animationControls.start("visible");
+    }
+  }, [isInView, animationControls]);
+
+  const parseTiming = (value, fallback) => {
+    const parsed = Number.parseFloat(value);
+    if (Number.isNaN(parsed)) return fallback;
+    return Math.max(0, parsed);
+  };
+
+  const getMotionConfig = (type, delayValue, durationValue, extraDelay = 0) => {
+    const preset = ANIMATION_PRESETS[type] || ANIMATION_PRESETS.fade;
+    return {
+      initial: "hidden",
+      animate: animationControls,
+      variants: preset,
+      transition: {
+        delay: parseTiming(delayValue, 0) + extraDelay,
+        duration: parseTiming(durationValue, 0.7),
+        ease: [0.22, 1, 0.36, 1],
+      },
+    };
+  };
 
   const formatPercentFa = (value) => {
     const num = Number(value);
@@ -147,16 +225,40 @@ const Slider1 = ({
   if (pathName !== "/newsitebuilder") products = data || sampleProducts;
 
   const desktopSlidesPerView = 4;
+  const sectionMotion = getMotionConfig(
+    sectionAnimationType,
+    sectionAnimationDelay,
+    sectionAnimationDuration
+  );
+  const headerMotion = getMotionConfig(
+    headerAnimationType,
+    headerAnimationDelay,
+    headerAnimationDuration
+  );
+  const sliderMotion = getMotionConfig(
+    sliderAnimationType,
+    sliderAnimationDelay,
+    sliderAnimationDuration
+  );
+  const getCardMotion = (index) =>
+    getMotionConfig(
+      cardsAnimationType,
+      cardsAnimationDelay,
+      cardsAnimationDuration,
+      parseTiming(cardsAnimationStagger, 0.07) * index
+    );
 
   return (
-    <div
+    <motion.div
+      ref={sectionRef}
       style={{ backgroundColor: bgColor }}
       className="w-full overflow-hidden dana"
       dir="rtl"
+      {...sectionMotion}
     >
       <div className="max-w-7xl mx-auto py-6 px-4 md:py-8 md:px-6 lg:py-10 lg:px-4">
         {(title || subtitle || titleIcon) && (
-          <div className="flex items-center gap-2 mb-5">
+          <motion.div className="flex items-center gap-2 mb-5" {...headerMotion}>
             {titleIcon ? <span className="text-lg">{titleIcon}</span> : null}
             <h2 className="text-lg md:text-xl danaBold" style={{ color: largeTextColor }}>
               {title}
@@ -166,10 +268,10 @@ const Slider1 = ({
                 {subtitle}
               </p>
             ) : null}
-          </div>
+          </motion.div>
         )}
 
-        <div className="relative p-1">
+        <motion.div className="relative p-1" {...sliderMotion}>
           <button
             onClick={() => swiperRef.current?.slidePrev()}
             className="absolute right-[-1rem] bg-white top-1/2 -translate-y-1/2 z-20 w-12 h-12 md:w-10 md:h-10 rounded-full flex items-center justify-center text-black shadow-lg"
@@ -231,7 +333,7 @@ const Slider1 = ({
               className="w-full"
               dir="rtl"
             >
-              {products.map((product) => {
+              {products.map((product, index) => {
                 const oldPrice =
                   product.oldPrice || product.old_price || product.previousPrice || "";
                 const discountPercent =
@@ -239,14 +341,15 @@ const Slider1 = ({
 
                 return (
                   <SwiperSlide key={product.id || product._id}>
-                    <Link
-                      href={getProductLink(product)}
-                      onClick={(e) => {
-                        if (isDragging) e.preventDefault();
-                      }}
-                      className="block"
-                    >
-                      <div className="bg-white border-l-1 border-gray-200 p-3 md:p-4 ">
+                    <motion.div {...getCardMotion(index)}>
+                      <Link
+                        href={getProductLink(product)}
+                        onClick={(e) => {
+                          if (isDragging) e.preventDefault();
+                        }}
+                        className="block"
+                      >
+                        <div className="bg-white border-l-1 border-gray-200 p-3 md:p-4 ">
                         <div className="w-full aspect-square rounded-2xl overflow-hidden mb-3 flex items-center justify-center">
                           {(product.image || product.mainImage) && (
                             <img
@@ -297,16 +400,17 @@ const Slider1 = ({
 
 
                         </div>
-                      </div>
-                    </Link>
+                        </div>
+                      </Link>
+                    </motion.div>
                   </SwiperSlide>
                 );
               })}
             </Swiper>
           </div>
-        </div>
+        </motion.div>
       </div>
-    </div>
+    </motion.div>
   );
 };
 

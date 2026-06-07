@@ -2,6 +2,8 @@
 
 import React from 'react'
 import Link from 'next/link'
+import { motion } from 'framer-motion'
+import { useViewportMotion } from './animationUtils'
 
 /**
  * کامپوننت بخش بالایی
@@ -22,8 +24,18 @@ const TopSection1 = ({
   ctaText = 'مشاهده کن',
   ctaLink = '#',
   secondaryCtaText = 'اطلاعات بیش‌تر',
-  secondaryCtaLink = '#'
+  secondaryCtaLink = '#',
+  sectionAnimationType = 'slideUp',
+  sectionAnimationDelay = '0.05',
+  sectionAnimationDuration = '0.75'
 }) => {
+  const { sectionRef, motionProps } = useViewportMotion({
+    animationType: sectionAnimationType,
+    animationDelay: sectionAnimationDelay,
+    animationDuration: sectionAnimationDuration,
+    amount: 0.25
+  })
+
   // تابع کمکی برای تبدیل URL تصویر
   const getImageUrl = (imagePath) => {
     if (!imagePath) return ''
@@ -31,7 +43,7 @@ const TopSection1 = ({
     return `${process.env.NEXT_PUBLIC_LIARA_IMAGE_URL}${imagePath}`
   }
   return (
-    <div className="w-full bg-white">
+    <motion.div ref={sectionRef} className="w-full bg-white" {...motionProps}>
       <div className="max-w-7xl mx-auto">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center py-12 px-6 md:px-12">
           {/* Left Content - Text Section */}
@@ -78,7 +90,7 @@ const TopSection1 = ({
           </div>
         </div>
       </div>
-    </div>
+    </motion.div>
   )
 }
 

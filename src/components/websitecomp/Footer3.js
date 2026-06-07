@@ -1,6 +1,8 @@
 'use client'
 import React from 'react'
 import Link from 'next/link'
+import { motion } from 'framer-motion'
+import { useViewportMotion } from './animationUtils'
 
 const PhoneIcon = () => (
   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
@@ -45,7 +47,17 @@ const Footer3 = ({
   trustLogo3Src = '', trustLogo3Link = '#',
   trustLogo4Src = '', trustLogo4Link = '#',
   trustLogo5Src = '', trustLogo5Link = '#',
+  sectionAnimationType = 'fade',
+  sectionAnimationDelay = '0.05',
+  sectionAnimationDuration = '0.7'
 }) => {
+  const { sectionRef, motionProps } = useViewportMotion({
+    animationType: sectionAnimationType,
+    animationDelay: sectionAnimationDelay,
+    animationDuration: sectionAnimationDuration,
+    amount: 0.2
+  })
+
   const getImageUrl = (src) => {
     if (!src) return ''
     if (src.startsWith('http')) return src
@@ -85,7 +97,7 @@ const Footer3 = ({
   }
 
   return (
-    <footer dir="rtl" className="w-full dana" style={{ backgroundColor: bgColor }}>
+    <motion.footer ref={sectionRef} dir="rtl" className="w-full dana" style={{ backgroundColor: bgColor }} {...motionProps}>
       <div className="max-w-7xl mx-auto px-3 py-4 md:px-5 md:py-5 lg:px-6 lg:py-6">
         <div
           className="rounded-[18px] border overflow-hidden"
@@ -174,7 +186,7 @@ const Footer3 = ({
           {copyright}
         </p>
       </div>
-    </footer>
+    </motion.footer>
   )
 }
 

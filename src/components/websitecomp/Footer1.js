@@ -1,6 +1,8 @@
 'use client'
 
 import React from 'react'
+import { motion } from 'framer-motion'
+import { useViewportMotion } from './animationUtils'
 
 /**
  * کامپوننت فوتر - استایل 1
@@ -43,8 +45,18 @@ const Footer1 = ({
       ]
     }
   ],
-  copyright = 'استفاده از محتوای این سایت برای مقاصد تجاری و غیرتجاری و ذکر منبع بلامانع است. کلیه حقوق این سایت متعلق به شرکت نگار پیشرو الکترونیک می باشد.'
+  copyright = 'استفاده از محتوای این سایت برای مقاصد تجاری و غیرتجاری و ذکر منبع بلامانع است. کلیه حقوق این سایت متعلق به شرکت نگار پیشرو الکترونیک می باشد.',
+  sectionAnimationType = 'fade',
+  sectionAnimationDelay = '0.05',
+  sectionAnimationDuration = '0.7'
 }) => {
+  const { sectionRef, motionProps } = useViewportMotion({
+    animationType: sectionAnimationType,
+    animationDelay: sectionAnimationDelay,
+    animationDuration: sectionAnimationDuration,
+    amount: 0.2
+  })
+
   // تابع کمکی برای تبدیل URL تصویر
   const getImageUrl = (imagePath) => {
     if (!imagePath) return ''
@@ -59,7 +71,7 @@ const Footer1 = ({
   ]
 
   return (
-    <footer className="dana bg-gray-50 border-t border-gray-300 py-10 px-5 md:py-14 md:px-8 rtl font-dana" dir="rtl">
+    <motion.footer ref={sectionRef} className="dana bg-gray-50 border-t border-gray-300 py-10 px-5 md:py-14 md:px-8 rtl font-dana" dir="rtl" {...motionProps}>
       <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-8 md:gap-10 mb-8">
         {/* Contact Info Section */}
         <div className="flex flex-col gap-6 md:col-span-1 lg:col-span-1">
@@ -102,7 +114,7 @@ const Footer1 = ({
           {copyright}
         </p>
       </div>
-    </footer>
+    </motion.footer>
   )
 }
 

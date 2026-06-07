@@ -1,6 +1,8 @@
 'use client'
 
 import React from 'react'
+import { motion } from 'framer-motion'
+import { useViewportMotion } from './animationUtils'
 
 /**
  * کامپوننت بخش ویژگی‌ها
@@ -34,10 +36,20 @@ const FeaturesSection = ({
   ],
   backgroundColor = 'bg-white',
   sectionTitle = '',
-  sectionDescription = ''
+  sectionDescription = '',
+  sectionAnimationType = 'fade',
+  sectionAnimationDelay = '0.05',
+  sectionAnimationDuration = '0.7'
 }) => {
+  const { sectionRef, motionProps } = useViewportMotion({
+    animationType: sectionAnimationType,
+    animationDelay: sectionAnimationDelay,
+    animationDuration: sectionAnimationDuration,
+    amount: 0.25
+  })
+
   return (
-    <div className={`w-full ${backgroundColor} py-12`}>
+    <motion.div ref={sectionRef} className={`w-full ${backgroundColor} py-12`} {...motionProps}>
       <div className="max-w-7xl mx-auto px-6 md:px-12">
         {/* Section Header */}
         {sectionTitle && (
@@ -73,7 +85,7 @@ const FeaturesSection = ({
           ))}
         </div>
       </div>
-    </div>
+    </motion.div>
   )
 }
 

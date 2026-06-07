@@ -2,6 +2,8 @@
 
 import React from 'react'
 import Link from 'next/link'
+import { motion } from 'framer-motion'
+import { useViewportMotion } from './animationUtils'
 
 /**
  * سکشن معرفی (شبیه تصویر) - فارسی و قابل تنظیم
@@ -31,8 +33,18 @@ const SplitShowcase = ({
   card1ImageUrl = 'https://images.unsplash.com/photo-1529421308418-eab98863cee1?w=1200&h=900&fit=crop',
   card1Text = 'سنسور',
   card2ImageUrl = 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=1200&h=900&fit=crop',
-  card2Text = 'قطعات'
+  card2Text = 'قطعات',
+  sectionAnimationType = 'fade',
+  sectionAnimationDelay = '0.05',
+  sectionAnimationDuration = '0.75'
 }) => {
+  const { sectionRef, motionProps } = useViewportMotion({
+    animationType: sectionAnimationType,
+    animationDelay: sectionAnimationDelay,
+    animationDuration: sectionAnimationDuration,
+    amount: 0.25
+  })
+
   const getImageUrl = (imagePath) => {
     if (!imagePath) return ''
     if (imagePath.startsWith('http')) return imagePath
@@ -48,7 +60,7 @@ const SplitShowcase = ({
   ]
 
   return (
-    <section className={`w-full ${sectionBackgroundColor}`}>
+    <motion.section ref={sectionRef} className={`w-full ${sectionBackgroundColor}`} {...motionProps}>
       <div className="mx-auto max-w-7xl px-6 md:px-12 py-12 md:py-16 ">
         <div className="relative rounded-2xl bg-red ">
           <div className="grid grid-cols-1 lg:grid-cols-2">
@@ -124,7 +136,7 @@ const SplitShowcase = ({
           </div>
         </div>
       </div>
-    </section>
+    </motion.section>
   )
 }
 

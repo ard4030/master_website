@@ -11,6 +11,8 @@ import {
   FiCreditCard,
   FiChevronDown,
   FiPlus,
+  FiEdit2,
+  FiTrash2,
 } from 'react-icons/fi'
 import { apiRequest } from '@/utils/functions'
 // import { toast } from 'react-toastify'
@@ -53,6 +55,8 @@ const StepTwo = ({ onContinue, onBack }) => {
   const [isLoading, setIsLoading] = useState(true)
   const [isAddressListOpen, setIsAddressListOpen] = useState(true)
   const [loadingShippingKey, setLoadingShippingKey] = useState(null)
+  const [editingAddressId, setEditingAddressId] = useState(null)
+  const [deletingAddressId, setDeletingAddressId] = useState(null)
 
   const [formData, setFormData] = useState({
     name: '',
@@ -61,6 +65,8 @@ const StepTwo = ({ onContinue, onBack }) => {
     city: '',
     postalCode: '',
     fullAddress: '',
+    lat: undefined,
+    lng: undefined,
   })
 
   useEffect(() => {
@@ -130,19 +136,41 @@ const StepTwo = ({ onContinue, onBack }) => {
     setLoadingShippingKey(null)
   }
 
-  const handleOpenModal = () => {
-    setFormData({
-      name: '',
-      phone: '',
-      state: '',
-      city: '',
-      postalCode: '',
-      fullAddress: '',
-    })
+  const getAddressId = (addr) => addr?._id || addr?.id
+
+  const handleOpenModal = (addr = null) => {
+    const isEditing = Boolean(addr)
+    setEditingAddressId(isEditing ? getAddressId(addr) : null)
+    setFormData(
+      isEditing
+        ? {
+            name: addr?.name || '',
+            phone: addr?.phone || '',
+            state: addr?.state || '',
+            city: addr?.city || '',
+            postalCode: addr?.postalCode || '',
+            fullAddress: addr?.fullAddress || '',
+            lat: addr?.lat,
+            lng: addr?.lng ?? addr?.long,
+          }
+        : {
+            name: '',
+            phone: '',
+            state: '',
+            city: '',
+            postalCode: '',
+            fullAddress: '',
+            lat: undefined,
+            lng: undefined,
+          }
+    )
     setIsModalOpen(true)
   }
 
-  const handleCloseModal = () => setIsModalOpen(false)
+  const handleCloseModal = () => {
+    setIsModalOpen(false)
+    setEditingAddressId(null)
+  }
 
   const handleSave = async () => {
     if (
@@ -156,20 +184,57 @@ const StepTwo = ({ onContinue, onBack }) => {
       toast.error('لطفاً تمام فیلدها را پر کنید')
       return
     }
-
     setIsSaving(true)
-    const response = await apiRequest('/addresses', 'POST', formData)
+    const endpoint = editingAddressId
+      ? `/addresses/${editingAddressId}`
+      : '/addresses'
+    const method = editingAddressId ? 'PUT' : 'POST'
+    const payload = {
+      ...formData,
+      long: formData?.lng ?? formData?.long,
+    }
+    delete payload.lng
+
+    const response = await apiRequest(endpoint, method, payload)
     if (response.success) {
       const createdAddressId =
-        response?.data?.data?._id || response?.data?.data?.id || null
-      toast.success('آدرس با موفقیت افزوده شد')
+        response?.data?.data?._id ||
+        response?.data?.data?.id ||
+        editingAddressId ||
+        null
+      toast.success(
+        editingAddressId
+          ? 'آدرس با موفقیت ویرایش شد'
+          : 'آدرس با موفقیت افزوده شد'
+      )
       await refreshCheckoutData({ forceAddressId: createdAddressId })
       setIsAddressListOpen(true)
       handleCloseModal()
     } else {
-      toast.error(response.error || 'خطا در افزودن آدرس')
+      toast.error(
+        response.error ||
+          (editingAddressId ? 'خطا در ویرایش آدرس' : 'خطا در افزودن آدرس')
+      )
     }
     setIsSaving(false)
+  }
+
+  const handleDeleteAddress = async (addr) => {
+    const addressId = getAddressId(addr)
+    if (!addressId) return
+
+    const confirmed = window.confirm('از حذف این آدرس مطمئن هستید؟')
+    if (!confirmed) return
+
+    setDeletingAddressId(addressId)
+    const response = await apiRequest(`/addresses/${addressId}`, 'DELETE')
+    if (response.success) {
+      toast.success('آدرس با موفقیت حذف شد')
+      await refreshCheckoutData()
+    } else {
+      toast.error(response.error || 'خطا در حذف آدرس')
+    }
+    setDeletingAddressId(null)
   }
 
   // ===== محاسبات سامری =====
@@ -305,6 +370,41 @@ const StepTwo = ({ onContinue, onBack }) => {
                               <p className="text-[11px] text-gray-400 mt-1">
                                 کد پستی: {addr.postalCode}
                               </p>
+                              <div className="mt-3 flex items-center gap-2">
+                                <button
+                                  type="button"
+                                  onClick={(e) => {
+                                    e.preventDefault()
+                                    e.stopPropagation()
+                                    handleOpenModal(addr)
+                                  }}
+                                  className="inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs rounded-md border border-gray-200 text-gray-600 hover:bg-gray-100 transition-colors"
+                                >
+                                  <FiEdit2 size={13} />
+                                  ویرایش
+                                </button>
+                                <button
+                                  type="button"
+                                  disabled={deletingAddressId === (addr._id || addr.id)}
+                                  onClick={(e) => {
+                                    e.preventDefault()
+                                    e.stopPropagation()
+                                    handleDeleteAddress(addr)
+                                  }}
+                                  className="inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs rounded-md border border-red-200 text-red-500 hover:bg-red-50 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+                                >
+                                  {deletingAddressId === (addr._id || addr.id) ? (
+                                    <CircularProgress
+                                      size={12}
+                                      thickness={6}
+                                      sx={{ color: '#ef4444' }}
+                                    />
+                                  ) : (
+                                    <FiTrash2 size={13} />
+                                  )}
+                                  حذف
+                                </button>
+                              </div>
                             </div>
                           </label>
                         )
@@ -490,6 +590,7 @@ const StepTwo = ({ onContinue, onBack }) => {
         <AddressFormModal
           formData={formData}
           setFormData={setFormData}
+          isEditMode={Boolean(editingAddressId)}
           onCancel={handleCloseModal}
           onSave={handleSave}
           isSaving={isSaving}
@@ -529,7 +630,14 @@ const Field = ({ label, value, onChange, placeholder, type = 'text' }) => (
 const STATES_API = 'https://iran-locations-api.vercel.app/api/v1/fa/states'
 const CITIES_API = 'https://iran-locations-api.vercel.app/api/v1/fa/cities'
 
-const AddressFormModal = ({ formData, setFormData, onCancel, onSave, isSaving }) => {
+const AddressFormModal = ({
+  formData,
+  setFormData,
+  onCancel,
+  onSave,
+  isSaving,
+  isEditMode,
+}) => {
   const [states, setStates] = useState([])
   const [cities, setCities] = useState([])
   const [loadingStates, setLoadingStates] = useState(false)
@@ -763,7 +871,7 @@ const AddressFormModal = ({ formData, setFormData, onCancel, onSave, isSaving })
           {isSaving ? (
             <CircularProgress size={18} thickness={5} sx={{ color: '#fff' }} />
           ) : (
-            'ثبت آدرس'
+            isEditMode ? 'ذخیره تغییرات' : 'ثبت آدرس'
           )}
         </button>
         <button

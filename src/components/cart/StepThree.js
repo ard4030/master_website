@@ -133,7 +133,8 @@ const StepThree = () => {
 
     try {
       const deviceId = getOrCreateDeviceId()
-
+      console.log('order',order);
+      
       const orderData = {
         address: order.address,
         coupon: order.coupon || null,
