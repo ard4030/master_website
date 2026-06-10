@@ -1,15 +1,47 @@
 "use client";
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Autoplay, FreeMode } from "swiper/modules";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
+import { motion, useAnimationControls, useInView } from "framer-motion";
 
 // Import Swiper styles
 import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/free-mode";
 import { formatPrice } from "@/utils/functions";
+
+const ANIMATION_PRESETS = {
+  none: {
+    hidden: { opacity: 1 },
+    visible: { opacity: 1 },
+  },
+  fade: {
+    hidden: { opacity: 0 },
+    visible: { opacity: 1 },
+  },
+  slideUp: {
+    hidden: { opacity: 0, y: 32 },
+    visible: { opacity: 1, y: 0 },
+  },
+  slideRight: {
+    hidden: { opacity: 0, x: -36 },
+    visible: { opacity: 1, x: 0 },
+  },
+  slideLeft: {
+    hidden: { opacity: 0, x: 36 },
+    visible: { opacity: 1, x: 0 },
+  },
+  zoomIn: {
+    hidden: { opacity: 0, scale: 0.92 },
+    visible: { opacity: 1, scale: 1 },
+  },
+  blurUp: {
+    hidden: { opacity: 0, y: 16, filter: "blur(8px)" },
+    visible: { opacity: 1, y: 0, filter: "blur(0px)" },
+  },
+};
 
 /**
  * کامپوننت محصولات لغزنده - استایل ساده
@@ -41,7 +73,77 @@ const Slider1Offer = ({
   subtitle = "تخفیف های باورنکردنی داس",
   viewAllText = "مشاهده همه",
   viewAllLink = "#",
+  sectionAnimationType = "fade",
+  sectionAnimationDelay = "0.05",
+  sectionAnimationDuration = "0.7",
+  panelAnimationType = "slideRight",
+  panelAnimationDelay = "0.14",
+  panelAnimationDuration = "0.72",
+  sliderAnimationType = "slideLeft",
+  sliderAnimationDelay = "0.18",
+  sliderAnimationDuration = "0.72",
+  cardAnimationType = "blurUp",
+  cardAnimationDelay = "0.25",
+  cardAnimationDuration = "0.65",
+  cardAnimationStagger = "0.07",
 }) => {
+  const sectionRef = useRef(null);
+  const animationControls = useAnimationControls();
+  const isInView = useInView(sectionRef, {
+    once: true,
+    amount: 0.25,
+    margin: "0px 0px -10% 0px",
+  });
+
+  useEffect(() => {
+    if (isInView) {
+      animationControls.start("visible");
+    }
+  }, [isInView, animationControls]);
+
+  const parseTiming = (value, fallback) => {
+    const parsed = Number.parseFloat(value);
+    if (Number.isNaN(parsed)) return fallback;
+    return Math.max(0, parsed);
+  };
+
+  const getMotionConfig = (type, delayValue, durationValue, extraDelay = 0) => {
+    const preset = ANIMATION_PRESETS[type] || ANIMATION_PRESETS.fade;
+    return {
+      initial: "hidden",
+      animate: animationControls,
+      variants: preset,
+      transition: {
+        delay: parseTiming(delayValue, 0) + extraDelay,
+        duration: parseTiming(durationValue, 0.7),
+        ease: [0.22, 1, 0.36, 1],
+      },
+    };
+  };
+
+  const sectionMotion = getMotionConfig(
+    sectionAnimationType,
+    sectionAnimationDelay,
+    sectionAnimationDuration,
+  );
+  const panelMotion = getMotionConfig(
+    panelAnimationType,
+    panelAnimationDelay,
+    panelAnimationDuration,
+  );
+  const sliderMotion = getMotionConfig(
+    sliderAnimationType,
+    sliderAnimationDelay,
+    sliderAnimationDuration,
+  );
+  const getCardMotion = (index) =>
+    getMotionConfig(
+      cardAnimationType,
+      cardAnimationDelay,
+      cardAnimationDuration,
+      parseTiming(cardAnimationStagger, 0.07) * index,
+    );
+
   const autoplayDelayMs =
     enableAutoplay === "true" ? (parseInt(autoplayDelay) || 5) * 1000 : 0;
   const pathName = usePathname();
@@ -165,10 +267,12 @@ const Slider1Offer = ({
   const desktopSlidesPerView = 3;
 
   return (
-    <div
+    <motion.div
+      ref={sectionRef}
       style={{ backgroundColor: bgColor }}
       className="w-full overflow-hidden dana"
       dir="rtl"
+      {...sectionMotion}
     >
       <div className="max-w-7xl mx-auto py-5 px-3 md:py-8 md:px-4 lg:py-10 lg:px-6">
         <div
@@ -176,11 +280,12 @@ const Slider1Offer = ({
           style={{ backgroundColor: shellBgColor }}
         >
           <div className="grid grid-cols-1 lg:grid-cols-[280px_minmax(0,1fr)] rounded-[34px] overflow-hidden">
-            <aside
+            <motion.aside
               className="px-6 py-10 md:px-8 md:py-12 flex flex-col items-center justify-center text-center"
               style={{
                 background: `linear-gradient(165deg, ${panelBgStart} 0%, ${panelBgEnd} 100%)`,
               }}
+              {...panelMotion}
             >
               <h2
                 className="danaBold text-4xl leading-[1.45] whitespace-pre-line"
@@ -254,9 +359,9 @@ const Slider1Offer = ({
               >
                 {viewAllText}
               </Link>
-            </aside>
+            </motion.aside>
 
-            <div className="p-3 md:p-4 lg:p-5 bg-white">
+            <motion.div className="p-3 md:p-4 lg:p-5 bg-white" {...sliderMotion}>
               <Swiper
                 modules={[Navigation, Autoplay, FreeMode]}
                 spaceBetween={14}
@@ -281,7 +386,7 @@ const Slider1Offer = ({
                 className="w-full"
                 dir="rtl"
               >
-                {products.map((product) => {
+                {products.map((product, index) => {
                   const oldPrice =
                     product.oldPrice ||
                     product.old_price ||
@@ -302,11 +407,12 @@ const Slider1Offer = ({
                         }}
                         className="block"
                       >
-                        <div
+                        <motion.div
                           style={{
                             background: `linear-gradient(145deg, ${footerBgStart} 0%, ${footerBgEnd} 100%)`,
                           }}
                           className="relative border border-[#9ea5be] rounded-[34px] pb-3 p-0.75 overflow-hidden"
+                          {...getCardMotion(index)}
                         >
                           {formatPercentFa(discountPercent) ? (
                             <span
@@ -375,17 +481,17 @@ const Slider1Offer = ({
 
 
                           </div>
-                        </div>
+                        </motion.div>
                       </Link>
                     </SwiperSlide>
                   );
                 })}
               </Swiper>
-            </div>
+            </motion.div>
           </div>
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 };
 

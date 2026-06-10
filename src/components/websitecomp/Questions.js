@@ -145,6 +145,19 @@ const Questions = ({
   const radius = Number.parseFloat(itemRadius)
   const safeRadius = Number.isNaN(radius) ? 10 : radius
 
+  const resolveColor = (value, fallback) => {
+    const raw = String(value ?? '').trim()
+    if (!raw) return fallback
+    const isHex = /^#([0-9a-f]{3}|[0-9a-f]{6}|[0-9a-f]{8})$/i.test(raw)
+    const isRgb = /^rgba?\([^)]*\)$/i.test(raw)
+    const isHsl = /^hsla?\([^)]*\)$/i.test(raw)
+    const isCssVar = /^var\(--[^)]+\)$/i.test(raw)
+    const isNamed = /^[a-z]+$/i.test(raw)
+    return isHex || isRgb || isHsl || isCssVar || isNamed ? raw : fallback
+  }
+
+  const safeAnswerColor = resolveColor(answerColor, '#b7c2d4')
+
   const toggleItem = (index) => {
     const isOpen = openIndexes.includes(index)
     if (multiple) {
@@ -219,8 +232,8 @@ const Questions = ({
                       exit={{ height: 0, opacity: 0 }}
                       transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
                     >
-                      <motion.div className="border-t px-3 pb-4 pt-3 sm:px-4 md:px-5" style={{ borderColor: itemBorderColor }} {...answerMotion}>
-                        <p className="text-sm leading-8 danaMed" style={{ color: answerColor }}>
+                      <motion.div className="border-t px-3 pb-4 pt-3 sm:px-4 md:px-5" style={{ borderColor: itemBorderColor, color: safeAnswerColor }} {...answerMotion}>
+                        <p className="text-sm leading-8 danaMed" style={{ color: safeAnswerColor }}>
                           {item.answer}
                         </p>
                       </motion.div>

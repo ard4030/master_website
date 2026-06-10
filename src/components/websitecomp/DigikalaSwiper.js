@@ -3,11 +3,43 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import { motion, useAnimationControls, useInView } from 'framer-motion'
 import { Swiper, SwiperSlide } from 'swiper/react'
 import { Navigation, Autoplay } from 'swiper/modules'
 
 import 'swiper/css'
 import 'swiper/css/navigation'
+
+const ANIMATION_PRESETS = {
+  none: {
+    hidden: { opacity: 1 },
+    visible: { opacity: 1 }
+  },
+  fade: {
+    hidden: { opacity: 0 },
+    visible: { opacity: 1 }
+  },
+  slideUp: {
+    hidden: { opacity: 0, y: 32 },
+    visible: { opacity: 1, y: 0 }
+  },
+  slideRight: {
+    hidden: { opacity: 0, x: -36 },
+    visible: { opacity: 1, x: 0 }
+  },
+  slideLeft: {
+    hidden: { opacity: 0, x: 36 },
+    visible: { opacity: 1, x: 0 }
+  },
+  zoomIn: {
+    hidden: { opacity: 0, scale: 0.92 },
+    visible: { opacity: 1, scale: 1 }
+  },
+  blurUp: {
+    hidden: { opacity: 0, y: 20, filter: 'blur(8px)' },
+    visible: { opacity: 1, y: 0, filter: 'blur(0px)' }
+  }
+}
 
 const DigikalaSwiper = ({
   data = null,
@@ -19,14 +51,45 @@ const DigikalaSwiper = ({
   largeTextColor = '#111827',
   smallTextColor = '#111827',
   autoplayDelay = '5',
-  enableAutoplay = 'true'
+  enableAutoplay = 'true',
+  cardAnimationType = 'fade',
+  cardAnimationDelay = '0',
+  cardAnimationDuration = '0.5',
+  headerAnimationType = 'slideUp',
+  headerAnimationDelay = '0.1',
+  headerAnimationDuration = '0.65',
+  titleAnimationType = 'slideRight',
+  titleAnimationDelay = '0.2',
+  titleAnimationDuration = '0.7',
+  viewAllAnimationType = 'slideLeft',
+  viewAllAnimationDelay = '0.25',
+  viewAllAnimationDuration = '0.7',
+  swiperAnimationType = 'fade',
+  swiperAnimationDelay = '0.3',
+  swiperAnimationDuration = '0.8',
+  navAnimationType = 'zoomIn',
+  navAnimationDelay = '0.4',
+  navAnimationDuration = '0.65'
 }) => {
   const autoplayDelayMs = (parseInt(autoplayDelay) || 5) * 1000
   const pathName = usePathname()
   const [mounted, setMounted] = useState(false)
+  const sectionRef = useRef(null)
   const prevRef = useRef(null)
   const nextRef = useRef(null)
   const swiperRef = useRef(null)
+  const animationControls = useAnimationControls()
+  const isInView = useInView(sectionRef, {
+    once: true,
+    amount: 0.25,
+    margin: '0px 0px -10% 0px'
+  })
+
+  useEffect(() => {
+    if (isInView) {
+      animationControls.start('visible')
+    }
+  }, [isInView, animationControls])
 
   const getImageUrl = (imagePath) => {
     if (!imagePath) return ''
@@ -332,8 +395,35 @@ const DigikalaSwiper = ({
     )
   }
 
+  const parseTiming = (value, fallback) => {
+    const parsed = Number.parseFloat(value)
+    if (Number.isNaN(parsed)) return fallback
+    return Math.max(0, parsed)
+  }
+
+  const getMotionConfig = (type, delayValue, durationValue) => {
+    const preset = ANIMATION_PRESETS[type] || ANIMATION_PRESETS.fade
+    return {
+      initial: 'hidden',
+      animate: animationControls,
+      variants: preset,
+      transition: {
+        delay: parseTiming(delayValue, 0),
+        duration: parseTiming(durationValue, 0.75),
+        ease: [0.22, 1, 0.36, 1]
+      }
+    }
+  }
+
+  const cardMotion = getMotionConfig(cardAnimationType, cardAnimationDelay, cardAnimationDuration)
+  const headerMotion = getMotionConfig(headerAnimationType, headerAnimationDelay, headerAnimationDuration)
+  const titleMotion = getMotionConfig(titleAnimationType, titleAnimationDelay, titleAnimationDuration)
+  const viewAllMotion = getMotionConfig(viewAllAnimationType, viewAllAnimationDelay, viewAllAnimationDuration)
+  const swiperMotion = getMotionConfig(swiperAnimationType, swiperAnimationDelay, swiperAnimationDuration)
+  const navMotion = getMotionConfig(navAnimationType, navAnimationDelay, navAnimationDuration)
+
   return (
-    <section className="w-full" dir="rtl" style={{backgroundColor: bgColor}}>
+    <section ref={sectionRef} className="w-full" dir="rtl" style={{backgroundColor: bgColor}}>
       <style>{`
         .digikala-swiper .swiper-button-next,
         .digikala-swiper .swiper-button-prev {
@@ -342,23 +432,25 @@ const DigikalaSwiper = ({
       `}</style>
 
       <div className="max-w-7xl mx-auto px-4 md:px-6 py-6 md:py-8">
-        <div className="bg-white border border-gray-200 rounded-2xl overflow-hidden">
+        <motion.div className="bg-white border border-gray-200 rounded-2xl overflow-hidden" {...cardMotion}>
           {/* Header */}
-          <div className="flex items-center justify-between px-4 md:px-6 py-4 border-b border-gray-100">
-            <div className="flex items-center gap-3">
+          <motion.div className="flex items-center justify-between px-4 md:px-6 py-4 border-b border-gray-100" {...headerMotion}>
+            <motion.div className="flex items-center gap-3" {...titleMotion}>
               <h2 className="text-base md:text-lg danaBold" style={{color: largeTextColor}}>{title}</h2>
               <span className="w-10 h-0.5 bg-red-500" />
-            </div>
-            {renderLink(
-              viewAllLink,
-              'text-sm danaMed text-red-500 hover:text-red-600',
-              viewAllText,
-              String(viewAllText || 'مشاهده همه')
-            )}
-          </div>
+            </motion.div>
+            <motion.div {...viewAllMotion}>
+              {renderLink(
+                viewAllLink,
+                'text-sm danaMed text-red-500 hover:text-red-600',
+                viewAllText,
+                String(viewAllText || 'مشاهده همه')
+              )}
+            </motion.div>
+          </motion.div>
 
           {/* Swiper */}
-          <div className="relative">
+          <motion.div className="relative" {...swiperMotion}>
             {!mounted ? (
               <div className="flex overflow-hidden">
                 {products.slice(0, 4).map((product, index) => (
@@ -395,11 +487,12 @@ const DigikalaSwiper = ({
             )}
 
             {/* Navigation buttons */}
-            <button
+            <motion.button
               ref={prevRef}
               type="button"
               aria-label="قبلی"
               className="hidden md:flex items-center justify-center w-10 h-10 rounded-full bg-white shadow border border-gray-200 absolute left-3 top-1/2 -translate-y-1/2 z-10"
+              {...navMotion}
               onClick={(e) => {
                 e.preventDefault()
                 e.stopPropagation()
@@ -408,13 +501,14 @@ const DigikalaSwiper = ({
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path d="M15 18L9 12L15 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
-            </button>
+            </motion.button>
 
-            <button
+            <motion.button
               ref={nextRef}
               type="button"
               aria-label="بعدی"
               className="hidden md:flex items-center justify-center w-10 h-10 rounded-full bg-white shadow border border-gray-200 absolute right-3 top-1/2 -translate-y-1/2 z-10"
+              {...navMotion}
               onClick={(e) => {
                 e.preventDefault()
                 e.stopPropagation()
@@ -423,9 +517,9 @@ const DigikalaSwiper = ({
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path d="M9 18L15 12L9 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
-            </button>
-          </div>
-        </div>
+            </motion.button>
+          </motion.div>
+        </motion.div>
       </div>
     </section>
   )
