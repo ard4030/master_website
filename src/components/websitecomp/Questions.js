@@ -2,6 +2,7 @@
 
 import React, { useMemo, useState } from 'react'
 import { AnimatePresence, motion, useAnimationControls, useInView } from 'framer-motion'
+import { FiChevronDown } from 'react-icons/fi'
 
 const ANIMATION_PRESETS = {
   none: {
@@ -45,11 +46,11 @@ const Questions = ({
   subtitle = 'پاسخ سریع به سوالات شما درباره سرویس و اتوماسیون هوشمند',
   sectionBg = '#03060d',
   itemBg = '#080c14',
-  itemBorderColor = '#1f2937',
   titleColor = '#f8fafc',
   subtitleColor = '#cbd5e1',
   questionColor = '#f3f4f6',
   answerColor = '#b7c2d4',
+  smallTextColor = '',
   iconColor = '#e5e7eb',
   itemRadius = '10',
   allowMultipleOpen = 'false',
@@ -156,7 +157,10 @@ const Questions = ({
     return isHex || isRgb || isHsl || isCssVar || isNamed ? raw : fallback
   }
 
-  const safeAnswerColor = resolveColor(answerColor, '#b7c2d4')
+  const fallbackAnswerColor = resolveColor(smallTextColor, '#b7c2d4')
+  const resolvedAnswerColor = resolveColor(answerColor, fallbackAnswerColor)
+  console.log('Resolved answer color:', resolvedAnswerColor,answerColor)
+  const answerTextColorClass = `text-[${resolvedAnswerColor}]`
 
   const toggleItem = (index) => {
     const isOpen = openIndexes.includes(index)
@@ -169,48 +173,47 @@ const Questions = ({
   }
 
   return (
-    <motion.section ref={sectionRef} className="w-full px-3 py-7 sm:px-4 sm:py-8 md:px-6 md:py-12" style={{ backgroundColor: sectionBg }} {...sectionMotion}>
-      <div className="mx-auto w-full max-w-5xl" dir="rtl">
+    <motion.section ref={sectionRef} className="w-full px-3 py-8 md:px-6 md:py-12" style={{ backgroundColor: sectionBg }} {...sectionMotion}>
+      <div className="mx-auto max-w-5xl" dir="rtl">
         <motion.div className="mb-7 flex flex-col items-center text-center md:mb-10" {...headerMotion}>
           <motion.span
-            className="rounded-lg border px-3 py-1 text-sm danaMed"
-            style={{ borderColor: itemBorderColor, color: subtitleColor, backgroundColor: itemBg }}
+            className="rounded-lg px-3 py-1 text-sm danaMed"
+            style={{ color: subtitleColor }}
             {...badgeMotion}
           >
             {badgeText}
           </motion.span>
           <motion.h2
-            className={`${isMobile ? 'mt-4 text-2xl leading-9 sm:text-3xl sm:leading-10' : 'mt-5 text-3xl leading-tight sm:text-4xl md:text-5xl'} danaBold max-w-3xl`}
+            className={`${isMobile ? 'mt-4 text-3xl leading-10' : 'mt-5 text-5xl leading-tight'} danaBold max-w-3xl`}
             style={{ color: titleColor }}
             {...titleMotion}
           >
             {title}
           </motion.h2>
-          <motion.p className="mt-3 text-sm leading-7 danaMed sm:mt-4 sm:text-base" style={{ color: subtitleColor }} {...subtitleMotion}>
+          <motion.p className="mt-4 text-base danaMed" style={{ color: subtitleColor }} {...subtitleMotion}>
             {subtitle}
           </motion.p>
         </motion.div>
 
-        <div className="space-y-2.5 sm:space-y-3">
+        <div className="space-y-3">
           {faqItems.map((item, index) => {
             const isOpen = openIndexes.includes(index)
             return (
               <motion.div
                 key={index}
-                className="overflow-hidden border"
+                className="overflow-hidden"
                 style={{
-                  borderColor: itemBorderColor,
                   borderRadius: `${safeRadius}px`,
-                  background: `linear-gradient(90deg, ${itemBg} 0%, ${itemBg} 72%, rgba(95, 53, 236, 0.18) 100%)`
+                  backgroundColor: itemBg
                 }}
                 {...itemMotion(index)}
               >
                 <button
                   type="button"
                   onClick={() => toggleItem(index)}
-                  className="flex w-full items-center justify-between gap-3 px-3 py-3.5 text-right sm:px-4 sm:py-4 md:px-5"
+                  className="flex w-full items-center justify-between gap-3 px-4 py-4 text-right md:px-5"
                 >
-                  <span className="text-sm leading-7 danaMed sm:text-base" style={{ color: questionColor }}>
+                  <span className="text-base danaMed" style={{ color: questionColor }}>
                     {item.question}
                   </span>
                   <motion.span
@@ -219,36 +222,24 @@ const Questions = ({
                     className="text-lg"
                     style={{ color: iconColor }}
                   >
-                    ˅
+                  <FiChevronDown
+                    className={`text-lg transition-transform ${isOpen ? 'rotate-180' : 'rotate-0'}`}
+                    style={{ color: iconColor }}
+                  />
                   </motion.span>
                 </button>
-
                 <AnimatePresence initial={false}>
                   {isOpen ? (
-                    <motion.div
-                      className="overflow-hidden"
-                      initial={{ height: 0, opacity: 0 }}
-                      animate={{ height: 'auto', opacity: 1 }}
-                      exit={{ height: 0, opacity: 0 }}
-                      transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
-                    >
-                      <motion.div className="border-t px-3 pb-4 pt-3 sm:px-4 md:px-5" style={{ borderColor: itemBorderColor, color: safeAnswerColor }} {...answerMotion}>
-                        <p className="text-sm leading-8 danaMed" style={{ color: safeAnswerColor }}>
+                        <p className={`text-sm px-6 pb-4 leading-8 danaMed ${answerTextColorClass}`} style={{color:answerColor}}>
                           {item.answer}
                         </p>
-                      </motion.div>
-                    </motion.div>
+
                   ) : null}
                 </AnimatePresence>
               </motion.div>
             )
           })}
         </div>
-
-        <div
-          className="mx-auto mt-7 h-10 w-[92%] rounded-t-2xl sm:mt-8 sm:h-14"
-          style={{ background: 'linear-gradient(90deg, rgba(93, 46, 174, 0.45) 0%, rgba(7, 11, 20, 0.2) 100%)' }}
-        />
       </div>
     </motion.section>
   )
