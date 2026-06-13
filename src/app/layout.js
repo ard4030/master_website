@@ -32,19 +32,21 @@ export default function RootLayout({ children }) {
           theme="light"
          /> */}
 
-        <MerchantProvider>
-          <AuthProvider>
-            <CartProvider>
-              <OrderProvider>
-                <div>
-                  {/* <Header1 /> */}
-                  <Header/>
-                  {children}
-                </div>
-              </OrderProvider>
-            </CartProvider>
-          </AuthProvider>
-        </MerchantProvider>
+        <ViewProvider>
+          <MerchantProvider>
+            <AuthProvider>
+              <CartProvider>
+                <OrderProvider>
+                  <div>
+                    {/* <Header1 /> */}
+                    <Header/>
+                    {children}
+                  </div>
+                </OrderProvider>
+              </CartProvider>
+            </AuthProvider>
+          </MerchantProvider>
+        </ViewProvider>
       </body>
     </html>
   );

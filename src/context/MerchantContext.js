@@ -14,9 +14,11 @@ export const MerchantProvider = ({ children }) => {
  
 
   useEffect(() => {
-    // if(!activeMerchant && !pathName.startsWith("/product")){
-      getMerchant()
-    // }
+    if(!activeMerchant && !pathName.startsWith("/product")){
+      if(!loading){
+        getMerchant()
+      }
+    }
   },[])
 
   const getMerchant = async () => {

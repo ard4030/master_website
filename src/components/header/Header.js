@@ -44,7 +44,7 @@ const Header = () => {
   const findHeader = () => {
     if(activeMerchant){
       let header = activeMerchant.activeTheme.components.find(item => item.type == "header") || {};
-      
+      console.log("header ",activeMerchant)
       const { id, componentId, styles, instanceId, props } = header;
 
       switch (header.id) {
@@ -56,10 +56,13 @@ const Header = () => {
           handleUserLogin={handleUserLogin} 
           cartItemsCount={cartItemsCount} />
         default:
-          return <Header />
+          return null
       }
+
+
     }
   }
+
 
 
   return (
