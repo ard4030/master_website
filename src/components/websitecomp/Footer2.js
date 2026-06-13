@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 import React from 'react'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
@@ -57,7 +57,7 @@ const Footer2 = ({
   })
 
   const getImageUrl = (src) => {
-    if (!src) return ''
+    if (!src) return '/assets/images/test.png'
     if (src.startsWith('http')) return src
     return `${process.env.NEXT_PUBLIC_LIARA_IMAGE_URL}${src}`
   }
@@ -152,7 +152,7 @@ const Footer2 = ({
 
         <div className='w-full pb-4'>
             {trustLogos.length > 0 && (
-              <div className="flex-wrap gap-4 grid grid-cols-8 items-center justify-start flex-wrap  mt-1">
+              <div className="gap-4 grid grid-cols-8 items-center justify-start mt-1">
                 {trustLogos.map((logo, i) => (
                   <a
                     key={i}
@@ -183,3 +183,5 @@ const Footer2 = ({
 }
 
 export default Footer2
+
+

@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import React from 'react'
 import { motion, useAnimationControls, useInView } from 'framer-motion'
@@ -126,7 +126,7 @@ const Comments = ({
   }
 
   const getImageUrl = (imagePath) => {
-    if (!imagePath) return ''
+    if (!imagePath) return '/assets/images/test.png'
     if (imagePath.startsWith('http')) return imagePath
     return `${process.env.NEXT_PUBLIC_LIARA_IMAGE_URL}uploads/${imagePath}`
   }
@@ -249,3 +249,4 @@ const Comments = ({
 }
 
 export default Comments
+

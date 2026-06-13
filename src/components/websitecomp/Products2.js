@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import React from 'react'
 import Link from 'next/link'
@@ -130,7 +130,7 @@ const Products2 = ({
 
   // تابع کمکی برای تبدیل URL تصویر
   const getImageUrl = (imagePath) => {
-    if (!imagePath) return ''
+    if (!imagePath) return '/assets/images/test.png'
     if (imagePath.startsWith('http')) return imagePath
     return `${process.env.NEXT_PUBLIC_LIARA_IMAGE_URL}${imagePath}`
   }
@@ -171,7 +171,7 @@ const Products2 = ({
                   backgroundColor: sortBy === filter.value ? sortButtonActiveBgColor : sortButtonBgColor,
                   color: sortBy === filter.value ? sortButtonActiveTextColor : sortButtonTextColor
                 }}
-                className="px-4 py-2 rounded-2xl whitespace-nowrap danaMed text-sm transition-colors hover:opacity-80 flex-shrink-0"
+                className="px-4 py-2 rounded-2xl whitespace-nowrap danaMed text-sm transition-colors hover:opacity-80 shrink-0"
               >
                 {filter.label}
               </button>
@@ -297,3 +297,4 @@ const Products2 = ({
 }
 
 export default Products2
+

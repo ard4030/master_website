@@ -26,6 +26,7 @@ import Slider2 from '@/components/websitecomp/Slider2';
 import About2 from '@/components/websitecomp/About2';
 import Comments from '@/components/websitecomp/Comments';
 import Questions from '@/components/websitecomp/Questions';
+import TopBanner from '@/components/websitecomp/TopBanner';
 
 
 function renderComponent(component, themeFont, themeColor) {
@@ -96,6 +97,8 @@ function renderComponent(component, themeFont, themeColor) {
       return <Comments key={instanceId} {...mergedProps} {...extraProps} />
       case 'questions':
       return <Questions key={instanceId} {...mergedProps} {...extraProps} />
+            case 'topBanner':
+      return <TopBanner key={instanceId} {...mergedProps} {...extraProps} />
     default:
       return null
   }

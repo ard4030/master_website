@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import React, { useEffect, useMemo, useRef, useState } from 'react'
 import Link from 'next/link'
@@ -44,7 +44,7 @@ const ANIMATION_PRESETS = {
 // ─── Utility functions (module-level to prevent re-creation on every render) ──
 
 const getImageUrl = (imagePath) => {
-  if (!imagePath) return ''
+  if (!imagePath) return '/assets/images/test.png'
   if (String(imagePath).startsWith('http')) return imagePath
   return `${process.env.NEXT_PUBLIC_LIARA_IMAGE_URL}${imagePath}`
 }
@@ -584,3 +584,4 @@ const DigikalaOfferSwiper = ({
 }
 
 export default DigikalaOfferSwiper
+

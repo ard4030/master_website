@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import React, { useEffect, useRef } from 'react'
 import Link from 'next/link'
@@ -41,7 +41,7 @@ const HeroBannerSwiper = ({
   const swiperRef = useRef(null)
 
   const getImageUrl = (imagePath) => {
-    if (!imagePath) return ''
+    if (!imagePath) return '/assets/images/test.png'
     if (imagePath.startsWith('http')) return imagePath
     return `${process.env.NEXT_PUBLIC_LIARA_IMAGE_URL}${imagePath}`
   }
@@ -196,3 +196,5 @@ const HeroBannerSwiper = ({
 }
 
 export default HeroBannerSwiper
+
+

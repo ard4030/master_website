@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 import React from 'react'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
@@ -59,7 +59,7 @@ const Footer3 = ({
   })
 
   const getImageUrl = (src) => {
-    if (!src) return ''
+    if (!src) return '/assets/images/test.png'
     if (src.startsWith('http')) return src
     return `${process.env.NEXT_PUBLIC_LIARA_IMAGE_URL}${src}`
   }
@@ -191,3 +191,4 @@ const Footer3 = ({
 }
 
 export default Footer3
+
