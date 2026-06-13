@@ -36,13 +36,11 @@ export default function RootLayout({ children }) {
           <AuthProvider>
             <CartProvider>
               <OrderProvider>
-                <ViewProvider>
-                  <div>
-                    <Header1 />
-                    {/* <Header/> */}
-                    {children}
-                  </div>
-                </ViewProvider>
+                <div>
+                  {/* <Header1 /> */}
+                  <Header/>
+                  {children}
+                </div>
               </OrderProvider>
             </CartProvider>
           </AuthProvider>

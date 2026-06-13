@@ -1,4 +1,5 @@
 import HomeWrapper from './HomeWrapper'
+import { cookies, headers } from "next/headers";
 
 async function getHomepageData() {
 
@@ -7,11 +8,20 @@ async function getHomepageData() {
     error:null
   }
 
+  const headersList = await headers();
+  const host = headersList.get('host');
+
   try {
     const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:3001'
     const response = await fetch(`${baseUrl}/homepage`, {
       method: 'GET',
-      cache: 'no-store'
+      cache: 'no-store',
+        headers: {
+        'Content-Type': 'application/json',
+        'origin': `https://${host}`,
+        'domain': host,
+        'referer': `https://${host}/`,
+      },
     })
     
     let data = await response.json()
@@ -25,6 +35,7 @@ async function getHomepageData() {
   } catch (error) {
     final.error = error.message
   }
+  // console.log("final ",final)
 
   return final
 
