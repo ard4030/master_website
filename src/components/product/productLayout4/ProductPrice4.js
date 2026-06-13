@@ -1,10 +1,13 @@
 'use client';
 import React, { useState, useContext } from 'react';
 import { CartContext } from '@/context/CartContext';
+import { useView } from '@/context/ViewContext';
 import { isCart } from '@/utils/functions';
 import { FiMinus, FiPlus, FiTrash2 } from 'react-icons/fi';
 import { BsShieldCheck } from 'react-icons/bs';
 import Link from 'next/link';
+import { motion, AnimatePresence } from 'framer-motion';
+import CircularProgress from '@mui/material/CircularProgress';
 
 // داده استاتیک بیمه - بعداً از product می‌آید
 const staticInsurance = {
@@ -13,9 +16,38 @@ const staticInsurance = {
   detailsUrl: '#',
 };
 
-const ProductPrice4 = ({ product, matchVariant, isVariants }) => {
+const ProductPrice4 = ({ product, matchVariant, isVariants, onAddSuccess }) => {
   const { addToCart, cart, increaseQuantity, decreaseQuantity, loading } = useContext(CartContext);
+  const { loadingObj, setLoadingObj } = useView();
   const [insuranceAdded, setInsuranceAdded] = useState(false);
+  const [loadingAction, setLoadingAction] = useState(null); // 'add' | 'inc' | 'dec' | null
+
+  const isCountLoading = loadingObj?.countProduct;
+
+  const withCountLoading = async (action, fn) => {
+    try {
+      setLoadingAction(action);
+      setLoadingObj((prev) => ({ ...prev, countProduct: true }));
+      await fn();
+    } finally {
+      setLoadingObj((prev) => ({ ...prev, countProduct: false }));
+      setLoadingAction(null);
+    }
+  };
+
+  const handleAdd = async () => {
+    await withCountLoading('add', () =>
+      addToCart({ _id: product._id, isVariants, variantId: matchVariant?._id || null })
+    );
+
+    if (typeof onAddSuccess === 'function') onAddSuccess();
+  };
+
+  const handleIncrease = (productId, variantId) =>
+    withCountLoading('inc', () => increaseQuantity(productId, variantId));
+
+  const handleDecrease = (productId, variantId) =>
+    withCountLoading('dec', () => decreaseQuantity(productId, variantId));
 
   // بعداً از product.insurance می‌آید
   const insurance = product?.insurance || staticInsurance;
@@ -38,7 +70,7 @@ const ProductPrice4 = ({ product, matchVariant, isVariants }) => {
       : null;
 
   return (
-    <div className="border border-gray-200 bg-neutral-50 rounded-xl p-4 flex flex-col gap-4shadow-xs">
+    <div className="border border-gray-200 bg-neutral-50 rounded-xl p-4 flex flex-col gap-4 shadow-xs">
       {/* قیمت */}
       <div className="flex flex-col gap-1">
         {discountPercent > 0 && (
@@ -139,47 +171,114 @@ const ProductPrice4 = ({ product, matchVariant, isVariants }) => {
       )}
 
       {/* دکمه افزودن / کانتر */}
-      <div>
+      <div className="min-h-13">
         {!matchVariant ? null : loading ? (
           <span className="text-sm danaMed text-gray-400">در حال بارگذاری...</span>
-        ) : cartItem ? (
-          <div className="flex flex-col gap-2">
-            {/* کانتر */}
-            <div className="flex items-center justify-between gap-2">
-              {/* سطل آشغال */}
-              <button
-                onClick={() => decreaseQuantity(cartItem.productId, cartItem.variantId)}
-                className="w-10 h-10 flex items-center justify-center border border-red-300 rounded-lg text-red-500 hover:bg-red-50 transition"
-              >
-                {cartItem.quantity > 1 ? <FiMinus size={17} /> : <FiTrash2 size={17} />}
-              </button>
-              {/* تعداد */}
-              <span className="flex-1 h-10 flex items-center justify-center border border-gray-300 rounded-lg text-base danaMed text-gray-900">
-                {cartItem.quantity}
-              </span>
-              {/* افزایش */}
-              <button
-                onClick={() => increaseQuantity(cartItem.productId, cartItem.variantId)}
-                className="w-10 h-10 flex items-center justify-center border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition"
-              >
-                <FiPlus size={17} />
-              </button>
-            </div>
-            {/* متن وضعیت */}
-            <p className="text-sm danaMed text-gray-500 text-center">در سبد شما</p>
-            <Link href="/cart" className="text-sm danaMed text-blue-500 hover:underline text-center">
-              مشاهده سبد خرید
-            </Link>
-          </div>
         ) : (
-          <button
-            onClick={() =>
-              addToCart({ _id: product._id, isVariants, variantId: matchVariant?._id || null })
-            }
-            className="w-full bg-[#0084ff] mt-4 text-white py-3 rounded-lg danaMed  hover:bg-blue-700 transition"
-          >
-            افزودن به سبد خرید
-          </button>
+          <AnimatePresence mode="wait" initial={false}>
+            {cartItem ? (
+              <motion.div
+                key="counter"
+                initial={{ opacity: 0, scale: 0.85, y: 8 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.9, y: -6 }}
+                transition={{ type: 'spring', stiffness: 320, damping: 26, mass: 0.6 }}
+                className="flex flex-col gap-2"
+              >
+                {/* کانتر */}
+                <div className="flex items-center justify-between gap-2">
+                  {/* سطل آشغال / منفی */}
+                  <motion.button
+                    whileTap={isCountLoading ? undefined : { scale: 0.88 }}
+                    whileHover={isCountLoading ? undefined : { scale: 1.04 }}
+                    transition={{ type: 'spring', stiffness: 400, damping: 18 }}
+                    onClick={() => handleDecrease(cartItem.productId, cartItem.variantId)}
+                    disabled={isCountLoading}
+                    className="w-10 h-10 flex items-center justify-center border border-red-300 rounded-lg text-red-500 hover:bg-red-50 transition-colors disabled:opacity-70 disabled:cursor-not-allowed"
+                  >
+                    {loadingAction === 'dec' ? (
+                      <CircularProgress size={16} thickness={5} sx={{ color: '#ef4444' }} />
+                    ) : (
+                      <AnimatePresence mode="wait" initial={false}>
+                        <motion.span
+                          key={cartItem.quantity > 1 ? 'minus' : 'trash'}
+                          initial={{ rotate: -90, opacity: 0, scale: 0.6 }}
+                          animate={{ rotate: 0, opacity: 1, scale: 1 }}
+                          exit={{ rotate: 90, opacity: 0, scale: 0.6 }}
+                          transition={{ duration: 0.18 }}
+                        >
+                          {cartItem.quantity > 1 ? <FiMinus size={17} /> : <FiTrash2 size={17} />}
+                        </motion.span>
+                      </AnimatePresence>
+                    )}
+                  </motion.button>
+
+                  {/* تعداد */}
+                  <div className="flex-1 h-10 relative flex items-center justify-center border border-gray-300 rounded-lg overflow-hidden">
+                    <AnimatePresence mode="popLayout" initial={false}>
+                      <motion.span
+                        key={cartItem.quantity}
+                        initial={{ y: 20, opacity: 0, scale: 0.7 }}
+                        animate={{ y: 0, opacity: 1, scale: 1 }}
+                        exit={{ y: -20, opacity: 0, scale: 0.7 }}
+                        transition={{ type: 'spring', stiffness: 380, damping: 24 }}
+                        className="text-base danaMed text-gray-900 absolute"
+                      >
+                        {cartItem.quantity.toLocaleString('fa-IR')}
+                      </motion.span>
+                    </AnimatePresence>
+                  </div>
+
+                  {/* افزایش */}
+                  <motion.button
+                    whileTap={isCountLoading ? undefined : { scale: 0.88 }}
+                    whileHover={isCountLoading ? undefined : { scale: 1.04 }}
+                    transition={{ type: 'spring', stiffness: 400, damping: 18 }}
+                    onClick={() => handleIncrease(cartItem.productId, cartItem.variantId)}
+                    disabled={isCountLoading}
+                    className="w-10 h-10 flex items-center justify-center border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors disabled:opacity-70 disabled:cursor-not-allowed"
+                  >
+                    {loadingAction === 'inc' ? (
+                      <CircularProgress size={16} thickness={5} sx={{ color: '#6b7280' }} />
+                    ) : (
+                      <FiPlus size={17} />
+                    )}
+                  </motion.button>
+                </div>
+                {/* متن وضعیت */}
+                <motion.p
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.12 }}
+                  className="text-sm danaMed text-gray-500 text-center"
+                >
+                  در سبد شما
+                </motion.p>
+                <Link href="/cart" className="text-sm danaMed text-blue-500 hover:underline text-center">
+                  مشاهده سبد خرید
+                </Link>
+              </motion.div>
+            ) : (
+              <motion.button
+                key="add-btn"
+                initial={{ opacity: 0, scale: 0.92, y: 8 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.9, y: -6 }}
+                whileTap={isCountLoading ? undefined : { scale: 0.96 }}
+                whileHover={isCountLoading ? undefined : { scale: 1.015 }}
+                transition={{ type: 'spring', stiffness: 320, damping: 24 }}
+                onClick={handleAdd}
+                disabled={isCountLoading}
+                className="w-full h-12 mt-4 bg-[#0084ff] text-white rounded-lg danaMed hover:bg-blue-700 transition-colors shadow-sm hover:shadow-md disabled:opacity-80 disabled:cursor-not-allowed flex items-center justify-center"
+              >
+                {loadingAction === 'add' ? (
+                  <CircularProgress size={22} thickness={4.5} sx={{ color: '#ffffff' }} />
+                ) : (
+                  'افزودن به سبد خرید'
+                )}
+              </motion.button>
+            )}
+          </AnimatePresence>
         )}
       </div>
     </div>

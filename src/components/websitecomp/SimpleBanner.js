@@ -2,6 +2,8 @@
 
 import Image from 'next/image'
 import React, { useState, useEffect } from 'react'
+import { motion } from 'framer-motion'
+import { useViewportMotion } from './animationUtils'
 
 /**
  * کامپوننت بنر ساده
@@ -26,9 +28,18 @@ const SimpleBanner = ({
   marginBottom = '0',
   alignment = 'center',
   objectFit = 'cover',
-  backgroundColor = 'transparent'
+  backgroundColor = 'transparent',
+  sectionAnimationType = 'fade',
+  sectionAnimationDelay = '0.05',
+  sectionAnimationDuration = '0.7'
 }) => {
   const [isMobile, setIsMobile] = useState(false)
+  const { sectionRef, motionProps } = useViewportMotion({
+    animationType: sectionAnimationType,
+    animationDelay: sectionAnimationDelay,
+    animationDuration: sectionAnimationDuration,
+    amount: 0.2
+  })
 
   useEffect(() => {
     setIsMobile(window?.innerWidth < 768)
@@ -79,7 +90,7 @@ const SimpleBanner = ({
   }
 
   return (
-    <div style={containerStyles}>
+    <motion.div ref={sectionRef} style={containerStyles} {...motionProps}>
       <div style={bannerStyles}>
         <Image 
           alt='بنر'
@@ -88,7 +99,7 @@ const SimpleBanner = ({
           style={{ objectFit: objectFit }}
         />
       </div>
-    </div>
+    </motion.div>
   )
 }
 

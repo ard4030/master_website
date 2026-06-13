@@ -1,8 +1,9 @@
 'use client';
-import React, { useRef } from 'react'
+import React, { useEffect, useRef } from 'react'
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation, Autoplay } from 'swiper/modules';
 import { usePathname } from 'next/navigation';
+import { motion, useAnimationControls, useInView } from 'framer-motion'
 
 // Import Swiper styles
 import 'swiper/css';
@@ -11,6 +12,37 @@ import Link from 'next/link';
 import Image from 'next/image';
 import ViewPrice from '../global/other/ViewPrice';
 import { formatPrice } from '@/utils/functions';
+
+const ANIMATION_PRESETS = {
+  none: {
+    hidden: { opacity: 1 },
+    visible: { opacity: 1 }
+  },
+  fade: {
+    hidden: { opacity: 0 },
+    visible: { opacity: 1 }
+  },
+  slideUp: {
+    hidden: { opacity: 0, y: 32 },
+    visible: { opacity: 1, y: 0 }
+  },
+  slideRight: {
+    hidden: { opacity: 0, x: -36 },
+    visible: { opacity: 1, x: 0 }
+  },
+  slideLeft: {
+    hidden: { opacity: 0, x: 36 },
+    visible: { opacity: 1, x: 0 }
+  },
+  zoomIn: {
+    hidden: { opacity: 0, scale: 0.92 },
+    visible: { opacity: 1, scale: 1 }
+  },
+  blurUp: {
+    hidden: { opacity: 0, y: 16, filter: 'blur(8px)' },
+    visible: { opacity: 1, y: 0, filter: 'blur(0px)' }
+  }
+}
 
 /**
  * کامپوننت محصولات لغزنده
@@ -28,8 +60,62 @@ const ProductSwp2 = ({
   largeTextColor = '#111827',
   smallTextColor = '#6b7280',
   autoplayDelay = '5',
-  enableAutoplay = 'true'
+  enableAutoplay = 'true',
+  sectionAnimationType = 'fade',
+  sectionAnimationDelay = '0.05',
+  sectionAnimationDuration = '0.7',
+  sliderAnimationType = 'slideUp',
+  sliderAnimationDelay = '0.15',
+  sliderAnimationDuration = '0.7',
+  cardAnimationType = 'zoomIn',
+  cardAnimationDelay = '0.22',
+  cardAnimationDuration = '0.62',
+  cardAnimationStagger = '0.08'
 }) => {
+  const sectionRef = useRef(null)
+  const animationControls = useAnimationControls()
+  const isInView = useInView(sectionRef, {
+    once: true,
+    amount: 0.25,
+    margin: '0px 0px -10% 0px'
+  })
+
+  useEffect(() => {
+    if (isInView) {
+      animationControls.start('visible')
+    }
+  }, [isInView, animationControls])
+
+  const parseTiming = (value, fallback) => {
+    const parsed = Number.parseFloat(value)
+    if (Number.isNaN(parsed)) return fallback
+    return Math.max(0, parsed)
+  }
+
+  const getMotionConfig = (type, delayValue, durationValue, extraDelay = 0) => {
+    const preset = ANIMATION_PRESETS[type] || ANIMATION_PRESETS.fade
+    return {
+      initial: 'hidden',
+      animate: animationControls,
+      variants: preset,
+      transition: {
+        delay: parseTiming(delayValue, 0) + extraDelay,
+        duration: parseTiming(durationValue, 0.7),
+        ease: [0.22, 1, 0.36, 1]
+      }
+    }
+  }
+
+  const sectionMotion = getMotionConfig(sectionAnimationType, sectionAnimationDelay, sectionAnimationDuration)
+  const sliderMotion = getMotionConfig(sliderAnimationType, sliderAnimationDelay, sliderAnimationDuration)
+  const getCardMotion = (index) =>
+    getMotionConfig(
+      cardAnimationType,
+      cardAnimationDelay,
+      cardAnimationDuration,
+      parseTiming(cardAnimationStagger, 0.08) * index
+    )
+
   const autoplayDelayMs = (parseInt(autoplayDelay) || 5) * 1000
   const pathName = usePathname()
   const prevRef = useRef(null)
@@ -96,8 +182,8 @@ const ProductSwp2 = ({
   if(pathName !== '/newsitebuilder') products = data || sampleProducts
 
   return (
-    <div className="w-full py-10 px-10 dana" dir="rtl" style={{backgroundColor: bgColor}}>
-      <div className="relative">
+    <motion.div ref={sectionRef} className="w-full py-10 px-10 dana" dir="rtl" style={{backgroundColor: bgColor}} {...sectionMotion}>
+      <motion.div className="relative" {...sliderMotion}>
         {/* دکمه قبلی */}
         <button
           ref={prevRef}
@@ -129,9 +215,9 @@ const ProductSwp2 = ({
           loop={products.length >= 2}
           autoplay={enableAutoplay === 'true' ? { delay: autoplayDelayMs, disableOnInteraction: false } : false}
         >
-          {products.map((product) => (
+          {products.map((product, index) => (
             <SwiperSlide key={product.id || product._id}>
-              <div className="flex flex-col md:flex-row items-center justify-between gap-10 md:gap-14 px-10 md:px-20 py-10 md:py-14 bg-linear-to-br from-blue-50 via-yellow-50 to-orange-100 rounded-3xl min-h-80 md:min-h-96" dir="rtl">
+              <motion.div className="flex flex-col md:flex-row items-center justify-between gap-10 md:gap-14 px-10 md:px-20 py-10 md:py-14 bg-linear-to-br from-blue-50 via-yellow-50 to-orange-100 rounded-3xl min-h-80 md:min-h-96" dir="rtl" {...getCardMotion(index)}>
                 {/* بخش متن */}
                 <div className="flex flex-col justify-center flex-1 w-full md:w-auto">
                   {/* قیمت */}
@@ -176,12 +262,12 @@ const ProductSwp2 = ({
                     />
                   )}
                 </div>
-              </div>
+              </motion.div>
             </SwiperSlide>
           ))}
         </Swiper>
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   )
 }
 

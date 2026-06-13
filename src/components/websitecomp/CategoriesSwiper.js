@@ -1,12 +1,45 @@
 'use client'
 
-import React from 'react'
+import React, { useEffect, useRef } from 'react'
 import { Swiper, SwiperSlide } from 'swiper/react'
 import { Navigation, Autoplay } from 'swiper/modules'
+import { motion, useAnimationControls, useInView } from 'framer-motion'
 
 // Import Swiper styles
 import 'swiper/css'
 import 'swiper/css/navigation'
+
+
+const ANIMATION_PRESETS = {
+  none: {
+    hidden: { opacity: 1 },
+    visible: { opacity: 1 }
+  },
+  fade: {
+    hidden: { opacity: 0 },
+    visible: { opacity: 1 }
+  },
+  slideUp: {
+    hidden: { opacity: 0, y: 36 },
+    visible: { opacity: 1, y: 0 }
+  },
+  slideRight: {
+    hidden: { opacity: 0, x: -42 },
+    visible: { opacity: 1, x: 0 }
+  },
+  slideLeft: {
+    hidden: { opacity: 0, x: 42 },
+    visible: { opacity: 1, x: 0 }
+  },
+  zoomIn: {
+    hidden: { opacity: 0, scale: 0.88 },
+    visible: { opacity: 1, scale: 1 }
+  },
+  blurUp: {
+    hidden: { opacity: 0, y: 20, filter: 'blur(8px)' },
+    visible: { opacity: 1, y: 0, filter: 'blur(0px)' }
+  }
+}
 
 /**
  * کامپوننت دسته‌بندی‌های لغزنده
@@ -98,9 +131,44 @@ const CategoriesSwiper = ({
   largeTextColor = '#111827',
   smallTextColor = '#111827',
   autoplayDelay = '5',
-  enableAutoplay = 'true'
+  enableAutoplay = 'true',
+  sectionAnimationType = 'fade',
+  sectionAnimationDelay = '0.05',
+  sectionAnimationDuration = '0.7',
+  containerAnimationType = 'fade',
+  containerAnimationDelay = '0.05',
+  containerAnimationDuration = '0.65',
+  titleAnimationType = 'slideUp',
+  titleAnimationDelay = '0.14',
+  titleAnimationDuration = '0.65',
+  swiperAnimationType = 'slideUp',
+  swiperAnimationDelay = '0.2',
+  swiperAnimationDuration = '0.7',
+  cardAnimationType = 'zoomIn',
+  cardAnimationDelay = '0.12',
+  cardAnimationDuration = '0.6',
+  cardAnimationStagger = '0.06'
 }) => {
   const autoplayDelayMs = (parseInt(autoplayDelay) || 5) * 1000
+  const sectionRef = useRef(null)
+  const animationControls = useAnimationControls()
+  const isInView = useInView(sectionRef, {
+    once: true,
+    amount: 0.25,
+    margin: '0px 0px -10% 0px'
+  })
+
+  useEffect(() => {
+    if (isInView) {
+      animationControls.start('visible')
+    }
+  }, [isInView, animationControls])
+
+  const parseTiming = (value, fallback) => {
+    const parsed = Number.parseFloat(value)
+    if (Number.isNaN(parsed)) return fallback
+    return Math.max(0, parsed)
+  }
   // تابع کمکی برای تبدیل URL تصویر
   const getImageUrl = (imagePath) => {
     if (!imagePath) return ''
@@ -108,17 +176,44 @@ const CategoriesSwiper = ({
     return `${process.env.NEXT_PUBLIC_LIARA_IMAGE_URL}${imagePath}`
   }
 
+  const getMotionConfig = (type, delayValue, durationValue, extraDelay = 0) => {
+    const preset = ANIMATION_PRESETS[type] || ANIMATION_PRESETS.fade
+    return {
+      initial: 'hidden',
+      animate: animationControls,
+      variants: preset,
+      transition: {
+        delay: parseTiming(delayValue, 0) + extraDelay,
+        duration: parseTiming(durationValue, 0.75),
+        ease: [0.22, 1, 0.36, 1]
+      }
+    }
+  }
+
+  const sectionMotion = getMotionConfig(sectionAnimationType, sectionAnimationDelay, sectionAnimationDuration)
+  const containerMotion = getMotionConfig(containerAnimationType, containerAnimationDelay, containerAnimationDuration)
+  const titleMotion = getMotionConfig(titleAnimationType, titleAnimationDelay, titleAnimationDuration)
+  const swiperMotion = getMotionConfig(swiperAnimationType, swiperAnimationDelay, swiperAnimationDuration)
+  const getCardMotion = (index) =>
+    getMotionConfig(
+      cardAnimationType,
+      cardAnimationDelay,
+      cardAnimationDuration,
+      parseTiming(cardAnimationStagger, 0.06) * index
+    )
+
   return (
-    <div className="w-full py-8 md:py-12" style={{backgroundColor: bgColor}}>
-      <div className="max-w-7xl mx-auto px-4 md:px-6">
+    <motion.div ref={sectionRef} className="w-full py-8 md:py-12" style={{backgroundColor: bgColor}} {...sectionMotion}>
+      <motion.div className="max-w-7xl mx-auto px-4 md:px-6" {...containerMotion}>
         {/* Title */}
         {title && (
-          <h2 className="text-2xl md:text-3xl danaBold mb-8 text-center md:text-right" style={{color: largeTextColor}}>
+          <motion.h2 className="text-2xl md:text-3xl danaBold mb-8 text-center md:text-right" style={{color: largeTextColor}} {...titleMotion}>
             {title}
-          </h2>
+          </motion.h2>
         )}
 
         {/* Categories Swiper */}
+        <motion.div {...swiperMotion}>
         <Swiper
           modules={[Navigation, Autoplay]}
           spaceBetween={16}
@@ -146,9 +241,9 @@ const CategoriesSwiper = ({
           autoplay={enableAutoplay === 'true' ? { delay: autoplayDelayMs, disableOnInteraction: false } : false}
           className="w-full"
         >
-          {categories.map((category) => (
+          {categories.map((category, index) => (
             <SwiperSlide key={category.id}>
-              <div className="flex flex-col items-center text-center cursor-pointer group">
+              <motion.div className="flex flex-col items-center text-center cursor-pointer group" {...getCardMotion(index)}>
                 {/* Category Image */}
                 <div className="w-full aspect-square bg-gray-100 rounded-full overflow-hidden mb-3 md:mb-4 flex items-center justify-center group-hover:shadow-lg transition-all duration-300">
                   {category.image && (
@@ -164,12 +259,13 @@ const CategoriesSwiper = ({
                 <p className="text-xs md:text-sm danaMed text-gray-700 leading-relaxed line-clamp-2">
                   {category.name}
                 </p>
-              </div>
+              </motion.div>
             </SwiperSlide>
           ))}
         </Swiper>
-      </div>
-    </div>
+        </motion.div>
+      </motion.div>
+    </motion.div>
   )
 }
 

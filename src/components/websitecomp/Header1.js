@@ -3,7 +3,39 @@ import { AuthContext } from '@/context/AuthContext'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import React, { useContext, useState, useEffect } from 'react'
+import React, { useContext, useState, useEffect, useRef } from 'react'
+import { motion, useAnimationControls, useInView } from 'framer-motion'
+
+const ANIMATION_PRESETS = {
+  none: {
+    hidden: { opacity: 1 },
+    visible: { opacity: 1 }
+  },
+  fade: {
+    hidden: { opacity: 0 },
+    visible: { opacity: 1 }
+  },
+  slideUp: {
+    hidden: { opacity: 0, y: 24 },
+    visible: { opacity: 1, y: 0 }
+  },
+  slideRight: {
+    hidden: { opacity: 0, x: -28 },
+    visible: { opacity: 1, x: 0 }
+  },
+  slideLeft: {
+    hidden: { opacity: 0, x: 28 },
+    visible: { opacity: 1, x: 0 }
+  },
+  zoomIn: {
+    hidden: { opacity: 0, scale: 0.94 },
+    visible: { opacity: 1, scale: 1 }
+  },
+  blurUp: {
+    hidden: { opacity: 0, y: 12, filter: 'blur(6px)' },
+    visible: { opacity: 1, y: 0, filter: 'blur(0px)' }
+  }
+}
 
 const Header1 = ({ 
   width = '100',
@@ -20,12 +52,38 @@ const Header1 = ({
   cartItemsCount = 0,
   handleUserLogin,
   handleLogout = false,
-  activeMerchant = false
+  activeMerchant = false,
+  sectionAnimationType = 'fade',
+  sectionAnimationDelay = '0.03',
+  sectionAnimationDuration = '0.5',
+  headerAnimationType = 'slideDown',
+  headerAnimationDelay = '0.08',
+  headerAnimationDuration = '0.55',
+  mobileHeaderAnimationType = 'slideUp',
+  mobileHeaderAnimationDelay = '0.12',
+  mobileHeaderAnimationDuration = '0.55',
+  mobileSearchAnimationType = 'fade',
+  mobileSearchAnimationDelay = '0.16',
+  mobileSearchAnimationDuration = '0.5'
 }) => {
+  const normalizedHeaderAnimationType = headerAnimationType === 'slideDown' ? 'slideUp' : headerAnimationType
   const [searchValue, setSearchValue] = useState('')
   const [isMobile, setIsMobile] = useState(false)
   const {user} = useContext(AuthContext)
   const router = useRouter()
+  const sectionRef = useRef(null)
+  const animationControls = useAnimationControls()
+  const isInView = useInView(sectionRef, {
+    once: true,
+    amount: 0.2,
+    margin: '0px 0px -10% 0px'
+  })
+
+  useEffect(() => {
+    if (isInView) {
+      animationControls.start('visible')
+    }
+  }, [isInView, animationControls])
 
   useEffect(() => {
     setIsMobile(window?.innerWidth < 768)
@@ -41,14 +99,46 @@ const Header1 = ({
   }
 
   const merchantLogo = activeMerchant?.merchant?.storeImage || activeMerchant?.storeImage
+  console.log('44',activeMerchant);
+
+  const parseTiming = (value, fallback) => {
+    const parsed = Number.parseFloat(value)
+    if (Number.isNaN(parsed)) return fallback
+    return Math.max(0, parsed)
+  }
+
+  const getMotionConfig = (type, delayValue, durationValue) => {
+    const preset = ANIMATION_PRESETS[type] || ANIMATION_PRESETS.fade
+    return {
+      initial: 'hidden',
+      animate: animationControls,
+      variants: preset,
+      transition: {
+        delay: parseTiming(delayValue, 0),
+        duration: parseTiming(durationValue, 0.55),
+        ease: [0.22, 1, 0.36, 1]
+      }
+    }
+  }
+
+  const sectionMotion = getMotionConfig(sectionAnimationType, sectionAnimationDelay, sectionAnimationDuration)
+  const headerMotion = getMotionConfig(normalizedHeaderAnimationType, headerAnimationDelay, headerAnimationDuration)
+  const mobileHeaderMotion = getMotionConfig(mobileHeaderAnimationType, mobileHeaderAnimationDelay, mobileHeaderAnimationDuration)
+  const mobileSearchMotion = getMotionConfig(mobileSearchAnimationType, mobileSearchAnimationDelay, mobileSearchAnimationDuration)
+  
 
   return (
-    <div style={{ display: 'flex', justifyContent: alignment === 'center' ? 'center' : alignment === 'flex-end' ? 'flex-end' : 'flex-start' }}>
-      <header 
+    <motion.div
+      ref={sectionRef}
+      style={{ display: 'flex', justifyContent: alignment === 'center' ? 'center' : alignment === 'flex-end' ? 'flex-end' : 'flex-start' }}
+      {...sectionMotion}
+    >
+      <motion.header
         className="sticky top-0 z-100 bg-white border-b border-gray-200" 
         style={{ 
           width: isMobile ? `${parseFloat(headerWidthMobile) || 100}%` : `${parseFloat(width) || 100}%`
         }}
+        {...headerMotion}
       >
         {/* Desktop Header */}
         <div 
@@ -115,9 +205,10 @@ const Header1 = ({
         </div>
 
         {/* Mobile Header */}
-        <div 
+        <motion.div
           className="md:hidden flex items-center justify-between w-full px-5 border-b border-gray-200"
           style={{ minHeight: `${safeParseInt(headerMinHeightMobile, 56)}px` }}
+          {...mobileHeaderMotion}
         >
           {/* Logo Container */}
           <div className="relative" style={{ width: `${safeParseInt(logoWidthMobile, 40)}px`, height: `${safeParseInt(logoHeightMobile, 40)}px` }}>
@@ -149,15 +240,15 @@ const Header1 = ({
                 <circle cx="20" cy="21" r="1"></circle>
                 <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
               </svg>
-              <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold w-4 h-4 rounded-full flex items-center justify-center border-2 border-white text-xs">
+              <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold w-4 h-4 rounded-full flex items-center justify-center border-2 border-white">
                 3
               </span>
             </Link>
           </div>
-        </div>
+        </motion.div>
 
         {/* Mobile Search Bar - Full Width at Bottom */}
-        <div className="md:hidden w-full px-5 py-3 bg-gray-50 border-t border-gray-200">
+        <motion.div className="md:hidden w-full px-5 py-3 bg-gray-50 border-t border-gray-200" {...mobileSearchMotion}>
           <div 
             className="flex items-center bg-white border border-gray-300 rounded-lg px-4"
             style={{ width: `${parseFloat(searchBarWidthMobile) || 100}%` }}
@@ -176,9 +267,9 @@ const Header1 = ({
               </svg>
             </button>
           </div>
-        </div>
-      </header>
-    </div>
+        </motion.div>
+      </motion.header>
+    </motion.div>
   )
 }
 

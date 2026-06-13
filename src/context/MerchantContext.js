@@ -14,9 +14,9 @@ export const MerchantProvider = ({ children }) => {
  
 
   useEffect(() => {
-    if(!activeMerchant && pathName.startsWith("/product")){
+    // if(!activeMerchant && !pathName.startsWith("/product")){
       getMerchant()
-    }
+    // }
   },[])
 
   const getMerchant = async () => {

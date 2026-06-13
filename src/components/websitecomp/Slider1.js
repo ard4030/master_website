@@ -51,11 +51,11 @@ const ANIMATION_PRESETS = {
  * @param {String} subtitle - زیرعنوان بخش محصولات
  * @param {String} description - توضیحات بخش
  */
-const ProductsSwiperBasic = ({
-  bgColor = "#ffffff",
-  largeTextColor = "#111827",
-  smallTextColor = "#6b7280",
-  priceColor = "#0d9488",
+const Slider1 = ({
+  bgColor = "#f3f4f8",
+  largeTextColor = "#30355a",
+  smallTextColor = "#8d90a6",
+  priceColor = "#28c76f",
   autoplayDelay = "5",
   enableAutoplay = "false",
   data = null,
@@ -117,6 +117,12 @@ const ProductsSwiperBasic = ({
     };
   };
 
+  const formatPercentFa = (value) => {
+    const num = Number(value);
+    if (!Number.isFinite(num) || num <= 0) return "";
+    return `${Math.round(num)}٪`;
+  };
+
   // تابع کمکی برای تبدیل URL تصویر
   const getImageUrl = (imagePath) => {
     if (!imagePath) return "";
@@ -140,7 +146,8 @@ const ProductsSwiperBasic = ({
         "https://images.unsplash.com/photo-1587836374828-4dbafa94cf0e?w=400&h=400&fit=crop",
       mainImage:
         "https://images.unsplash.com/photo-1587836374828-4dbafa94cf0e?w=400&h=400&fit=crop",
-      badge: false,
+      oldPrice: "99000000",
+      discountPercent: 35,
     },
     {
       id: 2,
@@ -151,7 +158,8 @@ const ProductsSwiperBasic = ({
         "https://images.unsplash.com/photo-1524592094714-0f0654e20314?w=400&h=400&fit=crop",
       mainImage:
         "https://images.unsplash.com/photo-1524592094714-0f0654e20314?w=400&h=400&fit=crop",
-      badge: false,
+      oldPrice: "99000000",
+      discountPercent: 35,
     },
     {
       id: 3,
@@ -162,7 +170,8 @@ const ProductsSwiperBasic = ({
         "https://images.unsplash.com/photo-1533139502658-0198f920d8e8?w=400&h=400&fit=crop",
       mainImage:
         "https://images.unsplash.com/photo-1533139502658-0198f920d8e8?w=400&h=400&fit=crop",
-      badge: false,
+      oldPrice: "99000000",
+      discountPercent: 35,
     },
     {
       id: 4,
@@ -173,7 +182,8 @@ const ProductsSwiperBasic = ({
         "https://images.unsplash.com/photo-1542496658-e33a6d0d50f6?w=400&h=400&fit=crop",
       mainImage:
         "https://images.unsplash.com/photo-1542496658-e33a6d0d50f6?w=400&h=400&fit=crop",
-      badge: false,
+      oldPrice: "99000000",
+      discountPercent: 35,
     },
     {
       id: 5,
@@ -184,7 +194,8 @@ const ProductsSwiperBasic = ({
         "https://images.unsplash.com/photo-1548169874-53e85f753f1e?w=400&h=400&fit=crop",
       mainImage:
         "https://images.unsplash.com/photo-1548169874-53e85f753f1e?w=400&h=400&fit=crop",
-      badge: false,
+      oldPrice: "99000000",
+      discountPercent: 35,
     },
   ];
 
@@ -213,7 +224,7 @@ const ProductsSwiperBasic = ({
 
   if (pathName !== "/newsitebuilder") products = data || sampleProducts;
 
-  const maxSlidesPerView = 4;
+  const desktopSlidesPerView = 4;
   const sectionMotion = getMotionConfig(
     sectionAnimationType,
     sectionAnimationDelay,
@@ -245,169 +256,162 @@ const ProductsSwiperBasic = ({
       dir="rtl"
       {...sectionMotion}
     >
-      <div className="max-w-7xl mx-auto py-6 px-3 md:py-8 md:px-4 lg:py-10 lg:px-6">
-        {/* Header */}
-        <motion.div className="flex items-center justify-between mb-6" {...headerMotion}>
-          {/* Title */}
-          <div className="flex items-center gap-2">
-            {titleIcon && <span className="text-2xl">{titleIcon}</span>}
-            <h2 className="text-xl font-bold" style={{ color: largeTextColor }}>
+      <div className="max-w-7xl mx-auto py-6 px-4 md:py-8 md:px-6 lg:py-10 lg:px-4">
+        {(title || subtitle || titleIcon) && (
+          <motion.div className="flex items-center gap-2 mb-5" {...headerMotion}>
+            {titleIcon ? <span className="text-lg">{titleIcon}</span> : null}
+            <h2 className="text-lg md:text-xl danaBold" style={{ color: largeTextColor }}>
               {title}
             </h2>
-          </div>
+            {subtitle ? (
+              <p className="text-sm danaBold" style={{ color: smallTextColor }}>
+                {subtitle}
+              </p>
+            ) : null}
+          </motion.div>
+        )}
 
-          {/* Navigation Arrows */}
-          <div className="flex items-center gap-2">
-            <button
-              onClick={() => swiperRef.current?.slideNext()}
-              className="w-9 h-9 rounded-full border border-gray-300 flex items-center justify-center text-gray-500 hover:border-gray-500 hover:text-gray-700 transition-colors"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="w-4 h-4"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M9 5l7 7-7 7"
-                />
-              </svg>
-            </button>
-            <button
-              onClick={() => swiperRef.current?.slidePrev()}
-              className="w-9 h-9 rounded-full border border-gray-300 flex items-center justify-center text-gray-500 hover:border-gray-500 hover:text-gray-700 transition-colors"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="w-4 h-4"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M15 19l-7-7 7-7"
-                />
-              </svg>
-            </button>
-          </div>
-        </motion.div>
-
-        {/* Products Swiper */}
-        <motion.div {...sliderMotion}>
-          <Swiper
-            modules={[Navigation, Autoplay, FreeMode]}
-            spaceBetween={16}
-            slidesPerView={1.5}
-            breakpoints={{
-              768: { slidesPerView: 2.5 },
-              1024: { slidesPerView: maxSlidesPerView },
-            }}
-            freeMode={{ enabled: true, sticky: false }}
-            grabCursor={true}
-            loop={products.length > maxSlidesPerView}
-            autoplay={
-              enableAutoplay === "true"
-                ? { delay: autoplayDelayMs, disableOnInteraction: false }
-                : false
-            }
-            onSwiper={(swiper) => {
-              swiperRef.current = swiper;
-            }}
-            onSliderMove={() => setIsDragging(true)}
-            onTouchEnd={() => setTimeout(() => setIsDragging(false), 100)}
-            className="w-full"
-            dir="rtl"
+        <motion.div className="relative p-1" {...sliderMotion}>
+          <button
+            onClick={() => swiperRef.current?.slidePrev()}
+            className="absolute right-[-1rem] bg-white top-1/2 -translate-y-1/2 z-20 w-12 h-12 md:w-10 md:h-10 rounded-full flex items-center justify-center text-black shadow-lg"
+            aria-label="قبلی"
           >
-            {products.map((product, index) => (
-              <SwiperSlide key={product.id || product._id}>
-                <motion.div {...getCardMotion(index)}>
-                  <Link
-                    href={getProductLink(product)}
-                    onClick={(e) => {
-                      if (isDragging) e.preventDefault();
-                    }}
-                    className="block group"
-                  >
-                    <div className="border border-gray-200 rounded-xl p-4 transition-all duration-300 hover:shadow-lg hover:border-gray-300 bg-white relative overflow-hidden">
-                  {/* Product Image */}
-                  <div className="w-full aspect-square rounded-lg overflow-hidden mb-4 flex items-center justify-center bg-gray-50">
-                    {(product.image || product.mainImage) && (
-                      <img
-                        src={getImageUrl(product.mainImage || product.image)}
-                        alt={product.name || product.title}
-                        className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-300"
-                        draggable={false}
-                      />
-                    )}
-                  </div>
 
-                  {/* Add to Cart Button - shows on hover */}
-                  <div className="absolute bottom-10 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10">
-                    <button
-                      onClick={(e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                      }}
-                      className="bg-emerald-500 hover:bg-emerald-600 text-white text-sm font-medium px-4 py-2 rounded-full flex items-center gap-2 whitespace-nowrap shadow-lg"
-                    >
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="w-4 h-4"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
+
+                        <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="w-6 h-6"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.5"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+            </svg>
+          </button>
+
+          <button
+            onClick={() => swiperRef.current?.slideNext()}
+            className="absolute left-[-1rem] top-1/2 bg-white -translate-y-1/2 z-20 w-12 h-12 md:w-10 md:h-10 rounded-full flex items-center justify-center text-black shadow-lg"
+            aria-label="بعدی"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="w-6 h-6"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.5"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+            </svg>
+          </button>
+
+          <div className="w-full rounded-[22px] shadow-sm overflow-hidden">
+            <Swiper
+              modules={[Navigation, Autoplay, FreeMode]}
+              spaceBetween={0}
+              slidesPerView={1.35}
+              breakpoints={{
+                768: { slidesPerView: 2.4 },
+                1024: { slidesPerView: desktopSlidesPerView },
+              }}
+              freeMode={{ enabled: true, sticky: false }}
+              grabCursor={true}
+              loop={products.length > desktopSlidesPerView}
+              autoplay={
+                enableAutoplay === "true"
+                  ? { delay: autoplayDelayMs, disableOnInteraction: false }
+                  : false
+              }
+              onSwiper={(swiper) => {
+                swiperRef.current = swiper;
+              }}
+              onSliderMove={() => setIsDragging(true)}
+              onTouchEnd={() => setTimeout(() => setIsDragging(false), 100)}
+              className="w-full"
+              dir="rtl"
+            >
+              {products.map((product, index) => {
+                const oldPrice =
+                  product.oldPrice || product.old_price || product.previousPrice || "";
+                const discountPercent =
+                  product.discountPercent || product.discount || product.discount_percentage || 0;
+
+                return (
+                  <SwiperSlide key={product.id || product._id}>
+                    <motion.div {...getCardMotion(index)}>
+                      <Link
+                        href={getProductLink(product)}
+                        onClick={(e) => {
+                          if (isDragging) e.preventDefault();
+                        }}
+                        className="block"
                       >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 100 4 2 2 0 000-4z"
-                        />
-                      </svg>
-                      <span>افزودن به سبد خرید</span>
-                    </button>
-                  </div>
+                        <div className="bg-white border-l-1 border-gray-200 p-3 md:p-4 ">
+                        <div className="w-full aspect-square rounded-2xl overflow-hidden mb-3 flex items-center justify-center">
+                          {(product.image || product.mainImage) && (
+                            <img
+                              src={getImageUrl(product.mainImage || product.image)}
+                              alt={product.name || product.title}
+                              className="w-[85%] h-[85%] object-contain"
+                              draggable={false}
+                            />
+                          )}
+                        </div>
 
-                  {/* Product Info */}
-                  <h3
-                    className="text-sm font-medium text-center leading-6 mb-3 line-clamp-2 min-h-12"
-                    style={{ color: largeTextColor }}
-                  >
-                    {product.name || product.title}
-                  </h3>
+                        <h3
+                          className="text-sm md:text-[15px] danaBold text-center leading-7 mb-3 line-clamp-1"
+                          style={{ color: largeTextColor }}
+                        >
+                          {product.name || product.title}
+                        </h3>
 
-                  {/* Price */}
-                  <div className="text-center">
-                    <span
-                      className="text-base font-bold"
-                      style={{ color: priceColor }}
-                    >
-                      {product.price ? formatPrice(product.price) : "۰"}
-                    </span>
-                    <span
-                      className="text-xs mr-1"
-                      style={{ color: priceColor }}
-                    >
-                      تومان
-                    </span>
-                  </div>
-                    </div>
-                  </Link>
-                </motion.div>
-              </SwiperSlide>
-            ))}
-          </Swiper>
+                        <div className="flex pt-4 items-end grid grid-cols-12 justify-between gap-2 border-t-1 pt-2 border-gray-300" dir="rtl">
+                          
+                            <div className="text-right col-span-4 grid flex flex-col items-end gap-1">
+                              {formatPercentFa(discountPercent) ? (
+                                <span
+                                  className="inline-flex h-7 min-w-12 px-3 rounded-full items-center justify-center text-white text-sm italic danaBold"
+                                  style={{ backgroundColor: "#6f2bd8", fontStyle: "italic" }}
+                                >
+                                  {formatPercentFa(discountPercent)}
+                                </span>
+                              ) : null}
+                              {oldPrice ? (
+                                <p className="text-xs danaBold text-[#c97b7b] line-through decoration-2 decoration-[#e15656]">
+                                  {formatPrice(oldPrice)}
+                                </p>
+                              ) : null}
+                            </div>
+                          
+                          <div className="text-left col-span-8 flex flex-wrap items-end gap-1">
+                            <div className="leading-none w-full">
+                              <span className="text-[24px] md:text-[24px] danaBold" style={{ color: priceColor }}>
+                                {product.price ? formatPrice(product.price) : "۰"}
+                              </span>
+                            </div>
+                            <span className="text-sm w-full danaBold mt-1 inline-block" style={{ color: smallTextColor }}>
+                              تومان
+                            </span>
+                          </div>
+
+
+
+                        </div>
+                        </div>
+                      </Link>
+                    </motion.div>
+                  </SwiperSlide>
+                );
+              })}
+            </Swiper>
+          </div>
         </motion.div>
       </div>
     </motion.div>
   );
 };
 
-export default ProductsSwiperBasic;
+export default Slider1;

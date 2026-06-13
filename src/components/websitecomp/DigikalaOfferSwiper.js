@@ -5,9 +5,41 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { Swiper, SwiperSlide } from 'swiper/react'
 import { Navigation, Autoplay } from 'swiper/modules'
+import { motion, useAnimationControls, useInView } from 'framer-motion'
 
 import 'swiper/css'
 import 'swiper/css/navigation'
+
+const ANIMATION_PRESETS = {
+  none: {
+    hidden: { opacity: 1 },
+    visible: { opacity: 1 }
+  },
+  fade: {
+    hidden: { opacity: 0 },
+    visible: { opacity: 1 }
+  },
+  slideUp: {
+    hidden: { opacity: 0, y: 32 },
+    visible: { opacity: 1, y: 0 }
+  },
+  slideRight: {
+    hidden: { opacity: 0, x: -36 },
+    visible: { opacity: 1, x: 0 }
+  },
+  slideLeft: {
+    hidden: { opacity: 0, x: 36 },
+    visible: { opacity: 1, x: 0 }
+  },
+  zoomIn: {
+    hidden: { opacity: 0, scale: 0.92 },
+    visible: { opacity: 1, scale: 1 }
+  },
+  blurUp: {
+    hidden: { opacity: 0, y: 16, filter: 'blur(8px)' },
+    visible: { opacity: 1, y: 0, filter: 'blur(0px)' }
+  }
+}
 
 // ─── Utility functions (module-level to prevent re-creation on every render) ──
 
@@ -183,8 +215,67 @@ const DigikalaOfferSwiper = ({
   panelBgColor = '#df324e',
   panelBgColorEnd = '#c01b57',
   autoplayDelay = '5',
-  enableAutoplay = 'true'
+  enableAutoplay = 'true',
+  sectionAnimationType = 'fade',
+  sectionAnimationDelay = '0.05',
+  sectionAnimationDuration = '0.7',
+  panelAnimationType = 'slideRight',
+  panelAnimationDelay = '0.12',
+  panelAnimationDuration = '0.7',
+  titleAnimationType = 'slideUp',
+  titleAnimationDelay = '0.24',
+  titleAnimationDuration = '0.65',
+  timerAnimationType = 'zoomIn',
+  timerAnimationDelay = '0.28',
+  timerAnimationDuration = '0.65',
+  sliderAnimationType = 'slideLeft',
+  sliderAnimationDelay = '0.2',
+  sliderAnimationDuration = '0.75',
+  ctaAnimationType = 'fade',
+  ctaAnimationDelay = '0.34',
+  ctaAnimationDuration = '0.65'
 }) => {
+  const sectionRef = useRef(null)
+  const animationControls = useAnimationControls()
+  const isInView = useInView(sectionRef, {
+    once: true,
+    amount: 0.25,
+    margin: '0px 0px -10% 0px'
+  })
+
+  useEffect(() => {
+    if (isInView) {
+      animationControls.start('visible')
+    }
+  }, [isInView, animationControls])
+
+  const parseTiming = (value, fallback) => {
+    const parsed = Number.parseFloat(value)
+    if (Number.isNaN(parsed)) return fallback
+    return Math.max(0, parsed)
+  }
+
+  const getMotionConfig = (type, delayValue, durationValue) => {
+    const preset = ANIMATION_PRESETS[type] || ANIMATION_PRESETS.fade
+    return {
+      initial: 'hidden',
+      animate: animationControls,
+      variants: preset,
+      transition: {
+        delay: parseTiming(delayValue, 0),
+        duration: parseTiming(durationValue, 0.7),
+        ease: [0.22, 1, 0.36, 1]
+      }
+    }
+  }
+
+  const sectionMotion = getMotionConfig(sectionAnimationType, sectionAnimationDelay, sectionAnimationDuration)
+  const panelMotion = getMotionConfig(panelAnimationType, panelAnimationDelay, panelAnimationDuration)
+  const titleMotion = getMotionConfig(titleAnimationType, titleAnimationDelay, titleAnimationDuration)
+  const timerMotion = getMotionConfig(timerAnimationType, timerAnimationDelay, timerAnimationDuration)
+  const sliderMotion = getMotionConfig(sliderAnimationType, sliderAnimationDelay, sliderAnimationDuration)
+  const ctaMotion = getMotionConfig(ctaAnimationType, ctaAnimationDelay, ctaAnimationDuration)
+
   const pathName = usePathname()
   const [mounted, setMounted] = useState(false)
   const [remainingSeconds, setRemainingSeconds] = useState(null)
@@ -355,7 +446,7 @@ const DigikalaOfferSwiper = ({
     : { backgroundColor: panelBgColor }
 
   return (
-    <section className="w-full" dir="rtl" style={{backgroundColor: bgColor}}>
+    <motion.section ref={sectionRef} className="w-full" dir="rtl" style={{backgroundColor: bgColor}} {...sectionMotion}>
       <style>{`
         .digikala-offer-swiper .swiper-button-next,
         .digikala-offer-swiper .swiper-button-prev {
@@ -367,25 +458,25 @@ const DigikalaOfferSwiper = ({
         <div className="md:rounded-2xl overflow-hidden" style={panelStyle}>
           <div className="flex flex-col md:flex-row pl-0 md:pl-1">
             {/* Right panel */}
-            <div className="w-full md:w-52 shrink-0 text-white flex flex-wrap flex-row md:flex-col items-center justify-between gap-3 md:gap-6 py-4 md:py-6 px-4 md:px-3">
+            <motion.div className="w-full md:w-52 shrink-0 text-white flex flex-wrap flex-row md:flex-col items-center justify-between gap-3 md:gap-6 py-4 md:py-6 px-4 md:px-3" {...panelMotion}>
               {/* Title */}
-              <div className="text-center shrink-0">
+              <motion.div className="text-center shrink-0" {...titleMotion}>
                 <h3 className="danaBold text-base md:text-xl leading-6 md:leading-8 whitespace-pre-line hidden md:block">
                   {panelTitle}
                 </h3>
                 <h3 className="danaBold text-base leading-6 md:hidden">
                   {String(panelTitle).replace(/\n/g, ' ')}
                 </h3>
-              </div>
+              </motion.div>
 
               {/* Timer */}
-              <div className="flex items-center gap-1.5 md:gap-2 shrink-0" dir="ltr">
+              <motion.div className="flex items-center gap-1.5 md:gap-2 shrink-0" dir="ltr" {...timerMotion}>
                 {renderTimerBox(timerParts[0], 'h')}
                 <span className="danaBold">:</span>
                 {renderTimerBox(timerParts[1], 'm')}
                 <span className="danaBold">:</span>
                 {renderTimerBox(timerParts[2], 's')}
-              </div>
+              </motion.div>
 
               {/* Decorative icon — desktop only */}
               <div className="hidden md:flex items-center justify-center w-20 h-20 rounded-2xl bg-white/10">
@@ -397,7 +488,7 @@ const DigikalaOfferSwiper = ({
               </div>
 
               {/* View all link */}
-              <div className="shrink-0 flex-2">
+              <motion.div className="shrink-0 flex-2" {...ctaMotion}>
                 {renderLink(
                   viewAllLink,
                   'danaBold text-xs md:text-sm flex items-center gap-1 md:gap-2 hover:opacity-90 whitespace-nowrap',
@@ -407,11 +498,11 @@ const DigikalaOfferSwiper = ({
                   </>,
                   String(viewAllText || 'مشاهده همه')
                 )}
-              </div>
-            </div>
+              </motion.div>
+            </motion.div>
 
             {/* Products */}
-            <div className="w-full md:flex-1 min-w-0 relative p-3 pl-0 right-2 sm:right-0 md:py-4 md:pr-4 md:pl-0">
+            <motion.div className="w-full md:flex-1 min-w-0 relative p-3 pl-0 right-2 sm:right-0 md:py-4 md:pr-4 md:pl-0" {...sliderMotion}>
               <div className="bg-white rounded-xl overflow-hidden relative">
                 {!mounted ? (
                   <div className="flex overflow-hidden">
@@ -484,11 +575,11 @@ const DigikalaOfferSwiper = ({
                   </svg>
                 </button>
               </div>
-            </div>
+            </motion.div>
           </div>
         </div>
       </div>
-    </section>
+    </motion.section>
   )
 }
 

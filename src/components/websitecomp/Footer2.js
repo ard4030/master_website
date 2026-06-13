@@ -1,6 +1,8 @@
 'use client'
 import React from 'react'
 import Link from 'next/link'
+import { motion } from 'framer-motion'
+import { useViewportMotion } from './animationUtils'
 
 // آیکون‌های SVG حرفه‌ای
 const PhoneIcon = () => (
@@ -43,7 +45,17 @@ const Footer2 = ({
   logo3Src = '', logo3Link = '#',
   logo4Src = '', logo4Link = '#',
   logo5Src = '', logo5Link = '#',
+  sectionAnimationType = 'fade',
+  sectionAnimationDelay = '0.05',
+  sectionAnimationDuration = '0.7'
 }) => {
+  const { sectionRef, motionProps } = useViewportMotion({
+    animationType: sectionAnimationType,
+    animationDelay: sectionAnimationDelay,
+    animationDuration: sectionAnimationDuration,
+    amount: 0.2
+  })
+
   const getImageUrl = (src) => {
     if (!src) return ''
     if (src.startsWith('http')) return src
@@ -69,7 +81,7 @@ const Footer2 = ({
   const accentColor = 'rgba(255,255,255,0.15)'
 
   return (
-    <footer dir="rtl" style={{ backgroundColor: bgColor, color: textColor }} className="dana w-full">
+    <motion.footer ref={sectionRef} dir="rtl" style={{ backgroundColor: bgColor, color: textColor }} className="dana w-full" {...motionProps}>
       <div className="max-w-7xl mx-auto px-4 md:px-8 py-10 md:py-14">
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8 md:gap-12 mb-10">
 
@@ -166,7 +178,7 @@ const Footer2 = ({
           <p className="text-xs danaMed text-center" style={{ opacity: 0.5 }}>{copyright}</p>
         </div>
       </div>
-    </footer>
+    </motion.footer>
   )
 }
 

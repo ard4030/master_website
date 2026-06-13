@@ -3,6 +3,8 @@
 import React from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import { motion } from 'framer-motion'
+import { useViewportMotion } from './animationUtils'
 
 /**
  * کامپوننت محصولات
@@ -15,10 +17,19 @@ const Products1 = ({
   data = null, 
   dataSourceType = 'manual',
   title = 'نان های خاص و شیرین',
-  subtitle = 'محصولات منتخب ما برای شما'
+  subtitle = 'محصولات منتخب ما برای شما',
+  sectionAnimationType = 'fade',
+  sectionAnimationDelay = '0.05',
+  sectionAnimationDuration = '0.7'
 }) => {
 
   const pathName = usePathname()
+  const { sectionRef, motionProps } = useViewportMotion({
+    animationType: sectionAnimationType,
+    animationDelay: sectionAnimationDelay,
+    animationDuration: sectionAnimationDuration,
+    amount: 0.2
+  })
 
   // تابع کمکی برای تبدیل URL تصویر
   const getImageUrl = (imagePath) => {
@@ -122,7 +133,7 @@ const Products1 = ({
   if(pathName !== '/newsitebuilder') products = data
 
   return (
-    <div className="w-full bg-white">
+    <motion.div ref={sectionRef} className="w-full bg-white" {...motionProps}>
       <div className="max-w-7xl mx-auto px-6 py-12">
         {/* Header */}
         <div className="mb-12 text-center">
@@ -215,7 +226,7 @@ const Products1 = ({
           ))}
         </div>
       </div>
-    </div>
+    </motion.div>
   )
 }
 

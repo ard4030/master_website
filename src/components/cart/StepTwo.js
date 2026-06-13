@@ -1,44 +1,63 @@
 'use client'
 
-import React, { useState, useContext, useEffect } from 'react'
-import { MdAdd } from 'react-icons/md'
-import { apiRequest, getOrCreateDeviceId } from '@/utils/functions'
-import { toast } from 'react-toastify'
+import React, { useState, useContext, useEffect, useRef } from 'react'
+import {
+  FiArrowLeft,
+  FiChevronLeft,
+  FiMapPin,
+  FiTruck,
+  FiCheck,
+  FiShoppingCart,
+  FiCreditCard,
+  FiChevronDown,
+  FiPlus,
+  FiEdit2,
+  FiTrash2,
+} from 'react-icons/fi'
+import { apiRequest } from '@/utils/functions'
+// import { toast } from 'react-toastify'
+import { toast } from 'sonner'
+
 import OrderContext from '@/context/OrderContext'
 import { CartContext } from '@/context/CartContext'
+import { MerchantContext } from '@/context/MerchantContext'
+import { AnimatePresence, motion } from 'framer-motion'
+import CircularProgress from '@mui/material/CircularProgress'
+import ModalLayout from '@/components/global/ModalLayout/ModalLayout'
+import SelectMap from '@/components/cart/map/SelectMap'
+import AddAddressButton from '@/components/cart/AddAddressButton'
 
-const StepTwo = () => {
+const IMAGE_BASE = process.env.NEXT_PUBLIC_LIARA_IMAGE_URL || ''
+const SHIPPING_TYPES = [
+  {
+    name : 'withPost',
+    faName : 'پست پیشتاز',
+    icon : ''
+  },
+  {
+    name : 'withTipax',
+    faName : 'تیپاکس',
+    icon : ''
+  },
+    {
+    name : 'withTrucking',
+    faName : 'باربری',
+    icon : ''
+  },
+  ];
+const StepTwo = ({ onContinue, onBack }) => {
   const { order, setOrder } = useContext(OrderContext)
-  const { cart, getCart,setCart } = useContext(CartContext)
+  const { cart, setCart } = useContext(CartContext)
+  const { activeMerchant } = useContext(MerchantContext) || {}
+
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
+  const [isAddressListOpen, setIsAddressListOpen] = useState(true)
+  const [loadingShippingKey, setLoadingShippingKey] = useState(null)
+  const [editingAddressId, setEditingAddressId] = useState(null)
+  const [deletingAddressId, setDeletingAddressId] = useState(null)
 
-  // دریافت اطلاعات checkout در ورود به مرحله دوم
-  useEffect(() => {
-    fetchCheckoutData()
-  }, [])
-
-  const fetchCheckoutData = async () => {
-    setIsLoading(true)
-    const response = await apiRequest('/checkout/data', 'GET')
-    if (response.success) {
-      const addressList = response.data.data.addresses || []
-      const paymentGatewaysList = response.data.data.paymentGateways || []
-
-      setOrder({
-        ...order,
-        addresses: addressList,
-        paymentGateways: paymentGatewaysList,
-        // انتخاب خودکار اولین آدرس
-        address: order.address || (addressList.length > 0 ? addressList[0] : null),
-        shippingMethod: order.shippingMethod || null,
-      })
-    } else {
-      toast.error(response.error || 'خطا در دریافت اطلاعات')
-    }
-    setIsLoading(false)
-  }
   const [formData, setFormData] = useState({
     name: '',
     phone: '',
@@ -46,279 +65,1027 @@ const StepTwo = () => {
     city: '',
     postalCode: '',
     fullAddress: '',
+    lat: undefined,
+    lng: undefined,
   })
 
-  const handleSelectAddress = (addr) => {
-    setOrder({ ...order, address: addr })
-  }
+  useEffect(() => {
+    fetchCheckoutData()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
-
-  const handleSelectShippingMethod = async (methodKey) => {
-    const method = cart[methodKey]
-    if (method) {
-      // تغییر state
-      setOrder({ ...order, 
-        shippingMethod: {
-          slug: method.slug,
-          ...method
-        }
-      })
-
-      // ارسال slug به endpoint کارت
-      const deviceId = getOrCreateDeviceId()
-      const response = await apiRequest('/cart', 'POST', {
-        deviceId,
-        shippingMethod: method.slug
-      })
-
-      if (response.success) {
-        // کارت را دوباره بکش
-        // await getCart()
-        // console.log("resssss ",response.data)
-        setCart(response.data.data)
-        toast.success('روش ارسال انتخاب شد')
-      } else {
-        toast.error(response.error || 'خطا در تغییر روش ارسال')
-      }
-    }
-  }
-
-  const handleOpenModal = () => {
-    setFormData({
-      name: '',
-      phone: '',
-      state: '',
-      city: '',
-      postalCode: '',
-      fullAddress: '',
-    })
-    setIsModalOpen(true)
-  }
-
-  const handleCloseModal = () => {
-    setIsModalOpen(false)
-  }
-
-  const refreshCheckoutData = async () => {
+  const fetchCheckoutData = async () => {
+    setIsLoading(true)
     const response = await apiRequest('/checkout/data', 'GET')
     if (response.success) {
       const addressList = response.data.data.addresses || []
-      const paymentGatewaysList = response.data.data.paymentGateways || []
+      const paymentGatewaysList = response.data.data.paymentGateways || [];
+      const shipingTypes = response.data.data.shippingMethods || []
       
       setOrder({
         ...order,
         addresses: addressList,
         paymentGateways: paymentGatewaysList,
+        address: order.address || (addressList.length > 0 ? addressList[0] : null),
+        shippingMethod: order.shippingMethod || null,
+        shipingTypes: shipingTypes,
       })
+    } else {
+      toast.error(response.error || 'خطا در دریافت اطلاعات')
+    }
+    setIsLoading(false)
+  }
+
+  const refreshCheckoutData = async ({ forceAddressId } = {}) => {
+    const response = await apiRequest('/checkout/data', 'GET')
+    if (response.success) {
+      const addressList = response.data.data.addresses || []
+      const paymentGatewaysList = response.data.data.paymentGateways || []
+
+      const forcedAddress = forceAddressId
+        ? addressList.find((addr) => (addr._id || addr.id) === forceAddressId)
+        : null
+
+      setOrder((prev) => ({
+        ...prev,
+        addresses: addressList,
+        paymentGateways: paymentGatewaysList,
+        address: forcedAddress || prev.address || (addressList[0] ?? null),
+      }))
     }
   }
 
+  const handleSelectAddress = (addr) => {
+    setOrder((prev) => ({ ...prev, address: addr }))
+  }
+
+  const handleSelectShippingMethod = (methodKey) => {
+    const method = SHIPPING_TYPES.find((item) => item.name === methodKey)
+    if (!method) return
+
+    setLoadingShippingKey(methodKey)
+    setOrder((prev) => ({
+      ...prev,
+      shippingMethod: {
+        slug: method.name,
+        name: method.name,
+        faName: method.faName,
+        icon: method.icon,
+      },
+    }))
+    setLoadingShippingKey(null)
+  }
+
+  const getAddressId = (addr) => addr?._id || addr?.id
+
+  const handleOpenModal = (addr = null) => {
+    const isEditing = Boolean(addr)
+    setEditingAddressId(isEditing ? getAddressId(addr) : null)
+    setFormData(
+      isEditing
+        ? {
+            name: addr?.name || '',
+            phone: addr?.phone || '',
+            state: addr?.state || '',
+            city: addr?.city || '',
+            postalCode: addr?.postalCode || '',
+            fullAddress: addr?.fullAddress || '',
+            lat: addr?.lat,
+            lng: addr?.lng ?? addr?.long,
+          }
+        : {
+            name: '',
+            phone: '',
+            state: '',
+            city: '',
+            postalCode: '',
+            fullAddress: '',
+            lat: undefined,
+            lng: undefined,
+          }
+    )
+    setIsModalOpen(true)
+  }
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false)
+    setEditingAddressId(null)
+  }
+
   const handleSave = async () => {
-    if (!formData.name || !formData.phone || !formData.state || !formData.city || !formData.postalCode || !formData.fullAddress) {
+    if (
+      !formData.name ||
+      !formData.phone ||
+      !formData.state ||
+      !formData.city ||
+      !formData.postalCode ||
+      !formData.fullAddress
+    ) {
       toast.error('لطفاً تمام فیلدها را پر کنید')
       return
     }
-
     setIsSaving(true)
-    const response = await apiRequest('/addresses', 'POST', formData)
+    const endpoint = editingAddressId
+      ? `/addresses/${editingAddressId}`
+      : '/addresses'
+    const method = editingAddressId ? 'PUT' : 'POST'
+    const payload = {
+      ...formData,
+      long: formData?.lng ?? formData?.long,
+    }
+    delete payload.lng
+
+    const response = await apiRequest(endpoint, method, payload)
     if (response.success) {
-      toast.success('آدرس با موفقیت افزوده شد')
-      await refreshCheckoutData()
+      const createdAddressId =
+        response?.data?.data?._id ||
+        response?.data?.data?.id ||
+        editingAddressId ||
+        null
+      toast.success(
+        editingAddressId
+          ? 'آدرس با موفقیت ویرایش شد'
+          : 'آدرس با موفقیت افزوده شد'
+      )
+      await refreshCheckoutData({ forceAddressId: createdAddressId })
+      setIsAddressListOpen(true)
       handleCloseModal()
     } else {
-      toast.error(response.error || 'خطا در افزودن آدرس')
+      toast.error(
+        response.error ||
+          (editingAddressId ? 'خطا در ویرایش آدرس' : 'خطا در افزودن آدرس')
+      )
     }
     setIsSaving(false)
   }
 
+  const handleDeleteAddress = async (addr) => {
+    const addressId = getAddressId(addr)
+    if (!addressId) return
+
+    const confirmed = window.confirm('از حذف این آدرس مطمئن هستید؟')
+    if (!confirmed) return
+
+    setDeletingAddressId(addressId)
+    const response = await apiRequest(`/addresses/${addressId}`, 'DELETE')
+    if (response.success) {
+      toast.success('آدرس با موفقیت حذف شد')
+      await refreshCheckoutData()
+    } else {
+      toast.error(response.error || 'خطا در حذف آدرس')
+    }
+    setDeletingAddressId(null)
+  }
+
+  // ===== محاسبات سامری =====
+  const items = cart?.items || []
+  const subtotal = items.reduce(
+    (acc, it) => acc + (Number(it.price) || 0) * (it.quantity || 1),
+    0
+  )
+  const productsDiscount = Number(cart?.productsDiscount) || 0
+  const shippingPrice = Number(order?.shippingMethod?.price ?? cart?.shippingTotal) || 0
+  const finalTotal =
+    Number(cart?.totalAmount) || subtotal - productsDiscount + shippingPrice
+  const isFreeShipping = shippingPrice === 0
+  const canContinue = Boolean(order?.address && order?.shippingMethod)
+
+  console.log('',activeMerchant);
+  
+  const merchantName =
+    activeMerchant?.merchant?.storeName || activeMerchant?.name || 'فروشگاه'
+  const merchantCity = 'شهر فروشنده'
+
+  // ===== رندر =====
+  return (
+    <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 dana pb-[calc(148px+env(safe-area-inset-bottom))] lg:pb-0" dir="rtl">
+      {/* ============ ستون راست ============ */}
+      <div className="lg:col-span-2 flex flex-col gap-4">
+        {/* هدر مرحله */}
+        <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
+          <div className="flex items-center justify-between px-5 py-4">
+            <h2 className="danaBold text-gray-800 text-base">آدرس و روش ارسال</h2>
+            <button
+              type="button"
+              onClick={() => onBack?.()}
+              className="text-gray-500 hover:text-orange-500 transition-colors"
+              aria-label="بازگشت"
+            >
+              <FiArrowLeft size={18} />
+            </button>
+          </div>
+
+          {/* استپر کوچک */}
+          <div className="px-5 pb-5">
+            <MiniStepper currentKey="address" />
+          </div>
+        </div>
+
+        {/* کارت آدرس */}
+        <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-5">
+          {isLoading ? (
+            <div className="flex items-center justify-center py-10">
+              <CircularProgress size={26} sx={{ color: '#f97316' }} />
+            </div>
+          ) : !order?.address ? (
+            <div className="text-center py-6">
+              <p className="text-gray-600 text-sm mb-4">هیچ آدرسی ثبت نشده است</p>
+              <AddAddressButton onClick={handleOpenModal} />
+            </div>
+          ) : (
+            <>
+              {/* آدرس انتخاب‌شده */}
+              <div className="flex items-start justify-between gap-3">
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm text-gray-500 mb-2">
+                    ارسال به{' '}
+                    <span className="text-gray-800 danaBold">
+                      {order.address.name}
+                    </span>
+                  </p>
+                  <p className="text-sm danaBold text-gray-900 flex items-start gap-1.5 leading-7">
+                    <FiTruck className="text-gray-400 mt-1 shrink-0" size={16} />
+                    <span>
+                      {order.address.state} - {order.address.city} - {order.address.fullAddress}
+                    </span>
+                  </p>
+                  <p className="text-xs text-gray-400 flex items-center gap-1.5 mt-2">
+                    <FiMapPin size={13} />
+                    موقعیت مکانی نداره!
+                  </p>
+                </div>
+              </div>
+
+              {/* تغییر آدرس */}
+              <div className="mt-3 flex justify-end">
+                <button
+                  onClick={() => setIsAddressListOpen((v) => !v)}
+                  className="flex items-center gap-1 text-sm text-orange-500 hover:text-orange-600 danaMed transition-colors"
+                >
+                  {isAddressListOpen ? 'بستن' : 'تغییر آدرس'}
+                  <FiChevronLeft size={15} />
+                </button>
+              </div>
+
+              {/* لیست آدرس‌ها */}
+              <AnimatePresence initial={false}>
+                {isAddressListOpen && (
+                  <motion.div
+                    key="address-list"
+                    initial={{ height: 0, opacity: 0 }}
+                    animate={{ height: 'auto', opacity: 1 }}
+                    exit={{ height: 0, opacity: 0 }}
+                    transition={{ duration: 0.25 }}
+                    className="overflow-hidden"
+                  >
+                    <div className="mt-4 pt-4 border-t border-dashed border-gray-200 space-y-2">
+                      {order.addresses?.map((addr, index) => {
+                        const selected =
+                          (order.address?._id || order.address?.id) ===
+                          (addr._id || addr.id)
+                        return (
+                          <label
+                            key={`addr-${addr?._id || addr?.id || 'no-id'}-${index}`}
+                            className={`flex items-start gap-3 p-3 rounded-lg cursor-pointer border transition-colors ${
+                              selected
+                                ? 'border-orange-400 bg-orange-50/60'
+                                : 'border-gray-200 hover:bg-gray-50'
+                            }`}
+                          >
+                            <input
+                              type="radio"
+                              name="address"
+                              checked={selected}
+                              onChange={() => handleSelectAddress(addr)}
+                              className="mt-1 accent-orange-500"
+                            />
+                            <div className="flex-1 min-w-0">
+                              <h3 className="danaBold text-sm text-gray-800">
+                                {addr.name}
+                              </h3>
+                              <p className="text-xs text-gray-500 mt-0.5">{addr.phone}</p>
+                              <p className="text-xs text-gray-600 mt-1 leading-5">
+                                {addr.state} - {addr.city} - {addr.fullAddress}
+                              </p>
+                              <p className="text-[11px] text-gray-400 mt-1">
+                                کد پستی: {addr.postalCode}
+                              </p>
+                              <div className="mt-3 flex items-center gap-2">
+                                <button
+                                  type="button"
+                                  onClick={(e) => {
+                                    e.preventDefault()
+                                    e.stopPropagation()
+                                    handleOpenModal(addr)
+                                  }}
+                                  className="inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs rounded-md border border-gray-200 text-gray-600 hover:bg-gray-100 transition-colors"
+                                >
+                                  <FiEdit2 size={13} />
+                                  ویرایش
+                                </button>
+                                <button
+                                  type="button"
+                                  disabled={deletingAddressId === (addr._id || addr.id)}
+                                  onClick={(e) => {
+                                    e.preventDefault()
+                                    e.stopPropagation()
+                                    handleDeleteAddress(addr)
+                                  }}
+                                  className="inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs rounded-md border border-red-200 text-red-500 hover:bg-red-50 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+                                >
+                                  {deletingAddressId === (addr._id || addr.id) ? (
+                                    <CircularProgress
+                                      size={12}
+                                      thickness={6}
+                                      sx={{ color: '#ef4444' }}
+                                    />
+                                  ) : (
+                                    <FiTrash2 size={13} />
+                                  )}
+                                  حذف
+                                </button>
+                              </div>
+                            </div>
+                          </label>
+                        )
+                      })}
+
+                      {/* <AddAddressButton
+                        onClick={handleOpenModal}
+                        fullWidth
+                        label="افزودن آدرس جدید"
+                        className="mt-2"
+                      /> */}
+                    </div>
+                  </motion.div>
+                )}
+                <div key="address-add-btn" className="w-full text-center mt-6">
+                  <AddAddressButton onClick={handleOpenModal} label="افزودن آدرس جدید" />
+                </div>
+
+              </AnimatePresence>
+            </>
+          )}
+        </div>
+
+        {/* کارت غرفه + روش ارسال */}
+        <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
+            {/* هدر غرفه */}
+            <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
+              <span className="danaBold text-sm text-gray-800">سرویس های ارسال:</span>
+              <span className="text-xs text-gray-500">
+                ارسال از: <span className="text-gray-700">{merchantCity}</span>
+              </span>
+            </div>
+
+            {/* روش‌های ارسال */}
+            <div className="px-5 pb-5 space-y-2">
+              {SHIPPING_TYPES.map((shippingType) => {
+                const key = shippingType?.name
+                const isSelected = order?.shippingMethod?.slug === key
+                const isMethodLoading = loadingShippingKey === key
+
+                return (
+                  <label
+                    key={key}
+                    className={`flex items-center gap-3 px-4 py-3 rounded-lg border cursor-pointer transition-colors ${
+                      isSelected
+                        ? 'border-orange-400 bg-orange-50/50'
+                        : 'border-gray-200 hover:bg-gray-50'
+                    } ${loadingShippingKey ? 'opacity-90' : ''}`}
+                  >
+                    <input
+                      type="radio"
+                      name="shippingMethod"
+                      checked={isSelected}
+                      onChange={() => handleSelectShippingMethod(key)}
+                      disabled={!!loadingShippingKey}
+                      className="accent-orange-500"
+                    />
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center justify-between gap-3">
+                        <h3 className="danaBold text-sm text-gray-800">
+                          {shippingType.faName}
+                        </h3>
+                      </div>
+                    </div>
+                    {isMethodLoading ? (
+                      <CircularProgress size={14} thickness={5} sx={{ color: '#f97316' }} />
+                    ) : isSelected ? (
+                      <FiCheck className="text-orange-500" size={16} />
+                    ) : null}
+                  </label>
+                )
+              })}
+              {SHIPPING_TYPES.length === 0 && (
+                <div className="text-center text-sm text-gray-500 py-4">
+                  در حال حاضر روش ارسالی برای این سفارش ثبت نشده است
+                </div>
+              )}
+            </div>
+        </div>
+      </div>
+
+      {/* ============ ستون چپ: جزئیات قیمت ============ */}
+      <aside className="hidden lg:block lg:col-span-1">
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-5 lg:sticky lg:top-4">
+          <h3 className="danaBold text-gray-800 text-base mb-4 text-left">
+            جزئیات قیمت
+          </h3>
+
+          <div className="space-y-3 text-sm">
+            <Row label="مجموع قیمت محصولات" value={subtotal} suffix="تومان" />
+            <Row
+              label="تخفیف محصولات"
+              value={productsDiscount}
+              suffix="تومان"
+              valueClass="text-red-500"
+              prefix={productsDiscount > 0 ? '-' : ''}
+            />
+            <div className="flex items-center justify-between pt-3 border-t border-dashed border-gray-200">
+              <span className="text-gray-600">هزینه ارسال</span>
+              {isFreeShipping ? (
+                <span className="danaBold text-green-600">رایگان</span>
+              ) : (
+                <span className="danaMed text-gray-800">
+                  {Math.floor(shippingPrice).toLocaleString('fa-IR')}
+                  <span className="text-xs text-gray-500 mr-1">تومان</span>
+                </span>
+              )}
+            </div>
+          </div>
+
+          <div className="border-t border-dashed border-gray-200 mt-5 pt-4 flex items-center justify-between">
+            <span className="danaBold text-gray-800 text-sm">مبلغ قابل پرداخت</span>
+            <span className="danaBold text-gray-900">
+              {Math.floor(finalTotal).toLocaleString('fa-IR')}
+              <span className="text-xs text-gray-500 danaMed mr-1">تومان</span>
+            </span>
+          </div>
+
+          <button
+            onClick={() => onContinue?.()}
+            disabled={!canContinue}
+            className="mt-5 w-full bg-orange-500 hover:bg-orange-600 active:scale-[0.99] text-white py-3 rounded-lg danaBold text-sm transition-all shadow-sm hover:shadow-md disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:bg-orange-500"
+          >
+            تایید و ادامه
+          </button>
+        </div>
+      </aside>
+
+      <div className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-white border-t border-gray-200 px-4 py-3 shadow-[0_-6px_18px_rgba(15,23,42,0.12)]">
+        <details className="group mb-3 rounded-lg border border-gray-200 bg-gray-50/70">
+          <summary className="list-none cursor-pointer px-3 py-2.5 flex items-center justify-between text-sm text-gray-700 danaMed">
+            <span>مشاهده جزئیات روش ارسال</span>
+            <span className="transition-transform group-open:rotate-180">⌄</span>
+          </summary>
+          <div className="px-3 pb-3 pt-1 border-t border-gray-200 space-y-2 text-sm">
+            <Row label="مجموع قیمت محصولات" value={subtotal} suffix="تومان" />
+            <Row
+              label="تخفیف محصولات"
+              value={productsDiscount}
+              suffix="تومان"
+              valueClass="text-red-500"
+              prefix={productsDiscount > 0 ? '-' : ''}
+            />
+            <div className="flex items-center justify-between pt-1">
+              <span className="text-gray-600">هزینه ارسال</span>
+              {isFreeShipping ? (
+                <span className="danaBold text-green-600">رایگان</span>
+              ) : (
+                <span className="danaMed text-gray-800">
+                  {Math.floor(shippingPrice).toLocaleString('fa-IR')}
+                  <span className="text-xs text-gray-500 mr-1">تومان</span>
+                </span>
+              )}
+            </div>
+          </div>
+        </details>
+
+        <div className="flex items-center justify-between gap-3">
+          <div className="text-right">
+            <p className="text-xs text-gray-500 danaMed">جمع مبلغ پرداختنی:</p>
+            <p className="danaBold text-gray-900 text-xl leading-7">
+              {Math.floor(finalTotal).toLocaleString('fa-IR')}
+              <span className="text-xs text-gray-500 danaMed mr-1">تومان</span>
+            </p>
+          </div>
+
+          <button
+            onClick={() => onContinue?.()}
+            disabled={!canContinue}
+            className="min-w-42 bg-orange-500 hover:bg-orange-600 text-white py-3 px-6 rounded-xl danaBold text-sm transition-all shadow-sm disabled:opacity-60 disabled:cursor-not-allowed"
+          >
+            تایید و ادامه
+          </button>
+        </div>
+      </div>
+
+      {/* ============ مدال افزودن آدرس ============ */}
+      <ModalLayout
+        isOpen={isModalOpen}
+        handleClose={handleCloseModal}
+        widthModal={520}
+      >
+        <AddressFormModal
+          formData={formData}
+          setFormData={setFormData}
+          isEditMode={Boolean(editingAddressId)}
+          onCancel={handleCloseModal}
+          onSave={handleSave}
+          isSaving={isSaving}
+        />
+      </ModalLayout>
+    </div>
+  )
+}
+
+// ===== Sub components =====
+
+const Row = ({ label, value, suffix, valueClass = 'text-gray-800', prefix = '' }) => (
+  <div className="flex items-center justify-between">
+    <span className="text-gray-600">{label}</span>
+    <span className={`danaMed ${valueClass}`}>
+      {prefix}
+      {Math.floor(Number(value) || 0).toLocaleString('fa-IR')}
+      <span className="text-xs text-gray-500 mr-1">{suffix}</span>
+    </span>
+  </div>
+)
+
+const Field = ({ label, value, onChange, placeholder, type = 'text' }) => (
+  <div>
+    <label className="block text-sm danaMed text-gray-700 mb-1.5">{label}</label>
+    <input
+      type={type}
+      value={value}
+      onChange={(e) => onChange(e.target.value)}
+      placeholder={placeholder}
+      className="w-full px-3 py-2 dana text-sm border border-gray-200 rounded-lg focus:outline-none focus:border-orange-400 focus:ring-2 focus:ring-orange-100 transition"
+    />
+  </div>
+)
+
+// ====== مدال افزودن آدرس (ایده گرفته از طرح ارائه‌شده) ======
+const STATES_API = 'https://iran-locations-api.vercel.app/api/v1/fa/states'
+const CITIES_API = 'https://iran-locations-api.vercel.app/api/v1/fa/cities'
+
+const AddressFormModal = ({
+  formData,
+  setFormData,
+  onCancel,
+  onSave,
+  isSaving,
+  isEditMode,
+}) => {
+  const [states, setStates] = useState([])
+  const [cities, setCities] = useState([])
+  const [loadingStates, setLoadingStates] = useState(false)
+  const [loadingCities, setLoadingCities] = useState(false)
+  const [statesLoadError, setStatesLoadError] = useState(false)
+  const [citiesLoadError, setCitiesLoadError] = useState(false)
+  const [isMapOpen, setIsMapOpen] = useState(false)
+
+  // دریافت موقعیت از نقشه و پر کردن فیلدها
+  const handleMapConfirm = (picked) => {
+    if (!picked) return
+    setFormData({
+      ...formData,
+      state: picked.state || formData.state,
+      city: picked.city || formData.city,
+      fullAddress: picked.address || formData.fullAddress,
+      lat: picked.lat,
+      lng: picked.lng,
+    })
+  }
+
+  // واکشی استان‌ها
+  useEffect(() => {
+    let cancelled = false
+    const fetchStates = async () => {
+      try {
+        setLoadingStates(true)
+        setStatesLoadError(false)
+        const res = await fetch(STATES_API)
+        const data = await res.json()
+        if (cancelled) return
+        const list = Array.isArray(data)
+          ? data
+          : Array.isArray(data?.states)
+          ? data.states
+          : Array.isArray(data?.data)
+          ? data.data
+          : []
+        setStates(
+          list
+            .map((s) => (typeof s === 'string' ? s : s?.name || s?.state || ''))
+            .filter(Boolean)
+        )
+      } catch {
+        if (!cancelled) {
+          setStatesLoadError(true)
+          toast.error('خطا در دریافت لیست استان‌ها، لطفا استان را دستی وارد کنید')
+        }
+      } finally {
+        if (!cancelled) setLoadingStates(false)
+      }
+    }
+    fetchStates()
+    return () => {
+      cancelled = true
+    }
+  }, [])
+
+  // واکشی شهرها وقتی استان تغییر کرد
+  useEffect(() => {
+    if (!formData.state) {
+      setCities([])
+      setCitiesLoadError(false)
+      return
+    }
+    const fetchCities = async () => {
+      try {
+        setLoadingCities(true)
+        setCitiesLoadError(false)
+        const res = await fetch(
+          `${CITIES_API}?state=${encodeURIComponent(formData.state)}`
+        )
+        const data = await res.json()
+        const list = Array.isArray(data)
+          ? data.flatMap((item) => item?.cities || [])
+          : data?.cities || []
+        setCities(list.map((c) => c.name).filter(Boolean))
+      } catch {
+        setCitiesLoadError(true)
+        setCities([])
+        toast.error('خطا در دریافت لیست شهرها، لطفا شهر را دستی وارد کنید')
+      } finally {
+        setLoadingCities(false)
+      }
+    }
+    fetchCities()
+  }, [formData.state])
+
+  const nameMax = 96
+  const addressMax = 1000
 
   return (
-    <div className="bg-white rounded-lg shadow p-6" dir="rtl">
-      <div className="flex items-center justify-between mb-6">
-        <h2 className="text-2xl danaBold text-gray-800">انتخاب آدرس تحویل</h2>
+    <div
+      className="w-full bg-white rounded-xl flex flex-col h-full md:h-auto md:max-h-[85vh]"
+      dir="rtl"
+    >
+      {/* هدر فیکس */}
+      <div className="shrink-0 flex items-center justify-between px-4 sm:px-5 py-3 sm:py-4 border-b border-gray-100 bg-white rounded-t-xl">
+        <h2 className="danaBold text-gray-900 text-sm sm:text-base">آدرس خود را وارد کنید</h2>
         <button
-          onClick={handleOpenModal}
-          className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg danaBold hover:bg-blue-700 transition-colors"
+          onClick={onCancel}
+          className="text-gray-400 hover:text-gray-600 text-2xl leading-none w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 transition"
+          aria-label="بستن"
         >
-          <MdAdd size={16} />
-          آدرس جدید
+          ×
         </button>
       </div>
 
-      {order.addresses && order.addresses.length > 0 ? (
-        <div className="space-y-3">
-          {order.addresses.map((addr) => (
-            <label
-              key={addr._id || addr.id}
-              className="flex items-center p-4 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100 transition-colors text-right"
-            >
-              <input
-                type="radio"
-                name="address"
-                checked={(order.address?._id || order.address?.id) === (addr._id || addr.id)}
-                onChange={() => handleSelectAddress(addr)}
-                className="w-5 h-5"
-              />
-              <div className="mr-4 flex-1">
-                <h3 className="danaBold text-gray-800">{addr.name}</h3>
-                <p className="text-sm text-gray-600 dana mt-1">{addr.phone}</p>
-                <p className="text-sm text-gray-600 dana">{addr.state} - {addr.city}</p>
-                <p className="text-sm text-gray-600 dana line-clamp-2">{addr.fullAddress}</p>
-                <p className="text-xs text-gray-500 dana mt-1">کد پستی: {addr.postalCode}</p>
+      {/* بدنه اسکرول */}
+      <div className="flex-1 min-h-0 overflow-y-auto px-4 sm:px-5 py-4 space-y-4 overscroll-contain">
+        {/* نقشه placeholder */}
+        <div className="relative w-full h-40 sm:h-44 rounded-xl overflow-hidden border border-gray-200 bg-[#e8f5e9] select-none">
+          {/* الگوی خطوط شبیه نقشه */}
+          <div
+            className="absolute inset-0 opacity-70"
+            style={{
+              backgroundImage:
+                'linear-gradient(white 2px, transparent 2px), linear-gradient(90deg, white 2px, transparent 2px), radial-gradient(circle at 30% 60%, #c8e6c9 0 60px, transparent 61px)',
+              backgroundSize: '60px 60px, 60px 60px, 100% 100%',
+            }}
+          />
+          {/* پین وسط */}
+          <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+            <div className="relative">
+              <div className="w-14 h-14 bg-orange-500 rounded-full rounded-bl-none flex items-center justify-center text-white shadow-lg rotate-45">
+                <FiPlus className="-rotate-45" size={24} />
               </div>
-            </label>
-          ))}
-        </div>
-      ) : (
-        <div className="text-center py-8 bg-gray-50 rounded-lg">
-          <p className="text-gray-600 dana mb-4">هیچ آدرسی ثبت نشده است</p>
+            </div>
+          </div>
+          {/* دکمه افزودن موقعیت */}
           <button
-            onClick={handleOpenModal}
-            className="px-6 py-2 bg-blue-600 text-white rounded-lg danaBold hover:bg-blue-700 transition-colors"
+            type="button"
+            onClick={() => setIsMapOpen(true)}
+            className="absolute bottom-3 right-3 flex items-center gap-1.5 bg-white border border-orange-400 text-orange-500 hover:bg-orange-50 rounded-lg px-3 py-1.5 text-xs danaBold shadow-sm transition-colors"
           >
-            افزودن آدرس
+            <FiMapPin size={14} />
+            {formData.lat ? 'تغییر موقعیت روی نقشه' : 'افزودن موقعیت مکانی روی نقشه'}
           </button>
         </div>
-      )}
 
-      {/* انتخاب روش ارسال */}
-      {order.address && cart && (
-        <div className="mt-8">
-          <h2 className="text-2xl danaBold text-gray-800 mb-6">انتخاب روش ارسال</h2>
-          <div className="space-y-3">
-            {['withPost', 'withTipax', 'withTrucking', 'withPickup'].map((methodKey) => {
-              const method = cart[methodKey]
-              if (!method) return null // اگر روش موجود نیست، نشون نده
-              
-              const isSelected = order.shippingMethod?.slug === method.slug
-              return (
-                <label
-                  key={methodKey}
-                  className="flex items-center p-4 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100 transition-colors text-right border-2 border-transparent"
-                  style={{
-                    borderColor: isSelected ? '#2563eb' : 'transparent',
-                  }}
-                >
-                  <input
-                    type="radio"
-                    name="shippingMethod"
-                    checked={isSelected}
-                    onChange={() => handleSelectShippingMethod(methodKey)}
-                    className="w-5 h-5"
-                  />
-                  <div className="mr-4 flex-1">
-                    <div className="flex items-center justify-between">
-                      <h3 className="danaBold text-gray-800">{method.description}</h3>
-                      <p className="text-lg danaBold text-blue-600">{method.price.toLocaleString('fa-IR')} تومان</p>
-                    </div>
-                    <p className="text-sm text-gray-600 dana mt-1">زمان تحویل: {method.receive}</p>
-                  </div>
-                </label>
-              )
-            })}
-          </div>
+        {/* نام */}
+        <CountedField
+          label="نام و نام خانوادگی تحویل گیرنده"
+          required
+          max={nameMax}
+          value={formData.name}
+          onChange={(v) => setFormData({ ...formData, name: v })}
+        />
+
+        {/* شماره تماس */}
+        <Field
+          label="شماره تماس تحویل گیرنده"
+          type="tel"
+          placeholder="09xxxxxxxxx"
+          value={formData.phone}
+          onChange={(v) => setFormData({ ...formData, phone: v })}
+        />
+
+        {/* استان و شهر */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          {statesLoadError ? (
+            <Field
+              label="استان"
+              placeholder="نام استان را وارد کنید"
+              value={formData.state}
+              onChange={(v) => setFormData({ ...formData, state: v, city: '' })}
+            />
+          ) : (
+            <Dropdown
+              label="استان"
+              required
+              placeholder="انتخاب استان"
+              value={formData.state}
+              options={states}
+              loading={loadingStates}
+              onChange={(v) =>
+                setFormData({ ...formData, state: v, city: '' })
+              }
+            />
+          )}
+
+          {citiesLoadError ? (
+            <Field
+              label="شهر"
+              placeholder="نام شهر را وارد کنید"
+              value={formData.city}
+              onChange={(v) => setFormData({ ...formData, city: v })}
+            />
+          ) : (
+            <Dropdown
+              label="شهر"
+              required
+              placeholder={formData.state ? 'انتخاب شهر' : 'ابتدا استان را انتخاب کنید'}
+              value={formData.city}
+              options={cities}
+              loading={loadingCities}
+              disabled={!formData.state}
+              onChange={(v) => setFormData({ ...formData, city: v })}
+            />
+          )}
         </div>
-      )}
 
-      {/* مدال اضافه آدرس */}
-      {isModalOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4" dir="rtl">
-          <div className="bg-white rounded-lg shadow-2xl p-8 w-full max-w-md dana">
-            <h2 className="text-2xl danaBold text-gray-900 mb-6 text-right">افزودن آدرس جدید</h2>
+        {/* کد پستی */}
+        <Field
+          label="کد پستی"
+          placeholder="کد پستی ۱۰ رقمی"
+          value={formData.postalCode}
+          onChange={(v) => setFormData({ ...formData, postalCode: v })}
+        />
 
-            <div className="space-y-4">
-              {/* نام آدرس */}
-              <div>
-                <label className="block text-sm danaMed text-gray-700 mb-2 text-right">نام آدرس</label>
-                <input
-                  type="text"
-                  value={formData.name}
-                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  placeholder="مثال: خانه، محل کار"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 dana text-right"
-                />
-              </div>
+        {/* آدرس کامل */}
+        <CountedField
+          label="آدرس دقیق پستی"
+          required
+          max={addressMax}
+          textarea
+          rows={4}
+          placeholder="آدرس"
+          value={formData.fullAddress}
+          onChange={(v) => setFormData({ ...formData, fullAddress: v })}
+        />
+      </div>
 
-              {/* شماره تماس */}
-              <div>
-                <label className="block text-sm danaMed text-gray-700 mb-2 text-right">شماره تماس</label>
-                <input
-                  type="tel"
-                  value={formData.phone}
-                  onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                  placeholder="09123456789"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 dana text-right"
-                />
-              </div>
+      {/* فوتر فیکس */}
+      <div className="shrink-0 flex items-center gap-2 sm:gap-3 px-4 sm:px-5 py-3 sm:py-4 border-t border-gray-100 bg-gray-50/80 rounded-b-xl">
+        <button
+          onClick={onSave}
+          disabled={isSaving}
+          className="flex-1 py-2.5 bg-orange-500 hover:bg-orange-600 text-white rounded-lg transition-colors danaBold text-sm disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center"
+        >
+          {isSaving ? (
+            <CircularProgress size={18} thickness={5} sx={{ color: '#fff' }} />
+          ) : (
+            isEditMode ? 'ذخیره تغییرات' : 'ثبت آدرس'
+          )}
+        </button>
+        <button
+          onClick={onCancel}
+          className="py-2.5 px-4 sm:px-6 border border-orange-400 text-orange-500 rounded-lg hover:bg-orange-50 transition-colors danaBold text-sm shrink-0"
+        >
+          انصراف
+        </button>
+      </div>
 
-              {/* استان */}
-              <div>
-                <label className="block text-sm danaMed text-gray-700 mb-2 text-right">استان</label>
-                <input
-                  type="text"
-                  value={formData.state}
-                  onChange={(e) => setFormData({ ...formData, state: e.target.value })}
-                  placeholder="نام استان"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 dana text-right"
-                />
-              </div>
+      {/* مدال انتخاب موقعیت روی نقشه */}
+      <SelectMap
+        isOpen={isMapOpen}
+        onClose={() => setIsMapOpen(false)}
+        onConfirm={handleMapConfirm}
+        initialPosition={
+          formData.lat && formData.lng
+            ? [Number(formData.lat), Number(formData.lng)]
+            : undefined
+        }
+      />
+    </div>
+  )
+}
 
-              {/* شهر */}
-              <div>
-                <label className="block text-sm danaMed text-gray-700 mb-2 text-right">شهر</label>
-                <input
-                  type="text"
-                  value={formData.city}
-                  onChange={(e) => setFormData({ ...formData, city: e.target.value })}
-                  placeholder="نام شهر"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 dana text-right"
-                />
-              </div>
+// فیلد همراه شمارنده‌ی کاراکتر (شبیه طرح: «X کاراکتر» در گوشه)
+const CountedField = ({
+  label,
+  value,
+  onChange,
+  placeholder,
+  max,
+  required,
+  textarea,
+  rows = 3,
+}) => {
+  const remaining = Math.max(0, max - (value?.length || 0))
+  const InputTag = textarea ? 'textarea' : 'input'
+  return (
+    <div>
+      <div className="flex items-center justify-between mb-1.5">
+        <label className="text-sm danaMed text-gray-700">
+          {label} {required && <span className="text-red-500">*</span>}
+        </label>
+        <span className="text-[11px] text-gray-400 danaMed">
+          {remaining.toLocaleString('fa-IR')} کاراکتر
+        </span>
+      </div>
+      <InputTag
+        value={value}
+        rows={textarea ? rows : undefined}
+        maxLength={max}
+        onChange={(e) => onChange(e.target.value)}
+        placeholder={placeholder}
+        className={`w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:border-orange-400 focus:ring-2 focus:ring-orange-100 transition ${
+          textarea ? 'resize-none' : ''
+        }`}
+      />
+    </div>
+  )
+}
 
-              {/* کد پستی */}
-              <div>
-                <label className="block text-sm danaMed text-gray-700 mb-2 text-right">کد پستی</label>
-                <input
-                  type="text"
-                  value={formData.postalCode}
-                  onChange={(e) => setFormData({ ...formData, postalCode: e.target.value })}
-                  placeholder="کد پستی"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 dana text-right"
-                />
-              </div>
+// دراپ‌داون ساده
+const Dropdown = ({
+  label,
+  value,
+  options = [],
+  onChange,
+  placeholder,
+  loading,
+  disabled,
+  required,
+}) => {
+  const [open, setOpen] = useState(false)
+  const [query, setQuery] = useState('')
+  const ref = useRef(null)
 
-              {/* آدرس کامل */}
-              <div>
-                <label className="block text-sm danaMed text-gray-700 mb-2 text-right">آدرس کامل</label>
-                <textarea
-                  value={formData.fullAddress}
-                  onChange={(e) => setFormData({ ...formData, fullAddress: e.target.value })}
-                  placeholder="آدرس کامل تحویل"
-                  rows="3"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 dana text-right"
-                />
-              </div>
+  useEffect(() => {
+    const handler = (e) => {
+      if (ref.current && !ref.current.contains(e.target)) setOpen(false)
+    }
+    document.addEventListener('mousedown', handler)
+    return () => document.removeEventListener('mousedown', handler)
+  }, [])
+
+  const filtered = query
+    ? options.filter((o) => o?.toString().includes(query))
+    : options
+
+  return (
+    <div ref={ref} className="relative dana">
+      <label className="block text-sm danaMed text-gray-700 mb-1.5">
+        {label} {required && <span className="text-red-500">*</span>}
+      </label>
+      <button
+        type="button"
+        disabled={disabled}
+        onClick={() => setOpen((v) => !v)}
+        className={`w-full flex items-center justify-between gap-2 px-3 py-2 text-sm dana border rounded-lg transition ${
+          open
+            ? 'border-orange-400 ring-2 ring-orange-100'
+            : 'border-gray-200 hover:border-gray-300'
+        } disabled:bg-gray-50 disabled:text-gray-400 disabled:cursor-not-allowed`}
+      >
+        <span className={value ? 'text-gray-800 danaBold' : 'text-gray-400'}>
+          {value || placeholder}
+        </span>
+        {loading ? (
+          <CircularProgress size={12} thickness={5} sx={{ color: '#9ca3af' }} />
+        ) : (
+          <FiChevronDown
+            size={16}
+            className={`text-gray-400 transition-transform ${open ? 'rotate-180' : ''}`}
+          />
+        )}
+      </button>
+
+      <AnimatePresence>
+        {open && !disabled && (
+          <motion.div
+            initial={{ opacity: 0, y: -6 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -6 }}
+            transition={{ duration: 0.15 }}
+            className="absolute z-50 top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg overflow-hidden"
+          >
+            <div className="p-2 border-b border-gray-100">
+              <input
+                autoFocus
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                placeholder="جستجو..."
+                className="w-full px-2 py-1.5 text-xs border border-gray-200 rounded-md focus:outline-none focus:border-orange-300"
+              />
             </div>
+            <ul className="max-h-52 overflow-y-auto text-sm">
+              {loading ? (
+                <li className="px-3 py-4 text-center text-gray-400">
+                  <CircularProgress size={16} thickness={5} sx={{ color: '#f97316' }} />
+                </li>
+              ) : filtered.length === 0 ? (
+                <li className="px-3 py-3 text-center text-gray-400 text-xs">
+                  موردی یافت نشد
+                </li>
+              ) : (
+                filtered.map((opt, index) => (
+                  <li
+                    key={`opt-${String(opt ?? 'empty')}-${index}`}
+                    onClick={() => {
+                      onChange(opt)
+                      setOpen(false)
+                      setQuery('')
+                    }}
+                    className={`px-3 py-2 cursor-pointer transition-colors ${
+                      opt === value
+                        ? 'bg-orange-50 text-orange-600 danaBold'
+                        : 'hover:bg-gray-50 text-gray-700'
+                    }`}
+                  >
+                    {opt}
+                  </li>
+                ))
+              )}
+            </ul>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  )
+}
 
-            {/* دکمه‌ها */}
-            <div className="flex gap-3 mt-8">
-              <button
-                onClick={handleCloseModal}
-                className="flex-1 py-2.5 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors danaBold"
+const MiniStepper = ({ currentKey }) => {
+  const steps = [
+    { key: 'cart', label: 'سبد', Icon: FiShoppingCart },
+    { key: 'address', label: 'انتخاب آدرس و ارسال', Icon: FiMapPin },
+    { key: 'payment', label: 'پرداخت', Icon: FiCreditCard },
+  ]
+  const currentIndex = steps.findIndex((s) => s.key === currentKey)
+
+  return (
+    <div className="flex items-center justify-between" dir="rtl">
+      {steps.map((s, i) => {
+        const active = i <= currentIndex
+        const Icon = s.Icon
+        return (
+          <React.Fragment key={s.key}>
+            <div className="flex flex-col items-center gap-1.5 shrink-0">
+              <div
+                className={`w-9 h-9 rounded-full flex items-center justify-center transition-colors ${
+                  active ? 'bg-orange-500 text-white' : 'bg-gray-100 text-gray-400'
+                }`}
               >
-                لغو
-              </button>
-              <button
-                onClick={handleSave}
-                disabled={isSaving}
-                className="flex-1 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors danaBold disabled:opacity-50 disabled:cursor-not-allowed"
+                <Icon size={16} />
+              </div>
+              <span
+                className={`text-[11px] danaMed ${
+                  active ? 'text-orange-500' : 'text-gray-400'
+                }`}
               >
-                {isSaving ? 'درحال ذخیره...' : 'افزودن'}
-              </button>
+                {s.label}
+              </span>
             </div>
-          </div>
-        </div>
-      )}
+            {i < steps.length - 1 && (
+              <div className="flex-1 h-0.5 mx-2 -mt-5 bg-gray-200 relative overflow-hidden">
+                <div
+                  className={`absolute inset-y-0 right-0 bg-orange-500 transition-all duration-300 ${
+                    i < currentIndex ? 'w-full' : 'w-0'
+                  }`}
+                />
+              </div>
+            )}
+          </React.Fragment>
+        )
+      })}
     </div>
   )
 }

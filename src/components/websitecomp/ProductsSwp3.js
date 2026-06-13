@@ -1,13 +1,45 @@
 'use client';
-import React, { useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation, Autoplay } from 'swiper/modules';
 import { usePathname } from 'next/navigation';
+import { motion, useAnimationControls, useInView } from 'framer-motion'
 
 // Import Swiper styles
 import 'swiper/css';
 import 'swiper/css/navigation';
 import { formatPrice } from '@/utils/functions';
+
+const ANIMATION_PRESETS = {
+  none: {
+    hidden: { opacity: 1 },
+    visible: { opacity: 1 }
+  },
+  fade: {
+    hidden: { opacity: 0 },
+    visible: { opacity: 1 }
+  },
+  slideUp: {
+    hidden: { opacity: 0, y: 32 },
+    visible: { opacity: 1, y: 0 }
+  },
+  slideRight: {
+    hidden: { opacity: 0, x: -36 },
+    visible: { opacity: 1, x: 0 }
+  },
+  slideLeft: {
+    hidden: { opacity: 0, x: 36 },
+    visible: { opacity: 1, x: 0 }
+  },
+  zoomIn: {
+    hidden: { opacity: 0, scale: 0.92 },
+    visible: { opacity: 1, scale: 1 }
+  },
+  blurUp: {
+    hidden: { opacity: 0, y: 16, filter: 'blur(8px)' },
+    visible: { opacity: 1, y: 0, filter: 'blur(0px)' }
+  }
+}
 
 /**
  * کامپوننت محصولات لغزنده - استایل 3
@@ -27,8 +59,59 @@ const ProductsSwp3 = ({
   dataSourceType = 'manual',
   title = 'بازار هفتر',
   subtitle = 'فروش ویژه پاییزه',
-  description = 'بازار خرید و فروش هنر دستساخته ها و اشیای ارزشمند'
+  description = 'بازار خرید و فروش هنر دستساخته ها و اشیای ارزشمند',
+  sectionAnimationType = 'fade',
+  sectionAnimationDelay = '0.05',
+  sectionAnimationDuration = '0.7',
+  contentAnimationType = 'slideRight',
+  contentAnimationDelay = '0.18',
+  contentAnimationDuration = '0.75',
+  imageAnimationType = 'slideLeft',
+  imageAnimationDelay = '0.2',
+  imageAnimationDuration = '0.75',
+  sliderAnimationType = 'blurUp',
+  sliderAnimationDelay = '0.28',
+  sliderAnimationDuration = '0.7'
 }) => {
+  const sectionRef = useRef(null)
+  const animationControls = useAnimationControls()
+  const isInView = useInView(sectionRef, {
+    once: true,
+    amount: 0.25,
+    margin: '0px 0px -10% 0px'
+  })
+
+  useEffect(() => {
+    if (isInView) {
+      animationControls.start('visible')
+    }
+  }, [isInView, animationControls])
+
+  const parseTiming = (value, fallback) => {
+    const parsed = Number.parseFloat(value)
+    if (Number.isNaN(parsed)) return fallback
+    return Math.max(0, parsed)
+  }
+
+  const getMotionConfig = (type, delayValue, durationValue) => {
+    const preset = ANIMATION_PRESETS[type] || ANIMATION_PRESETS.fade
+    return {
+      initial: 'hidden',
+      animate: animationControls,
+      variants: preset,
+      transition: {
+        delay: parseTiming(delayValue, 0),
+        duration: parseTiming(durationValue, 0.7),
+        ease: [0.22, 1, 0.36, 1]
+      }
+    }
+  }
+
+  const sectionMotion = getMotionConfig(sectionAnimationType, sectionAnimationDelay, sectionAnimationDuration)
+  const contentMotion = getMotionConfig(contentAnimationType, contentAnimationDelay, contentAnimationDuration)
+  const imageMotion = getMotionConfig(imageAnimationType, imageAnimationDelay, imageAnimationDuration)
+  const sliderMotion = getMotionConfig(sliderAnimationType, sliderAnimationDelay, sliderAnimationDuration)
+
   const autoplayDelayMs = enableAutoplay === 'true' ? (parseInt(autoplayDelay) || 5) * 1000 : 0
   const pathName = usePathname()
   const [activeMainSlide, setActiveMainSlide] = useState(0)
@@ -116,13 +199,13 @@ const ProductsSwp3 = ({
   };
 
   return (
-    <div style={{backgroundColor:bgColor}} className="w-full overflow-hidden dana">
+    <motion.div ref={sectionRef} style={{backgroundColor:bgColor}} className="w-full overflow-hidden dana" {...sectionMotion}>
       <div className="max-w-7xl mx-auto">
         {/* Hero Section */}
         <div className="py-12 md:py-20 px-6 md:px-12">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-12 items-center mb-6">
             {/* Left Content */}
-            <div className="flex flex-col justify-center space-y-6 text-right order-2 lg:order-1" dir="rtl">
+            <motion.div className="flex flex-col justify-center space-y-6 text-right order-2 lg:order-1" dir="rtl" {...contentMotion}>
               <div className="text-sm tracking-wider" style={{color: smallTextColor}}>
                 {subtitle}
               </div>
@@ -160,10 +243,10 @@ const ProductsSwp3 = ({
                 <span className="text-gray-300">•</span>
                 <span className="text-gray-300">•</span>
               </div>
-            </div>
+            </motion.div>
 
             {/* Right Content - Hero Image */}
-            <div className="flex justify-center items-center order-1 lg:order-2 relative h-96 md:h-full">
+            <motion.div className="flex justify-center items-center order-1 lg:order-2 relative h-96 md:h-full" {...imageMotion}>
               {selectedProduct && (selectedProduct.image || selectedProduct.mainImage) && (
                 <img 
                   src={getImageUrl(selectedProduct.mainImage || selectedProduct.image)} 
@@ -171,11 +254,11 @@ const ProductsSwp3 = ({
                   className="w-full h-full object-contain transition-all duration-300"
                 />
               )}
-            </div>
+            </motion.div>
           </div>
 
           {/* Products Grid Below */}
-          <div className="">
+          <motion.div className="" {...sliderMotion}>
             <div className="text-right mb-8 text-sm" dir="rtl" style={{color: smallTextColor}}>محصولات مشابه</div>
             
             <Swiper
@@ -228,10 +311,10 @@ const ProductsSwp3 = ({
                 </SwiperSlide>
               ))}
             </Swiper>
-          </div>
+          </motion.div>
         </div>
       </div>
-    </div>
+    </motion.div>
   )
 }
 

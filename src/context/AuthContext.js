@@ -2,7 +2,8 @@
 
 import { createContext, useState, useEffect } from 'react'
 import { apiRequest } from '@/utils/functions'
-import { toast } from 'react-toastify'
+// import { toast } from 'react-toastify'
+import { toast } from 'sonner'
 
 export const AuthContext = createContext()
 

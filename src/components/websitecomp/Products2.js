@@ -5,6 +5,8 @@ import Link from 'next/link'
 import { MdShoppingCart } from 'react-icons/md'
 import { Swiper, SwiperSlide } from 'swiper/react'
 import { Navigation, Pagination, Autoplay } from 'swiper/modules'
+import { motion } from 'framer-motion'
+import { useViewportMotion } from './animationUtils'
 import 'swiper/css'
 import 'swiper/css/navigation'
 import 'swiper/css/pagination'
@@ -55,8 +57,18 @@ const Products2 = ({
   autoplayDelay = '5000',
   enableLoop = 'true',
   enableNavigation = 'true',
-  enablePagination = 'true'
+  enablePagination = 'true',
+  sectionAnimationType = 'fade',
+  sectionAnimationDelay = '0.05',
+  sectionAnimationDuration = '0.7'
 }) => {
+  const { sectionRef, motionProps } = useViewportMotion({
+    animationType: sectionAnimationType,
+    animationDelay: sectionAnimationDelay,
+    animationDuration: sectionAnimationDuration,
+    amount: 0.2
+  })
+
   const filters = [
     { label: 'ارزانترین', value: 'cheapest' },
     { label: 'گرانترین', value: 'expensive' },
@@ -140,7 +152,12 @@ const Products2 = ({
   const displayedProducts = itemsLimit ? products.slice(0, parseInt(itemsLimit)) : products
 
   return (
-    <div className="py-8" style={{ backgroundColor, display: 'flex', justifyContent: alignment === 'center' ? 'center' : 'flex-start' }}>
+    <motion.div
+      ref={sectionRef}
+      className="py-8"
+      style={{ backgroundColor, display: 'flex', justifyContent: alignment === 'center' ? 'center' : 'flex-start' }}
+      {...motionProps}
+    >
       <div style={{ width: `${width}%` }} className="px-4">
         {/* Header */}
         <div className="mb-8">
@@ -275,7 +292,7 @@ const Products2 = ({
           </Swiper>
         </div>
       </div>
-    </div>
+    </motion.div>
   )
 }
 
