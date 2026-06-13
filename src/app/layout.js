@@ -34,8 +34,8 @@ export default function RootLayout({ children }) {
             <CartProvider>
               <OrderProvider>
                 <div>
-                  <Header1 />
-                  {/* <Header/> */}
+                  {/* <Header1 /> */}
+                  <Header/>
                   {children}
                 </div>
               </OrderProvider>

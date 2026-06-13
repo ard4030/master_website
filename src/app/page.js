@@ -25,6 +25,7 @@ async function getHomepageData() {
   } catch (error) {
     final.error = error.message
   }
+  // console.log("final ",final)
 
   return final
 
