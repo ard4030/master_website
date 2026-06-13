@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import React from 'react'
 import { motion } from 'framer-motion'
@@ -59,7 +59,7 @@ const Footer1 = ({
 
   // تابع کمکی برای تبدیل URL تصویر
   const getImageUrl = (imagePath) => {
-    if (!imagePath) return ''
+    if (!imagePath) return '/assets/images/test.png'
     if (imagePath.startsWith('http')) return imagePath
     return `${process.env.NEXT_PUBLIC_LIARA_IMAGE_URL}${imagePath}`
   }
@@ -119,3 +119,4 @@ const Footer1 = ({
 }
 
 export default Footer1
+

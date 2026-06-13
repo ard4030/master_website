@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import Image from 'next/image'
 import React, { useState, useEffect } from 'react'
@@ -48,7 +48,7 @@ const SimpleBanner = ({
     return () => window?.removeEventListener('resize', handleResize)
   }, [])
   const getImageUrl = (imagePath) => {
-    if (!imagePath) return ''
+    if (!imagePath) return '/assets/images/test.png'
     if (imagePath.startsWith('http')) return imagePath
     return `${process.env.NEXT_PUBLIC_LIARA_IMAGE_URL}${imagePath}`
   }
@@ -104,3 +104,4 @@ const SimpleBanner = ({
 }
 
 export default SimpleBanner
+

@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import React, { useEffect, useMemo, useRef, useState } from 'react'
 import Link from 'next/link'
@@ -92,7 +92,7 @@ const DigikalaSwiper = ({
   }, [isInView, animationControls])
 
   const getImageUrl = (imagePath) => {
-    if (!imagePath) return ''
+    if (!imagePath) return '/assets/images/test.png'
     if (String(imagePath).startsWith('http')) return imagePath
     return `${process.env.NEXT_PUBLIC_LIARA_IMAGE_URL}${imagePath}`
   }
@@ -526,3 +526,4 @@ const DigikalaSwiper = ({
 }
 
 export default DigikalaSwiper
+

@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import React from 'react'
 import Link from 'next/link'
@@ -93,7 +93,7 @@ const About2 = ({
   }, [isInView, animationControls])
 
   const getImageUrl = (imagePath) => {
-    if (!imagePath) return ''
+    if (!imagePath) return '/assets/images/test.png'
     if (imagePath.startsWith('http')) return imagePath
     return `${process.env.NEXT_PUBLIC_LIARA_IMAGE_URL}uploads/${imagePath}`
   }
@@ -224,3 +224,4 @@ const About2 = ({
 }
 
 export default About2
+

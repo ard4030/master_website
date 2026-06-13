@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 import Image from 'next/image'
 import Link from 'next/link';
 import React from 'react'
@@ -69,7 +69,7 @@ const BannerTwo = ({
   }, [isInView, animationControls])
 
   const getImageUrl = (imagePath) => {
-    if (!imagePath) return ''
+    if (!imagePath) return '/assets/images/test.png'
     if (imagePath.startsWith('http')) return imagePath
     return `${process.env.NEXT_PUBLIC_LIARA_IMAGE_URL}${imagePath}`
   }
@@ -137,3 +137,4 @@ const BannerTwo = ({
 }
 
 export default BannerTwo
+
