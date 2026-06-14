@@ -27,6 +27,7 @@ import About2 from '@/components/websitecomp/About2';
 import Comments from '@/components/websitecomp/Comments';
 import Questions from '@/components/websitecomp/Questions';
 import TopBanner from '@/components/websitecomp/TopBanner';
+import SimpleHeader from '@/components/websitecomp/SimpleHeader';
 
 
 function renderComponent(component, themeFont, themeColor) {
@@ -99,6 +100,8 @@ function renderComponent(component, themeFont, themeColor) {
       return <Questions key={instanceId} {...mergedProps} {...extraProps} />
             case 'topBanner':
       return <TopBanner key={instanceId} {...mergedProps} {...extraProps} />
+            case 'simpleHeader':
+      return <SimpleHeader key={instanceId} {...mergedProps} {...extraProps} />
     default:
       return null
   }
