@@ -1,12 +1,17 @@
 ﻿"use client"
-import React, { useState, useRef, useEffect } from 'react'
+import React, { useState, useRef, useEffect, useContext } from 'react'
 import Image from 'next/image'
+import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { motion, AnimatePresence, useAnimationControls, useInView } from 'framer-motion'
 import { FiSearch, FiChevronDown } from 'react-icons/fi'
 import { HiOutlineMenuAlt3 } from 'react-icons/hi'
 import { PiShoppingCartSimpleLight } from 'react-icons/pi'
 import { TbLogin2 } from 'react-icons/tb'
-import { getImageUrl } from '@/utils/functions'
+import { AuthContext } from '@/context/AuthContext'
+import { CartContext } from '@/context/CartContext'
+import Login from '@/components/global/Login'
+// import { getImageUrl } from '@/utils/functions'
 
 const ANIMATION_PRESETS = {
   none: {
@@ -181,6 +186,7 @@ const SimpleHeader = ({
   showStoreName = 'true',
   logoTextColor = '#ee1b24',
   navItemsColor = '#555560',
+  navAlignment = 'center',
   navItems: navItemsProp,
   categoryItems,
   menuBtnAnimationType = 'slideRight',
@@ -214,6 +220,18 @@ const SimpleHeader = ({
   const [isMobileCategoriesOpen, setIsMobileCategoriesOpen] = useState(false)
   const [mobileActiveCategory, setMobileActiveCategory] = useState(null)
   const [mobileActiveSubcategory, setMobileActiveSubcategory] = useState(null)
+  const [isLoginOpen, setIsLoginOpen] = useState(false)
+  const { user } = useContext(AuthContext) || {}
+  const { cart } = useContext(CartContext) || {}
+  const router = useRouter()
+  const cartItemsCount = cart?.items?.reduce((total, item) => total + (item.quantity || 1), 0) || 0
+  const handleUserLogin = () => {
+    if (user) {
+      router.push('/dashboard/userprofile')
+    } else {
+      setIsLoginOpen(true)
+    }
+  }
   const closeTimerRef = useRef(null)
   const sectionRef = useRef(null)
   const animationControls = useAnimationControls()
@@ -316,7 +334,7 @@ const SimpleHeader = ({
             {logoImage ? (
               <div className="relative shrink-0 overflow-hidden rounded-full w-9 h-9 md:w-11 md:h-11">
                 <Image
-                  src={getImageUrl(logoImage)}
+                  src={logoImage}
                   alt={storeName || 'logo'}
                   fill
                   sizes="(min-width: 768px) 44px, 36px"
@@ -363,13 +381,18 @@ const SimpleHeader = ({
           {/* سبد خرید + ورود - فقط دسکتاپ */}
           <motion.div className="hidden lg:flex items-center gap-3 shrink-0" {...actionsMotion}>
             {/* آیکون سبد خرید */}
-            <button
-              type="button"
+            <Link
+              href="/cart"
               aria-label="سبد خرید"
-              className="w-10 h-10 flex items-center justify-center text-[#3a3a57] hover:text-red-600 transition-colors"
+              className="relative w-10 h-10 flex items-center justify-center text-[#3a3a57] hover:text-red-600 transition-colors"
             >
               <PiShoppingCartSimpleLight size={24} />
-            </button>
+              {cartItemsCount > 0 && (
+                <span className="absolute -top-0.5 -right-0.5 bg-red-500 text-white text-[10px] danaBold rounded-full min-w-4.5 h-4.5 px-1 flex items-center justify-center border-2 border-white">
+                  {cartItemsCount}
+                </span>
+              )}
+            </Link>
 
             {/* جداکننده عمودی */}
             <span className="h-7 w-px bg-[#d8d8de]" />
@@ -377,22 +400,29 @@ const SimpleHeader = ({
             {/* دکمه ورود/ثبت‌نام */}
             <button
               type="button"
+              onClick={handleUserLogin}
               className="flex items-center gap-2 h-10 px-4 rounded-xl border border-[#d8d8de] text-[#3a3a57] danaMed text-[14px] hover:border-[#9a9aa2] hover:bg-[#f5f5f7] transition-colors"
             >
               <TbLogin2 size={20} className="text-[#3a3a57]" />
-              <span className="whitespace-nowrap">ورود | ثبت‌نام</span>
+              <span className="whitespace-nowrap">{user ? 'حساب کاربری' : 'ورود | ثبت‌نام'}</span>
             </button>
           </motion.div>
 
           {/* آیکون سبد - فقط موبایل/تبلت */}
-          <motion.button
-            type="button"
-            aria-label="سبد خرید"
-            className="shrink-0 w-9 h-9 flex items-center justify-center text-[#3a3a57] lg:hidden"
-            {...actionsMotion}
-          >
-            <PiShoppingCartSimpleLight size={22} />
-          </motion.button>
+          <motion.div className="shrink-0 lg:hidden" {...actionsMotion}>
+            <Link
+              href="/cart"
+              aria-label="سبد خرید"
+              className="relative w-9 h-9 flex items-center justify-center text-[#3a3a57]"
+            >
+              <PiShoppingCartSimpleLight size={22} />
+              {cartItemsCount > 0 && (
+                <span className="absolute -top-0.5 -right-0.5 bg-red-500 text-white text-[10px] danaBold rounded-full min-w-4 h-4 px-1 flex items-center justify-center border-2 border-white">
+                  {cartItemsCount}
+                </span>
+              )}
+            </Link>
+          </motion.div>
 
         </div>
       </div>
@@ -405,7 +435,7 @@ const SimpleHeader = ({
         className="hidden lg:block mx-auto max-w-7xl px-4 py-2 md:px-6 lg:px-8 overflow-visible"
         {...row2Motion}
       >
-        <div className="flex items-center justify-between gap-4">
+        <div className="flex items-center gap-4">
 
             {/* دسته‌بندی کالاها با دراپ‌داون هاور */}
             <motion.div
@@ -562,7 +592,13 @@ const SimpleHeader = ({
             </motion.div>
 
             {/* لینک‌های ناوبری */}
-            <div className="flex items-center whitespace-nowrap gap-1">
+            <div
+              className={`flex-1 flex items-center whitespace-nowrap gap-1 ${
+                navAlignment === 'center' ? 'justify-center' :
+                navAlignment === 'left' ? 'justify-end' :
+                'justify-start'
+              }`}
+            >
               {navLinks.map((item, index) => {
                 const itemMotion = getMotionConfig(
                   navLinksAnimationType,
@@ -713,10 +749,28 @@ const SimpleHeader = ({
               </a>
             ))}
 
+            <span className="h-px bg-[#ebebf0] my-1" />
+
+            {/* دکمه ورود/حساب کاربری (موبایل) */}
+            <button
+              type="button"
+              onClick={() => {
+                setIsMenuOpen(false)
+                handleUserLogin()
+              }}
+              className="flex items-center gap-2 danaMed text-[13px] text-[#3a3a57] px-2 py-2 rounded-lg hover:bg-[#f5f5f7] transition-colors text-right"
+            >
+              <TbLogin2 size={18} className="text-[#3a3a57]" />
+              <span>{user ? 'حساب کاربری' : 'ورود | ثبت‌نام'}</span>
+            </button>
+
             </div>
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* مودال ورود */}
+      <Login isOpen={isLoginOpen} onClose={() => setIsLoginOpen(false)} loginMode="user" />
     </header>
   )
 }

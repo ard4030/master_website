@@ -28,6 +28,7 @@ import Comments from '@/components/websitecomp/Comments';
 import Questions from '@/components/websitecomp/Questions';
 import TopBanner from '@/components/websitecomp/TopBanner';
 import SimpleHeader from '@/components/websitecomp/SimpleHeader';
+import SimpleSwiper from '@/components/websitecomp/SimpleSwiper';
 
 
 function renderComponent(component, themeFont, themeColor) {
@@ -102,6 +103,8 @@ function renderComponent(component, themeFont, themeColor) {
       return <TopBanner key={instanceId} {...mergedProps} {...extraProps} />
             case 'simpleHeader':
       return <SimpleHeader key={instanceId} {...mergedProps} {...extraProps} />
+            case 'simpleSwiper':
+      return <SimpleSwiper key={instanceId} {...mergedProps} {...extraProps} />
     default:
       return null
   }
