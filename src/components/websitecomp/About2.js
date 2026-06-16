@@ -3,6 +3,7 @@
 import React from 'react'
 import Link from 'next/link'
 import { motion, useAnimationControls, useInView } from 'framer-motion'
+import Image from 'next/image'
 
 const ANIMATION_PRESETS = {
   none: {
@@ -155,12 +156,16 @@ const About2 = ({
               <div
                 className="absolute inset-0 overflow-hidden"
                 style={{
-                  backgroundImage: `url(${getImageUrl(imageUrl)})`,
-                  backgroundSize: 'cover',
-                  backgroundPosition: 'center',
                   borderRadius: `${safeImageRadius}px`
                 }}
               >
+                <Image
+                  src={getImageUrl(imageUrl)}
+                  alt={brandText || 'about image'}
+                  fill
+                  className="object-contain object-center"
+                  sizes="(max-width: 768px) 100vw, 50vw"
+                />
                 <div
                   className="absolute inset-0"
                   style={{ backgroundColor: `rgba(0, 0, 0, ${safeOverlay})` }}
