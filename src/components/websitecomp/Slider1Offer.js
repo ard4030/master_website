@@ -279,86 +279,68 @@ const Slider1Offer = ({
           className="rounded-[42px] p-2 md:p-3 overflow-hidden"
           style={{ backgroundColor: shellBgColor }}
         >
-          <div className="grid grid-cols-1 lg:grid-cols-[280px_minmax(0,1fr)] rounded-[34px] overflow-hidden">
+          <div className="flex flex-col lg:grid lg:grid-cols-[280px_minmax(0,1fr)] rounded-[34px] overflow-hidden">
             <motion.aside
-              className="px-6 py-10 md:px-8 md:py-12 flex flex-col items-center justify-center text-center"
+              className="px-5 py-6 md:px-8 md:py-10 flex flex-col lg:flex-col items-center justify-center text-center"
               style={{
                 background: `linear-gradient(165deg, ${panelBgStart} 0%, ${panelBgEnd} 100%)`,
               }}
               {...panelMotion}
             >
-              <h2
-                className="danaBold text-4xl leading-[1.45] whitespace-pre-line"
-                style={{ color: panelTitleColor }}
-              >
-                {parseMultiLine(title).join("\n")}
-              </h2>
-
-              <p
-                className="mt-5 danaBold text-sm"
-                style={{ color: panelTextColor }}
-              >
-                {subtitle}
-              </p>
-
-              <div
-                className="w-full h-px my-4"
-                style={{ backgroundColor: "rgba(255,255,255,0.25)" }}
-              />
-
-              <div className="flex items-center gap-3 mb-6">
-                <button
-                  onClick={() => swiperRef.current?.slidePrev()}
-                  className="w-12 h-12 rounded-full flex items-center justify-center text-white"
-                  style={{ backgroundColor: navBtnColor }}
-                  aria-label="قبلی"
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="w-5 h-5"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2.5"
+              {/* موبایل: افقی — دسکتاپ: عمودی */}
+              <div className="w-full flex flex-row lg:flex-col items-center justify-between lg:justify-center gap-4 lg:gap-0">
+                <div className="flex flex-col items-start lg:items-center text-right lg:text-center">
+                  <h2
+                    className="danaBold text-2xl md:text-3xl lg:text-4xl leading-[1.45] whitespace-pre-line"
+                    style={{ color: panelTitleColor }}
                   >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M9 5l7 7-7 7"
-                    />
-                  </svg>
-                </button>
-                <button
-                  onClick={() => swiperRef.current?.slideNext()}
-                  className="w-12 h-12 rounded-full flex items-center justify-center text-white"
-                  style={{ backgroundColor: navBtnColor }}
-                  aria-label="بعدی"
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="w-5 h-5"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2.5"
+                    {parseMultiLine(title).join("\n")}
+                  </h2>
+                  <p
+                    className="mt-2 lg:mt-5 danaBold text-sm"
+                    style={{ color: panelTextColor }}
                   >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M15 19l-7-7 7-7"
-                    />
-                  </svg>
+                    {subtitle}
+                  </p>
+                </div>
 
-                </button>
+                <div className="flex flex-col items-center gap-3">
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => swiperRef.current?.slidePrev()}
+                      className="w-10 h-10 lg:w-12 lg:h-12 rounded-full flex items-center justify-center text-white"
+                      style={{ backgroundColor: navBtnColor }}
+                      aria-label="قبلی"
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 lg:w-5 lg:h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+                      </svg>
+                    </button>
+                    <button
+                      onClick={() => swiperRef.current?.slideNext()}
+                      className="w-10 h-10 lg:w-12 lg:h-12 rounded-full flex items-center justify-center text-white"
+                      style={{ backgroundColor: navBtnColor }}
+                      aria-label="بعدی"
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 lg:w-5 lg:h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+                      </svg>
+                    </button>
+                  </div>
+                  <Link
+                    href={viewAllLink || "#"}
+                    className="inline-flex items-center justify-center border-2 rounded-full px-5 lg:px-8 h-9 lg:h-12 text-sm lg:text-base danaBold whitespace-nowrap"
+                    style={{ color: "#ffffff", borderColor: "#ffffff" }}
+                  >
+                    {viewAllText}
+                  </Link>
+                </div>
               </div>
 
-              <Link
-                href={viewAllLink || "#"}
-                className="inline-flex items-center justify-center border-2 rounded-full px-8 h-12 text-base danaBold"
-                style={{ color: "#ffffff", borderColor: "#ffffff" }}
-              >
-                {viewAllText}
-              </Link>
+              <div
+                className="hidden lg:block w-full h-px my-4"
+                style={{ backgroundColor: "rgba(255,255,255,0.25)" }}
+              />
             </motion.aside>
 
             <motion.div className="p-3 md:p-4 lg:p-5 bg-white" {...sliderMotion}>

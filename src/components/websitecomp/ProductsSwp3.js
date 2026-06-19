@@ -9,6 +9,7 @@ import { motion, useAnimationControls, useInView } from 'framer-motion'
 import 'swiper/css';
 import 'swiper/css/navigation';
 import { formatPrice } from '@/utils/functions';
+import Link from 'next/link';
 
 const ANIMATION_PRESETS = {
   none: {
@@ -219,10 +220,12 @@ const ProductsSwp3 = ({
               </p>
 
               <div className="flex items-center gap-6 pt-4">
-                <button className="px-6 py-2 rounded-full border-2 border-blue-600 bg-blue-600 text-white text-sm font-semibold hover:bg-blue-700 transition-colors flex items-center gap-2">
+                <Link
+                href={`/product/${selectedProduct?._id}`}
+                 className="px-8 py-3 rounded-2xl border-2 bg-blue-500 text-white text-[16px] font-semibold hover:bg-blue-700 transition-colors flex items-center gap-2">
                   <span>ثبت سفارش</span>
                   <span>←</span>
-                </button>
+                </Link>
                 {selectedProduct?.price && (
                   <div className=" dana">
                     <span className="text-3xl md:text-2xl font-bold tracking-tight leading-none" style={{color: smallTextColor}}>
@@ -246,13 +249,137 @@ const ProductsSwp3 = ({
             </motion.div>
 
             {/* Right Content - Hero Image */}
-            <motion.div className="flex justify-center items-center order-1 lg:order-2 relative h-96 md:h-full" {...imageMotion}>
+            <motion.div
+              className="flex justify-center items-center order-1 lg:order-2 relative"
+              {...imageMotion}
+            >
               {selectedProduct && (selectedProduct.image || selectedProduct.mainImage) && (
-                <img 
-                  src={getImageUrl(selectedProduct.mainImage || selectedProduct.image)} 
-                  alt={selectedProduct.name || selectedProduct.title} 
-                  className="w-full h-full object-contain transition-all duration-300"
-                />
+                <div className="relative group">
+                  {/* هاله آبی پشت تصویر - متحرک */}
+                  <motion.div
+                    className="absolute -inset-4 bg-linear-to-tr from-blue-500/40 via-blue-400/25 to-blue-600/20 rounded-full blur-3xl"
+                    animate={{
+                      scale: [1, 1.15, 1],
+                      opacity: [0.6, 0.9, 0.6],
+                      rotate: [0, 20, 0],
+                    }}
+                    transition={{
+                      duration: 8,
+                      ease: 'easeInOut',
+                      repeat: Infinity,
+                    }}
+                  />
+
+                  {/* هاله ثانویه - چرخش معکوس */}
+                  <motion.div
+                    className="absolute -inset-2 bg-linear-to-bl from-cyan-400/30 via-transparent to-blue-500/30 rounded-full blur-2xl"
+                    animate={{
+                      scale: [1.1, 0.95, 1.1],
+                      opacity: [0.4, 0.7, 0.4],
+                      rotate: [0, -25, 0],
+                    }}
+                    transition={{
+                      duration: 10,
+                      ease: 'easeInOut',
+                      repeat: Infinity,
+                    }}
+                  />
+
+                  {/* دایره دکوراتیو پشت تصویر - شناور */}
+                  <motion.div
+                    className="absolute inset-0 m-auto w-80 h-80 md:w-96 md:h-96 rounded-full bg-linear-to-br from-blue-100/50 to-blue-50/10 backdrop-blur-sm border border-blue-200/40 shadow-2xl"
+                    animate={{
+                      y: [0, -10, 0],
+                      rotate: [0, 5, 0],
+                    }}
+                    transition={{
+                      duration: 6,
+                      ease: 'easeInOut',
+                      repeat: Infinity,
+                    }}
+                  />
+
+                  {/* حلقه دکوراتیو در حال چرخش */}
+                  <motion.div
+                    className="absolute inset-0 m-auto w-80 h-80 md:w-96 md:h-96 rounded-full border-2 border-dashed border-blue-300/40"
+                    animate={{ rotate: 360 }}
+                    transition={{
+                      duration: 30,
+                      ease: 'linear',
+                      repeat: Infinity,
+                    }}
+                  />
+
+                  {/* تصویر اصلی - شناور ملایم */}
+                  <motion.div
+                    className="relative w-80 h-80 md:w-96 md:h-96 flex items-center justify-center"
+                    animate={{ y: [0, -8, 0] }}
+                    transition={{
+                      duration: 4,
+                      ease: 'easeInOut',
+                      repeat: Infinity,
+                    }}
+                  >
+                    <img
+                      src={getImageUrl(selectedProduct.mainImage || selectedProduct.image)}
+                      alt={selectedProduct.name || selectedProduct.title}
+                      className="w-full h-full object-contain rounded-md drop-shadow-2xl transition-transform duration-500 group-hover:scale-105 group-hover:-rotate-2"
+                    />
+                  </motion.div>
+
+                  {/* نقاط دکوراتیو متحرک */}
+                  <motion.span
+                    className="absolute -top-2 -right-2 w-3 h-3 rounded-full bg-blue-400 shadow-lg shadow-blue-400/60"
+                    animate={{
+                      scale: [1, 1.6, 1],
+                      opacity: [0.7, 1, 0.7],
+                    }}
+                    transition={{
+                      duration: 2.2,
+                      ease: 'easeInOut',
+                      repeat: Infinity,
+                    }}
+                  />
+                  <motion.span
+                    className="absolute bottom-4 -left-2 w-2 h-2 rounded-full bg-blue-300 shadow-lg shadow-blue-300/60"
+                    animate={{
+                      scale: [1, 1.8, 1],
+                      opacity: [0.6, 1, 0.6],
+                    }}
+                    transition={{
+                      duration: 2.6,
+                      ease: 'easeInOut',
+                      repeat: Infinity,
+                      delay: 0.6,
+                    }}
+                  />
+                  <motion.span
+                    className="absolute top-1/3 -left-4 w-1.5 h-1.5 rounded-full bg-cyan-300 shadow-lg shadow-cyan-300/60"
+                    animate={{
+                      x: [0, -6, 0],
+                      opacity: [0.5, 1, 0.5],
+                    }}
+                    transition={{
+                      duration: 3,
+                      ease: 'easeInOut',
+                      repeat: Infinity,
+                      delay: 1,
+                    }}
+                  />
+                  <motion.span
+                    className="absolute top-6 left-8 w-2 h-2 rounded-full bg-blue-500/80 shadow-lg shadow-blue-500/60"
+                    animate={{
+                      y: [0, -10, 0],
+                      opacity: [0.4, 1, 0.4],
+                    }}
+                    transition={{
+                      duration: 3.4,
+                      ease: 'easeInOut',
+                      repeat: Infinity,
+                      delay: 0.3,
+                    }}
+                  />
+                </div>
               )}
             </motion.div>
           </div>
@@ -282,7 +409,7 @@ const ProductsSwp3 = ({
                     dir="rtl"
                   >
                     {/* Product Image */}
-                    <div className="w-full aspect-square bg-gray-100 rounded-lg overflow-hidden mb-4 flex items-center justify-center">
+                    <div className="w-4/5 aspect-square bg-gray-100 rounded-lg overflow-hidden mb-4 flex items-center justify-center">
                       {(product.image || product.mainImage) && (
                         <img
                           src={getImageUrl(product.mainImage || product.image)}
