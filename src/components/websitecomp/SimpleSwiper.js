@@ -224,7 +224,7 @@ const SimpleSwiper = ({
   // لینک محصول
   const getProductLink = (product) => {
     const id = product._id || product.id;
-    return `/product/view/${id}`;
+    return `/product/${id}`;
   };
 
   const sampleProducts = [

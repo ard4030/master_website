@@ -30,6 +30,7 @@ import TopBanner from '@/components/websitecomp/TopBanner';
 import SimpleHeader from '@/components/websitecomp/SimpleHeader';
 import SimpleSwiper from '@/components/websitecomp/SimpleSwiper';
 import Slider3 from '@/components/websitecomp/Slider3';
+import ViewCategory from '@/components/websitecomp/ViewCategory';
 
 
 function renderComponent(component, themeFont, themeColor) {
@@ -108,6 +109,8 @@ function renderComponent(component, themeFont, themeColor) {
       return <SimpleSwiper key={instanceId} {...mergedProps} {...extraProps} />
             case 'slider3':
       return <Slider3 key={instanceId} {...mergedProps} {...extraProps} />
+           case 'viewCategory':
+      return <ViewCategory key={instanceId} {...mergedProps} {...extraProps} />
     default:
       return null
   }
