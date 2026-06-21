@@ -405,8 +405,8 @@ const Slider1Offer = ({
                             </span>
                           ) : null}
 
-                          <div className=" w-full flex-wrap rounded-[34px]
-                           overflow-hidden bg-white flex items-center justify-center p-2">
+                          <div className= {`w-full flex-wrap rounded-[34px]
+                           overflow-hidden bg-white flex items-center justify-center p-2`}>
                             {(product.image || product.mainImage) && (
                               <div className="w-full h-full p-4">
                                   <img

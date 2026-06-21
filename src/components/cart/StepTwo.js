@@ -30,21 +30,27 @@ import AddAddressButton from '@/components/cart/AddAddressButton'
 const IMAGE_BASE = process.env.NEXT_PUBLIC_LIARA_IMAGE_URL || ''
 const SHIPPING_TYPES = [
   {
-    name : 'withPost',
-    faName : 'پست پیشتاز',
-    icon : ''
+    name: 'withPost',
+    faName: 'پست پیشتاز',
+    desc: 'تحویل ۳ تا ۵ روز کاری',
+    image: '/assets/images/shiping/post.webp',
+    accent: 'amber',
   },
   {
-    name : 'withTipax',
-    faName : 'تیپاکس',
-    icon : ''
+    name: 'withTipax',
+    faName: 'تیپاکس',
+    desc: 'تحویل سریع ۲ تا ۴ روز کاری',
+    image: '/assets/images/shiping/tipax.png',
+    accent: 'red',
   },
-    {
-    name : 'withTrucking',
-    faName : 'باربری',
-    icon : ''
+  {
+    name: 'withTrucking',
+    faName: 'باربری',
+    desc: 'مناسب برای بارهای حجیم و سنگین',
+    image: '/assets/images/shiping/trucking.png',
+    accent: 'blue',
   },
-  ];
+]
 const StepTwo = ({ onContinue, onBack }) => {
   const { order, setOrder } = useContext(OrderContext)
   const { cart, setCart } = useContext(CartContext)
@@ -130,7 +136,7 @@ const StepTwo = ({ onContinue, onBack }) => {
         slug: method.name,
         name: method.name,
         faName: method.faName,
-        icon: method.icon,
+        image: method.image,
       },
     }))
     setLoadingShippingKey(null)
@@ -432,53 +438,37 @@ const StepTwo = ({ onContinue, onBack }) => {
         <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
             {/* هدر غرفه */}
             <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
-              <span className="danaBold text-sm text-gray-800">سرویس های ارسال:</span>
+              <div className="flex items-center gap-2">
+                <span className="w-8 h-8 rounded-full bg-orange-50 text-orange-500 flex items-center justify-center">
+                  <FiTruck size={15} />
+                </span>
+                <span className="danaBold text-sm text-gray-800">سرویس‌های ارسال</span>
+              </div>
               <span className="text-xs text-gray-500">
-                ارسال از: <span className="text-gray-700">{merchantCity}</span>
+                ارسال از: <span className="text-gray-700 danaMed">{merchantCity}</span>
               </span>
             </div>
 
             {/* روش‌های ارسال */}
-            <div className="px-5 pb-5 space-y-2">
+            <div className="px-5 py-4 grid grid-cols-1 sm:grid-cols-3 gap-3">
               {SHIPPING_TYPES.map((shippingType) => {
                 const key = shippingType?.name
                 const isSelected = order?.shippingMethod?.slug === key
                 const isMethodLoading = loadingShippingKey === key
 
                 return (
-                  <label
+                  <ShippingCard
                     key={key}
-                    className={`flex items-center gap-3 px-4 py-3 rounded-lg border cursor-pointer transition-colors ${
-                      isSelected
-                        ? 'border-orange-400 bg-orange-50/50'
-                        : 'border-gray-200 hover:bg-gray-50'
-                    } ${loadingShippingKey ? 'opacity-90' : ''}`}
-                  >
-                    <input
-                      type="radio"
-                      name="shippingMethod"
-                      checked={isSelected}
-                      onChange={() => handleSelectShippingMethod(key)}
-                      disabled={!!loadingShippingKey}
-                      className="accent-orange-500"
-                    />
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center justify-between gap-3">
-                        <h3 className="danaBold text-sm text-gray-800">
-                          {shippingType.faName}
-                        </h3>
-                      </div>
-                    </div>
-                    {isMethodLoading ? (
-                      <CircularProgress size={14} thickness={5} sx={{ color: '#f97316' }} />
-                    ) : isSelected ? (
-                      <FiCheck className="text-orange-500" size={16} />
-                    ) : null}
-                  </label>
+                    method={shippingType}
+                    selected={isSelected}
+                    loading={isMethodLoading}
+                    disabled={!!loadingShippingKey && !isMethodLoading}
+                    onSelect={() => handleSelectShippingMethod(key)}
+                  />
                 )
               })}
               {SHIPPING_TYPES.length === 0 && (
-                <div className="text-center text-sm text-gray-500 py-4">
+                <div className="col-span-full text-center text-sm text-gray-500 py-4">
                   در حال حاضر روش ارسالی برای این سفارش ثبت نشده است
                 </div>
               )}
@@ -601,6 +591,94 @@ const StepTwo = ({ onContinue, onBack }) => {
 }
 
 // ===== Sub components =====
+
+const ACCENT_MAP = {
+  amber: {
+    ring: 'ring-amber-300',
+    border: 'border-amber-400',
+    bg: 'bg-amber-50/60',
+    icon: 'text-amber-500 bg-amber-50',
+    dot: 'bg-amber-500',
+  },
+  red: {
+    ring: 'ring-red-300',
+    border: 'border-red-400',
+    bg: 'bg-red-50/60',
+    icon: 'text-red-500 bg-red-50',
+    dot: 'bg-red-500',
+  },
+  blue: {
+    ring: 'ring-blue-300',
+    border: 'border-blue-400',
+    bg: 'bg-blue-50/60',
+    icon: 'text-blue-500 bg-blue-50',
+    dot: 'bg-blue-500',
+  },
+}
+
+const ShippingCard = ({ method, selected, loading, disabled, onSelect }) => {
+  const [imgError, setImgError] = useState(false)
+  const accent = ACCENT_MAP[method.accent] || ACCENT_MAP.amber
+
+  return (
+    <button
+      type="button"
+      onClick={onSelect}
+      disabled={disabled}
+      className={`group relative flex flex-col items-center text-center rounded-2xl border bg-white px-4 pt-6 pb-5 min-h-45 transition-all overflow-hidden focus:outline-none ${
+        selected
+          ? `${accent.border} ring-2 ${accent.ring}/40 shadow-md ${accent.bg}`
+          : 'border-gray-200 hover:border-gray-300 hover:shadow-md hover:-translate-y-0.5'
+      } ${disabled ? 'opacity-60 cursor-not-allowed' : 'cursor-pointer active:scale-[0.99]'}`}
+    >
+      {/* بج انتخاب گوشه */}
+      <span
+        className={`absolute top-3 left-3 w-7 h-7 rounded-full flex items-center justify-center transition-all ${
+          selected
+            ? 'bg-orange-500 text-white scale-100 shadow-sm'
+            : 'bg-gray-100 text-transparent scale-90 group-hover:scale-100 group-hover:bg-gray-200'
+        }`}
+      >
+        {loading ? (
+          <CircularProgress size={14} thickness={6} sx={{ color: '#fff' }} />
+        ) : (
+          <FiCheck size={15} />
+        )}
+      </span>
+
+      {/* لوگو وسط بالا */}
+      <div
+        className={`shrink-0 w-30 h-30 rounded-2xl border flex items-center justify-center overflow-hidden mb-3 transition-colors ${
+          selected ? 'border-transparent bg-white shadow-sm' : 'border-gray-100 bg-gray-50/60'
+        } ${imgError ? accent.icon : ''}`}
+      >
+        {imgError ? (
+          <FiTruck size={30} />
+        ) : (
+          <img
+            src={method.image}
+            alt={method.faName}
+            onError={() => setImgError(true)}
+            className="w-full h-full object-contain p-2"
+          />
+        )}
+      </div>
+
+      {/* عنوان */}
+      <div className="flex items-center justify-center gap-1.5 mb-1.5">
+        <span className={`w-1.5 h-1.5 rounded-full ${accent.dot}`} />
+        <h3 className="danaBold text-sm sm:text-base text-gray-800">
+          {method.faName}
+        </h3>
+      </div>
+
+      {/* توضیح */}
+      <p className="text-[11px] sm:text-xs text-gray-500 leading-5 max-w-50">
+        {method.desc}
+      </p>
+    </button>
+  )
+}
 
 const Row = ({ label, value, suffix, valueClass = 'text-gray-800', prefix = '' }) => (
   <div className="flex items-center justify-between">

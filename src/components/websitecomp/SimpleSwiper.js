@@ -469,11 +469,11 @@ const SimpleSwiper = ({
 
           <button
             onClick={() => swiperRef.current?.slideNext()}
-            className="absolute left-1 sm:left-2 top-1/2 -translate-y-1/2 z-20
+            className={`absolute left-1 sm:left-2 top-1/2 -translate-y-1/2 z-20
               w-7 h-7 sm:w-9 sm:h-9 md:w-10 md:h-10
               rounded-full flex items-center justify-center
               bg-white/80 hover:bg-white shadow-md hover:shadow-lg
-              transition-all duration-200 border border-gray-100"
+              transition-all duration-200 border border-gray-100`}
             aria-label="بعدی"
           >
             <FaChevronLeft className="text-gray-600 text-[11px] sm:text-[13px]" />

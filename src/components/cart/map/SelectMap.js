@@ -2,6 +2,7 @@
 
 import React from 'react'
 import dynamic from 'next/dynamic'
+import { FiX } from 'react-icons/fi'
 import ModalLayout from '@/components/global/ModalLayout/ModalLayout'
 import AnimLayout from '@/components/global/animationLayout/AnimLayout'
 
@@ -24,11 +25,12 @@ const SelectMap = ({ isOpen, onClose, onConfirm, initialPosition }) => {
               انتخاب موقعیت روی نقشه
             </h2>
             <button
+              type="button"
               onClick={onClose}
-              className="text-gray-400 hover:text-gray-600 text-2xl leading-none w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 transition"
               aria-label="بستن"
+              className="group w-9 h-9 flex items-center justify-center rounded-full bg-gray-50 hover:bg-red-50 border border-gray-200 hover:border-red-200 text-gray-500 hover:text-red-500 active:scale-95 transition"
             >
-              ×
+              <FiX size={18} className="transition-transform group-hover:rotate-90" />
             </button>
           </div>
 

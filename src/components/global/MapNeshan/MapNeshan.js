@@ -5,7 +5,7 @@ import { MapContainer, TileLayer, Marker, useMap, useMapEvents } from 'react-lea
 import 'leaflet/dist/leaflet.css'
 import L from 'leaflet'
 import { FaSearch } from 'react-icons/fa'
-import { FiMapPin } from 'react-icons/fi'
+import { FiMapPin, FiSun, FiMoon } from 'react-icons/fi'
 
 // تنظیم آیکون پیش‌فرض Leaflet
 delete L.Icon.Default.prototype._getIconUrl
@@ -58,6 +58,7 @@ export default function MapNeshan({
   const [userInput, setUserInput] = useState(false)
   const [picked, setPicked] = useState(null)
   const [mapInstance, setMapInstance] = useState(null)
+  const [mapStyle, setMapStyle] = useState('dreamy') // 'dreamy' = روز ، 'standard_night' = شب
 
   const boxRef = useRef(null)
   const resultsRef = useRef(null)
@@ -228,15 +229,33 @@ export default function MapNeshan({
       )}
 
       {/* نقشه */}
-      <MapContainer
-        center={position}
-        zoom={14}
-        style={{ height: '320px', width: '100%', borderRadius: 12 }}
-      >
-        <TileLayer url="https://tile.openstreetmap.org/{z}/{x}/{y}.png" />
-        <LocationMarker position={position} onPick={handlePickFromMap} />
-        <MapController onMapReady={setMapInstance} />
-      </MapContainer>
+      <div className="relative">
+        <MapContainer
+          center={position}
+          zoom={14}
+          style={{ height: '320px', width: '100%', borderRadius: 12 }}
+        >
+          <TileLayer
+            key={mapStyle}
+            url={`https://api.neshan.org/v4/static?key=${NESHAN_KEY}&type=${mapStyle}&zoom={z}&x={x}&y={y}`}
+          />
+          <LocationMarker position={position} onPick={handlePickFromMap} />
+          <MapController onMapReady={setMapInstance} />
+        </MapContainer>
+
+        {/* دکمه تغییر حالت روز/شب */}
+        <button
+          type="button"
+          onClick={() =>
+            setMapStyle((s) => (s === 'dreamy' ? 'standard_night' : 'dreamy'))
+          }
+          title={mapStyle === 'dreamy' ? 'حالت شب' : 'حالت روز'}
+          aria-label={mapStyle === 'dreamy' ? 'حالت شب' : 'حالت روز'}
+          className="absolute top-3 right-3 z-500 w-9 h-9 flex items-center justify-center rounded-full bg-white/95 hover:bg-white shadow-md border border-gray-200 text-gray-700 hover:text-orange-500 transition"
+        >
+          {mapStyle === 'dreamy' ? <FiMoon size={16} /> : <FiSun size={16} />}
+        </button>
+      </div>
 
       {/* خلاصه آدرس انتخاب‌شده */}
       {picked && (
