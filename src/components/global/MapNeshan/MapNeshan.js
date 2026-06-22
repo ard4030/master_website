@@ -15,7 +15,8 @@ L.Icon.Default.mergeOptions({
   shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
 })
 
-const NESHAN_KEY = process.env.NEXT_PUBLIC_NESHAN_API_KEY
+const NESHAN_KEY = process.env.NEXT_PUBLIC_NESHAN_API_KEY;
+// const NESHAN_KEY = 'web.cf62a18161bf4936b1cd1788662b035a';
 const NESHAN_KEY_SEARCH = process.env.NEXT_PUBLIC_NESHAN_API_KEY_SEARCH
 
 function MapController({ onMapReady }) {
@@ -237,7 +238,8 @@ export default function MapNeshan({
         >
           <TileLayer
             key={mapStyle}
-            url={`https://api.neshan.org/v4/static?key=${NESHAN_KEY}&type=${mapStyle}&zoom={z}&x={x}&y={y}`}
+            // url={`https://api.neshan.org/v4/static?key=${NESHAN_KEY}&type=${mapStyle}&zoom={z}&x={x}&y={y}`}
+          url="https://tile.openstreetmap.org/{z}/{x}/{y}.png"
           />
           <LocationMarker position={position} onPick={handlePickFromMap} />
           <MapController onMapReady={setMapInstance} />
