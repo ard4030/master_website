@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useContext } from 'react'
+import React, { useState, useContext, useEffect } from 'react'
 import { AuthContext } from '@/context/AuthContext'
 import OrderContext from '@/context/OrderContext'
 import Login from '@/components/global/Login'
@@ -14,6 +14,7 @@ import { toast } from 'sonner'
 
 import { CartContext } from '@/context/CartContext'
 import { SuggestionsModal } from '@/components/global/suggestions/SuggestionsModal'
+import { MerchantContext } from '@/context/MerchantContext'
 
 const CartPage = () => {
   const { user } = useContext(AuthContext)
@@ -21,6 +22,7 @@ const CartPage = () => {
   const { cart,showSuggestions, setShowSuggestions } = useContext(CartContext);
   const [currentStep, setCurrentStep] = useState(1)
   const [isLoginOpen, setIsLoginOpen] = useState(false)
+  const {activeMerchant,loading,getMerchant} = useContext(MerchantContext)
 
   const steps = [
     { id: 1, label: 'سبد خرید' },
@@ -107,6 +109,12 @@ const CartPage = () => {
         return <StepOne onContinue={() => handleStepChange(2)} />
     }
   }
+
+  useEffect(() => {
+    if(!activeMerchant){
+      getMerchant()
+    }
+  },[activeMerchant])
 
   return (
     <div className="min-h-screen bg-gray-50 py-12 px-4 dana">

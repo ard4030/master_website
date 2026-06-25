@@ -12,13 +12,13 @@ const ResultContent = () => {
   const [order, setOrder] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
-  console.log("order ", order)
+
 
   useEffect(() => {
     const fetchOrder = async () => {
       try {
         setLoading(true)
-        const response = await apiRequest(`/orders/${orderId}`, 'GET')
+        const response = await apiRequest(`/orders1/${orderId}`, 'GET')
         
         if (!response.success) {
           throw new Error(response.error || 'خطا در دریافت اطلاعات سفارش')

@@ -143,7 +143,7 @@ export default function HomeWrapper({ homepageData }) {
         {componentsToRender && Array.isArray(componentsToRender) && componentsToRender.length > 0 ? (
           <div data-theme-font={themeFont}>
             {componentsToRender.map((component, index) => (
-              renderComponent(component, themeFont, themeColor)
+             component.type !=="header" && component.type !=="footer" && renderComponent(component, themeFont, themeColor)
             ))}
           </div>
         ) : (
