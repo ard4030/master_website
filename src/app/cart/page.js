@@ -41,7 +41,7 @@ const CartPage = () => {
   }
 
   const handleStepChange = (step) => {
-    console.log(step,currentStep);
+    // console.log(step,currentStep);
     if(step > currentStep && currentStep === 1){
       // console.log(38,);
       
@@ -72,9 +72,14 @@ const CartPage = () => {
     setCurrentStep(step)
   }
 
+  const countinueSteps = (lastStep,nextStep) => {
+  setCurrentStep(2)
+  }
+
   const handleSuggestionsNextStep = () => {
     setShowSuggestions(false)
-
+    console.log('wwwwee',currentStep);
+    
     if (!user) {
       setIsLoginOpen(true)
       return
@@ -133,7 +138,7 @@ const CartPage = () => {
       </div>
 
       {/* مدال لاگین */}
-      <Login isOpen={isLoginOpen} onClose={() => setIsLoginOpen(false)} loginMode="user" />
+      <Login isOpen={isLoginOpen} onClose={() => setIsLoginOpen(false)} loginMode="user" payload={() => countinueSteps(1,2)} />
     </div>
   )
 }

@@ -58,6 +58,8 @@ const AboutUs = ({
   item2Text, item2Desc, item2Icon, item2Color,
   item3Text, item3Desc, item3Icon, item3Color,
   item4Text, item4Desc, item4Icon, item4Color,
+        largeTextColor = '#1f2937',
+        smallTextColor = '#9ca3af',
     sectionAnimationType = 'fade',
     sectionAnimationDelay = '0.05',
     sectionAnimationDuration = '0.7',
@@ -101,6 +103,43 @@ const AboutUs = ({
         }
 
         const sectionMotion = getMotionConfig(sectionAnimationType, sectionAnimationDelay, sectionAnimationDuration)
+                const itemPadCls = 'px-5'
+                const iconBoxCls = 'w-16 h-16'
+
+                const itemMotion = (index) => getMotionConfig(
+                    cardAnimationType,
+                    parseTiming(cardAnimationDelay, 0.12) + index * 0.08,
+                    cardAnimationDuration
+                )
+
+                const iconMotion = (index) => getMotionConfig(
+                    cardAnimationType,
+                    parseTiming(cardAnimationDelay, 0.12) + index * 0.08 + 0.04,
+                    parseTiming(cardAnimationDuration, 0.65)
+                )
+
+                const textMotion = (index) => getMotionConfig(
+                    cardAnimationType,
+                    parseTiming(cardAnimationDelay, 0.12) + index * 0.08 + 0.08,
+                    parseTiming(cardAnimationDuration, 0.65)
+                )
+
+                const getIconColorClass = (color) => {
+                    if (!color) return 'bg-linear-to-br from-blue-500 to-blue-700'
+                    if (color.includes('from-') || color.includes('to-')) return `bg-linear-to-br ${color}`
+                    return ''
+                }
+
+                const getIconStyle = (color) => {
+                    if (!color) return null
+                    if (color.includes('from-') || color.includes('to-')) return null
+                    if (color.includes('gradient(')) return { backgroundImage: color }
+                    if (color.includes(',')) {
+                        const [first = '#3b82f6', second = '#1d4ed8'] = color.split(',').map((c) => c.trim())
+                        return { backgroundImage: `linear-gradient(135deg, ${first}, ${second})` }
+                    }
+                    return { background: color }
+                }
 
     const properties = [
         {
@@ -135,23 +174,17 @@ const AboutUs = ({
     <div className='block sm:flex bg-white border-t border-b font-medium dana border-gray-200 justify-between items-center max-w-7xl mx-auto px-4 md:px-6 py-6 md:py-8'>
         {
             properties.map((item,index) => {
-                const itemMotion = getMotionConfig(
-                  cardAnimationType,
-                  parseTiming(cardAnimationDelay, 0.12) + index * 0.08,
-                  cardAnimationDuration
-                )
-
                 return(
-                    <motion.div key={index} className='text-center px-5' {...itemMotion}>
+                    <motion.div key={index} className={`text-center ${itemPadCls}`} {...itemMotion(index)}>
                         <div className='w-full flex mb-4 justify-center items-center'>
-                            <div className={`bg-linear-to-br ${item.color} text-white rounded-2xl w-16 h-16 flex items-center justify-center shadow-md`}>
+                            <motion.div className={`${getIconColorClass(item.color)} text-white rounded-2xl ${iconBoxCls} flex items-center justify-center shadow-md`} style={getIconStyle(item.color)} {...iconMotion(index)}>
                                 {item?.icon}
-                            </div>
+                            </motion.div>
                         </div>
-                        <span className='mb-1.5 block font-medium text-gray-800'>{item?.text}</span>
-                        <p className='text-[12px] text-gray-400 leading-relaxed'>
+                        <motion.span className='mb-1.5 block font-semibold' style={{color: largeTextColor}} {...textMotion(index)}>{item?.text}</motion.span>
+                        <motion.p className='text-[12px] leading-relaxed' style={{color: smallTextColor}} {...textMotion(index)}>
                             {item?.desc}
-                        </p>
+                        </motion.p>
                     </motion.div>
                 )
             })}

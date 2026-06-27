@@ -31,6 +31,7 @@ import SimpleHeader from '@/components/websitecomp/SimpleHeader';
 import SimpleSwiper from '@/components/websitecomp/SimpleSwiper';
 import Slider3 from '@/components/websitecomp/Slider3';
 import ViewCategory from '@/components/websitecomp/ViewCategory';
+import SimpleBlogs from '@/components/websitecomp/SimpleBlogs';
 
 
 function renderComponent(component, themeFont, themeColor) {
@@ -111,6 +112,8 @@ function renderComponent(component, themeFont, themeColor) {
       return <Slider3 key={instanceId} {...mergedProps} {...extraProps} />
            case 'viewCategory':
       return <ViewCategory key={instanceId} {...mergedProps} {...extraProps} />
+           case 'blogs':
+      return <SimpleBlogs key={instanceId} {...mergedProps} {...extraProps} />
     default:
       return null
   }
@@ -134,7 +137,7 @@ export default function HomeWrapper({ homepageData }) {
   // استفاده از تم جدید (اگر موجود باشد) یا تم قدیمی
   const componentsToRender = newTheme?.components || activeTheme?.components || []
   
-  // console.log(',,,,,,',componentsToRender,homepageData.data);
+  console.log(',,,,,,',componentsToRender,homepageData.data);
   
   return (
     

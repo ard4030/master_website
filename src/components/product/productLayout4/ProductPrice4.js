@@ -269,7 +269,7 @@ const ProductPrice4 = ({ product, matchVariant, isVariants, onAddSuccess }) => {
                 transition={{ type: 'spring', stiffness: 320, damping: 24 }}
                 onClick={handleAdd}
                 disabled={isCountLoading}
-                className="w-full h-12 mt-4 bg-[#0084ff] text-white rounded-lg danaMed hover:bg-blue-700 transition-colors shadow-sm hover:shadow-md disabled:opacity-80 disabled:cursor-not-allowed flex items-center justify-center"
+                className="w-full h-12 mt-4 bg-orange-500 text-white rounded-lg danaMed hover:bg-orange-700 transition-colors shadow-sm hover:shadow-md disabled:opacity-80 disabled:cursor-not-allowed flex items-center justify-center"
               >
                 {loadingAction === 'add' ? (
                   <CircularProgress size={22} thickness={4.5} sx={{ color: '#ffffff' }} />

@@ -119,7 +119,7 @@ const HeroBannerSwiper = ({
         >
           {slides.map((slide, index) => (
             <SwiperSlide key={index}>
-              <div className="relative w-full h-96 sm:h-70 md:h-60 lg:h-100 overflow-hidden">
+              <div className="relative w-full h-95 sm:h-100 md:h-85 lg:h-110 overflow-hidden">
                 {renderOverlayLink(slide.link, String(slide.title || 'بنر'))}
 
                 {slide.imageUrl ? (

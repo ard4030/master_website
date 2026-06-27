@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useContext, useEffect, useState } from 'react'
-import { FiCheckCircle, FiCreditCard, FiMapPin, FiTruck } from 'react-icons/fi'
+import { FiCheck, FiCreditCard, FiMapPin, FiTruck } from 'react-icons/fi'
 import OrderContext from '@/context/OrderContext'
 import { CartContext } from '@/context/CartContext'
 import { apiRequest, getOrCreateDeviceId } from '@/utils/functions'
@@ -244,48 +244,18 @@ const StepThree = () => {
           </div>
 
           {hasGateways ? (
-            <div className="space-y-2">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
               {order.paymentGateways.map((gateway) => {
                 const gatewayId = gateway._id || gateway.id
                 const isSelected = selectedGatewayId === gatewayId
 
                 return (
-                  <label
+                  <PaymentGatewayCard
                     key={gatewayId}
-                    className={`flex items-center gap-3 p-4 rounded-lg cursor-pointer border transition-colors ${
-                      isSelected
-                        ? 'border-orange-400 bg-orange-50/70'
-                        : 'border-gray-200 hover:bg-gray-50'
-                    }`}
-                  >
-                    <input
-                      type="radio"
-                      name="paymentGateway"
-                      checked={isSelected}
-                      onChange={() => handleSelectPaymentGateway(gateway)}
-                      className="accent-orange-500"
-                    />
-
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center justify-between gap-3">
-                        <h4 className="danaBold text-gray-800 text-sm">
-                          {getGatewayTitle(gateway?.name)}
-                        </h4>
-                        {isSelected && <FiCheckCircle className="text-orange-500 shrink-0" size={16} />}
-                      </div>
-                      {gateway.description && (
-                        <p className="text-xs text-gray-500 mt-1 leading-5">{gateway.description}</p>
-                      )}
-                    </div>
-
-                    {gateway.icon && (
-                      <img
-                        src={gateway.icon}
-                        alt={gateway.name}
-                        className="w-10 h-10 object-cover rounded-md border border-gray-200"
-                      />
-                    )}
-                  </label>
+                    gateway={gateway}
+                    selected={isSelected}
+                    onSelect={() => handleSelectPaymentGateway(gateway)}
+                  />
                 )
               })}
             </div>
@@ -440,6 +410,54 @@ const PriceRow = ({ label, value, valueClass = 'text-gray-800', prefix = '' }) =
     </span>
   </div>
 )
+
+const PaymentGatewayCard = ({ gateway, selected, onSelect }) => {
+  const title = getGatewayTitle(gateway?.name)
+
+  return (
+    <button
+      type="button"
+      onClick={onSelect}
+      className={`group relative flex flex-col items-center text-center rounded-2xl border bg-white px-4 pt-6 pb-5 min-h-45 transition-all overflow-hidden focus:outline-none ${
+        selected
+          ? 'border-orange-400 ring-2 ring-orange-200/60 shadow-md bg-orange-50/60'
+          : 'border-gray-200 hover:border-gray-300 hover:shadow-md hover:-translate-y-0.5'
+      } cursor-pointer active:scale-[0.99]`}
+    >
+      <span
+        className={`absolute top-3 left-3 w-7 h-7 rounded-full flex items-center justify-center transition-all ${
+          selected
+            ? 'bg-orange-500 text-white scale-100 shadow-sm'
+            : 'bg-gray-100 text-transparent scale-90 group-hover:scale-100 group-hover:bg-gray-200'
+        }`}
+      >
+        <FiCheck size={15} />
+      </span>
+
+      <div
+        className={`shrink-0 w-20 h-20 rounded-2xl border flex items-center justify-center overflow-hidden mb-3 transition-colors ${
+          selected ? 'border-transparent bg-white shadow-sm' : 'border-gray-100 bg-gray-50/60'
+        }`}
+      >
+        {gateway?.icon ? (
+          <img
+            src={gateway.icon}
+            alt={gateway?.name || title}
+            className="w-full h-full object-contain p-2"
+          />
+        ) : (
+          <FiCreditCard size={30} className="text-orange-500" />
+        )}
+      </div>
+
+      <h4 className="danaBold text-sm sm:text-base text-gray-800 mb-1.5">{title}</h4>
+
+      <p className="text-[11px] sm:text-xs text-gray-500 leading-5 max-w-50">
+        {gateway?.description || 'پرداخت امن از طریق درگاه انتخابی'}
+      </p>
+    </button>
+  )
+}
 
 const getGatewayTitle = (gatewayName) => {
   switch (gatewayName) {

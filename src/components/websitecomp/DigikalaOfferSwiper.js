@@ -44,7 +44,7 @@ const ANIMATION_PRESETS = {
 // ─── Utility functions (module-level to prevent re-creation on every render) ──
 
 const getImageUrl = (imagePath) => {
-  console.log("++++++ ",imagePath)
+  // console.log("++++++ ",imagePath)
   if (!imagePath) return '/assets/images/test.png'
   if (String(imagePath).startsWith('http')) return imagePath
   return `${process.env.NEXT_PUBLIC_LIARA_IMAGE_URL}${imagePath}`
@@ -152,7 +152,7 @@ const ProductCard = ({ product }) => {
   const price = product?.price
   const oldPrice = product?.oldPrice
   const discountPercent = product?.discountPercent
-  console.log("&&&&& ",product)
+  // console.log("&&&&& ",product)
 
   return renderLink(
     href,

@@ -147,7 +147,7 @@ const Header1 = ({
         >
           <div className='flex items-center w-[70%]'> 
             {/* Logo Container */}
-            <div className="relative" style={{ width: `${safeParseInt(logoWidth, 50)}px`, height: `${safeParseInt(logoHeight, 50)}px` }}>
+            <Link href="/" className="relative block" style={{ width: `${safeParseInt(logoWidth, 50)}px`, height: `${safeParseInt(logoHeight, 50)}px` }}>
               <Image 
                 src={process.env.NEXT_PUBLIC_LIARA_IMAGE_URL + merchantLogo} 
                 alt="Store Logo" 
@@ -155,7 +155,7 @@ const Header1 = ({
                 height={safeParseInt(logoHeight, 50)}
                 className="absolute inset-0 object-cover"
               />
-            </div>
+            </Link>
 
             {/* Search Bar */}
             <div 
@@ -211,7 +211,7 @@ const Header1 = ({
           {...mobileHeaderMotion}
         >
           {/* Logo Container */}
-          <div className="relative" style={{ width: `${safeParseInt(logoWidthMobile, 40)}px`, height: `${safeParseInt(logoHeightMobile, 40)}px` }}>
+          <Link href="/" className="relative block" style={{ width: `${safeParseInt(logoWidthMobile, 40)}px`, height: `${safeParseInt(logoHeightMobile, 40)}px` }}>
             <Image 
               src={process.env.NEXT_PUBLIC_LIARA_IMAGE_URL + user?.storeImage} 
               alt="Store Logo" 
@@ -219,7 +219,7 @@ const Header1 = ({
               height={safeParseInt(logoHeightMobile, 40)}
               className="absolute inset-0 object-cover"
             />
-          </div>
+          </Link>
 
           {/* Mobile Right Actions */}
           <div className="flex items-center justify-end gap-3">

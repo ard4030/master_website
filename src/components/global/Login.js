@@ -8,7 +8,7 @@ import { MerchantContext } from '@/context/MerchantContext'
 
 const IMAGE_BASE = process.env.NEXT_PUBLIC_LIARA_IMAGE_URL || ''
 
-const Login = ({ isOpen, onClose, loginMode = 'user' }) => {
+const Login = ({ isOpen, onClose, loginMode = 'user',payload=() => null }) => {
   const { setUser } = useContext(AuthContext)
   const { activeMerchant } = useContext(MerchantContext) || {}
   const [loginType, setLoginType] = useState('phone')
@@ -71,7 +71,8 @@ const Login = ({ isOpen, onClose, loginMode = 'user' }) => {
     if (response.success) {
       // ذخیره اطلاعات کاربر در AuthContext
       if (response.data?.user) {
-        setUser(response.data.user)
+        setUser(response.data.user);
+        payload()
       }
       // بستن مودال
       onClose()

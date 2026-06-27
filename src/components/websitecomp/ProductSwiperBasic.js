@@ -56,6 +56,8 @@ const ProductsSwiperBasic = ({
   largeTextColor = "#111827",
   smallTextColor = "#6b7280",
   priceColor = "#0d9488",
+  cartButtonBgColor = "#10b981",
+  cartButtonTextColor = "#ffffff",
   autoplayDelay = "5",
   enableAutoplay = "false",
   data = null,
@@ -213,7 +215,7 @@ const ProductsSwiperBasic = ({
 
   if (pathName !== "/newsitebuilder") products = data || sampleProducts;
 
-  const maxSlidesPerView = 4;
+  const maxSlidesPerView = 5;
   const sectionMotion = getMotionConfig(
     sectionAnimationType,
     sectionAnimationDelay,
@@ -336,68 +338,72 @@ const ProductsSwiperBasic = ({
                     className="block group"
                   >
                     <div className="border border-gray-200 rounded-xl p-4 transition-all duration-300 hover:shadow-lg hover:border-gray-300 bg-white relative overflow-hidden">
-                  {/* Product Image */}
-                  <div className="w-full aspect-square rounded-lg overflow-hidden mb-4 flex items-center justify-center bg-gray-50">
-                    {(product.image || product.mainImage) && (
-                      <img
-                        src={getImageUrl(product.mainImage || product.image)}
-                        alt={product.name || product.title}
-                        className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-300"
-                        draggable={false}
-                      />
-                    )}
-                  </div>
+                      {/* Product Image */}
+                      <div className="w-full aspect-square rounded-lg overflow-hidden mb-4 flex items-center justify-center bg-gray-50">
+                        {(product.image || product.mainImage) && (
+                          <img
+                            src={getImageUrl(product.mainImage || product.image)}
+                            alt={product.name || product.title}
+                            className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-300"
+                            draggable={false}
+                          />
+                        )}
+                      </div>
 
-                  {/* Add to Cart Button - shows on hover */}
-                  <div className="absolute bottom-10 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10">
-                    <button
-                      onClick={(e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                      }}
-                      className="bg-emerald-500 hover:bg-emerald-600 text-white text-sm font-medium px-4 py-2 rounded-full flex items-center gap-2 whitespace-nowrap shadow-lg"
-                    >
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="w-4 h-4"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
+                      {/* Product Info */}
+                      <h3
+                        className="text-sm font-medium text-center leading-6 mb-3 line-clamp-2 min-h-12"
+                        style={{ color: largeTextColor }}
                       >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 100 4 2 2 0 000-4z"
-                        />
-                      </svg>
-                      <span>افزودن به سبد خرید</span>
-                    </button>
-                  </div>
+                        {product.name || product.title}
+                      </h3>
 
-                  {/* Product Info */}
-                  <h3
-                    className="text-sm font-medium text-center leading-6 mb-3 line-clamp-2 min-h-12"
-                    style={{ color: largeTextColor }}
-                  >
-                    {product.name || product.title}
-                  </h3>
+                      {/* Price */}
+                      <div className="text-center">
+                        <span
+                          className="text-base font-bold"
+                          style={{ color: priceColor }}
+                        >
+                          {product.price ? formatPrice(product.price) : "۰"}
+                        </span>
+                        <span
+                          className="text-xs mr-1"
+                          style={{ color: priceColor }}
+                        >
+                          تومان
+                        </span>
+                      </div>
 
-                  {/* Price */}
-                  <div className="text-center">
-                    <span
-                      className="text-base font-bold"
-                      style={{ color: priceColor }}
-                    >
-                      {product.price ? formatPrice(product.price) : "۰"}
-                    </span>
-                    <span
-                      className="text-xs mr-1"
-                      style={{ color: priceColor }}
-                    >
-                      تومان
-                    </span>
-                  </div>
+                      {/* Add to Cart Button */}
+                      <div className="mt-4 flex justify-center">
+                        <button
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                          }}
+                          className="text-sm font-medium px-4 py-2 rounded-full flex items-center gap-2 whitespace-nowrap shadow-lg transition-opacity hover:opacity-90"
+                          style={{
+                            backgroundColor: cartButtonBgColor,
+                            color: cartButtonTextColor,
+                          }}
+                        >
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            className="w-4 h-4"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 100 4 2 2 0 000-4z"
+                            />
+                          </svg>
+                          <span>افزودن به سبد خرید</span>
+                        </button>
+                      </div>
                     </div>
                   </Link>
                 </motion.div>

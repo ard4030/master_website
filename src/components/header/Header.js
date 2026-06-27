@@ -44,7 +44,7 @@ const Header = () => {
   const findHeader = () => {
     if(activeMerchant){
       let header = activeMerchant.activeTheme.components.find(item => item.type == "header") || {};
-      console.log("header ",activeMerchant)
+      console.log("header ",activeMerchant,user)
       const { id, componentId, styles, instanceId, props } = header;
 
       switch (header.id) {

@@ -34,7 +34,7 @@ const ContinueShopping = ({
       </button>
       <Link
         href="/cart"
-        className="h-11 rounded-xl bg-[#0084ff] text-white danaMed text-sm hover:bg-blue-700 transition flex items-center justify-center"
+        className="h-11 rounded-xl bg-orange-500 text-white danaMed text-sm hover:bg-orange-700 transition flex items-center justify-center"
       >
         تسویه حساب
       </Link>
