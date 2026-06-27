@@ -35,7 +35,7 @@ export const MerchantProvider = ({ children }) => {
     <MerchantContext.Provider
       value={{
         activeMerchant,setActiveMerchant,
-        loading,setLoading
+        loading,setLoading,getMerchant
         // homepageData,
         // activeTheme,
         // components: activeTheme?.components || []

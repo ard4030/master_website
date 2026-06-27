@@ -1,9 +1,17 @@
 'use client'
 
-import React, { Suspense } from 'react'
+import React, { Suspense, useContext, useEffect } from 'react'
 import ResultContent from './ResultContent'
+import { MerchantContext } from '@/context/MerchantContext'
 
 function ResultPage() {
+  const {activeMerchant,getMerchant,loading} = useContext(MerchantContext)
+
+  useEffect(() => {
+    if(!activeMerchant){
+      getMerchant()
+    }
+  },[activeMerchant])
   return (
     <Suspense fallback={
       <div className="min-h-screen bg-gradient-to-bl from-slate-100 to-blue-200 p-5 flex items-center justify-center dana">
@@ -13,7 +21,10 @@ function ResultPage() {
         </div>
       </div>
     }>
+      {
+        loading ? "...." :
       <ResultContent />
+      }
     </Suspense>
   )
 }

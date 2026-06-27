@@ -4,6 +4,7 @@ import ProductLayout2 from '@/components/product/productLayout2/ProductLayout2';
 import ProductLayout3 from '@/components/product/productLayout3/ProductLayout3';
 import ProductLayout4 from '@/components/product/productLayout4/ProductLayout4';
 import { cookies, headers } from "next/headers";
+import UpdateActiveMerchant from '@/app/UpdateActiveMerchant';
 
 
 const page = async ({params}) => {
@@ -32,24 +33,27 @@ const page = async ({params}) => {
     let render;
     switch (productData.data.activeTheme.activeMenu) {
       case 'productlayout':
-        render = <ProductLayout idPage={id} product={productData.data.product} />
+        render = <ProductLayout idPage={id} product={productData.product} />
         break;
       case 'productlayout2':
-        render = <ProductLayout2 idPage={id} product={productData.data.product} />
+        render = <ProductLayout2 idPage={id} product={productData.product} />
         break;
       case 'productlayout3':  
-        render = <ProductLayout3 idPage={id} product={productData.data.product} />
+        render = <ProductLayout3 idPage={id} product={productData.product} />
         break
 
       case 'productlayout4':  
-        render = <ProductLayout4 idPage={id} product={productData.data.product} />
+        render = <ProductLayout4 idPage={id} product={productData.product} />
         break
       default:
-        render = <ProductLayout idPage={id} product={productData.data.product} />
+        render = <ProductLayout idPage={id} product={productData.product} />
     }
     
   return (
-    <div>{render}</div>
+    <div>
+      <UpdateActiveMerchant data={productData.data} />
+      {render}
+    </div>
     // <ProductLayout3 idPage={id} product={productData.data.product} />
   )
 }

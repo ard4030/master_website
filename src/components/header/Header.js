@@ -11,6 +11,7 @@ import { apiRequest } from '@/utils/functions'
 import { MerchantContext } from '@/context/MerchantContext'
 import Image from 'next/image'
 import Header1 from '../websitecomp/Header1'
+import SimpleHeader from '../websitecomp/SimpleHeader'
 
 const Header = () => {
   const [isLoginOpen, setIsLoginOpen] = useState(false)
@@ -20,7 +21,7 @@ const Header = () => {
   const pathName = usePathname()
   const { activeMerchant,loading } = useContext(MerchantContext)
 
-  // console.log("hommm ",activeMerchant)
+  console.log("hommm ",activeMerchant)
 
   // محاسبه تعداد کل آیتم ها در سبد
   const cartItemsCount = cart?.items?.reduce((total, item) => total + (item.quantity || 1), 0) || 0
@@ -41,6 +42,8 @@ const Header = () => {
     setIsLoginOpen(true)
   }
 
+
+
   const findHeader = () => {
     if(activeMerchant){
       let header = activeMerchant.activeTheme.components.find(item => item.type == "header") || {};
@@ -50,6 +53,13 @@ const Header = () => {
       switch (header.id) {
         case "header1":
           return <Header1 
+          activeMerchant={activeMerchant}
+          key={instanceId} {...props}
+          handleLogout={handleLogout} 
+          handleUserLogin={handleUserLogin} 
+          cartItemsCount={cartItemsCount} />
+        case "simpleHeader":
+          return <SimpleHeader 
           activeMerchant={activeMerchant}
           key={instanceId} {...props}
           handleLogout={handleLogout} 
