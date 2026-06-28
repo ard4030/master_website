@@ -223,12 +223,11 @@ const widthClassMapMobile = {
   '100': 'col-span-2'
 }
 
-// نگاشت ارتفاع به کلاس‌های ریسپانسیو ثابت (Tailwind نیاز به کلاس‌های کامل دارد).
-const responsiveHeightMap = {
-  'h-40': 'h-32 sm:h-36 md:h-40',
-  'h-56': 'h-40 sm:h-48 md:h-56',
-  'h-72': 'h-48 sm:h-60 md:h-72',
-  'h-96': 'h-56 sm:h-72 md:h-96'
+const cardHeightResponsiveMap = {
+  'h-40': 'h-auto md:h-40',
+  'h-56': 'h-auto md:h-56',
+  'h-72': 'h-auto md:h-72',
+  'h-96': 'h-auto md:h-96'
 }
 
 const getImageUrl = (imagePath) => {
@@ -295,10 +294,8 @@ const ViewCategory = ({
 
   const widthMap = isMobilePreview ? widthClassMapMobile : widthClassMapDesktop
 
-  // ارتفاع ریسپانسیو: روی موبایل کمی کوتاه‌تر برای جلوگیری از کارت‌های خیلی بلند.
-  const responsiveHeight = isMobilePreview
-    ? cardHeight
-    : (responsiveHeightMap[cardHeight] || cardHeight)
+  // در موبایل ارتفاع از خود تصویر می‌آید تا فضای اضافه نداشته باشیم.
+  const responsiveCardHeight = cardHeightResponsiveMap[cardHeight] || 'h-auto md:h-56'
 
   return (
     <section
@@ -331,17 +328,17 @@ const ViewCategory = ({
               >
                 <Link
                   href={href}
-                  className={`relative block ${responsiveHeight} w-full rounded-xl sm:rounded-2xl overflow-hidden group bg-gray-200`}
+                  className={`relative block ${responsiveCardHeight} w-full rounded-xl sm:rounded-2xl overflow-hidden group bg-gray-200`}
                 >
                   {imgUrl ? (
                     <img
                       src={imgUrl}
                       alt={label || 'category'}
-                      className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                      className="relative md:absolute md:inset-0 w-full h-auto md:h-full object-contain object-center transition-transform duration-500 group-hover:scale-105"
                       draggable={false}
                     />
                   ) : (
-                    <div className="absolute inset-0 bg-linear-to-br from-gray-300 to-gray-400" />
+                    <div className="relative md:absolute md:inset-0 w-full aspect-4/3 md:aspect-auto md:h-full bg-linear-to-br from-gray-300 to-gray-400" />
                   )}
 
                   {/* لایه تیرگی روی تصویر - فقط وقتی showOverlay فعال باشد */}

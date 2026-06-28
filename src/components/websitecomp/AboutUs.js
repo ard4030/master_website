@@ -66,6 +66,7 @@ const AboutUs = ({
     cardAnimationType = 'slideUp',
     cardAnimationDelay = '0.12',
     cardAnimationDuration = '0.65',
+    bgColor = '#ffffff',
 }) => {
 
         const sectionRef = React.useRef(null)
@@ -105,6 +106,7 @@ const AboutUs = ({
         const sectionMotion = getMotionConfig(sectionAnimationType, sectionAnimationDelay, sectionAnimationDuration)
                 const itemPadCls = 'px-5'
                 const iconBoxCls = 'w-16 h-16'
+            const itemHeightCls = 'min-h-[178px]'
 
                 const itemMotion = (index) => getMotionConfig(
                     cardAnimationType,
@@ -124,15 +126,31 @@ const AboutUs = ({
                     parseTiming(cardAnimationDuration, 0.65)
                 )
 
-                const getIconColorClass = (color) => {
-                    if (!color) return 'bg-linear-to-br from-blue-500 to-blue-700'
-                    if (color.includes('from-') || color.includes('to-')) return `bg-linear-to-br ${color}`
-                    return ''
+                const getIconColorClass = () => ''
+
+                const resolveTailwindColor = (token) => {
+                    if (!token) return null
+                    return `var(--color-${token})`
                 }
 
                 const getIconStyle = (color) => {
-                    if (!color) return null
-                    if (color.includes('from-') || color.includes('to-')) return null
+                    if (!color) {
+                        return { backgroundImage: 'linear-gradient(135deg, #3b82f6, #1d4ed8)' }
+                    }
+                    if (color.includes('from-') || color.includes('to-')) {
+                        const fromMatch = color.match(/from-([a-z0-9-]+)/)
+                        const toMatch = color.match(/to-([a-z0-9-]+)/)
+                        const fromKey = fromMatch?.[1]
+                        const toKey = toMatch?.[1]
+                        const fromColor = resolveTailwindColor(fromKey)
+                        const toColor = resolveTailwindColor(toKey)
+
+                        if (fromColor && toColor) {
+                            return { backgroundImage: `linear-gradient(135deg, ${fromColor}, ${toColor})` }
+                        }
+
+                        return { backgroundImage: 'linear-gradient(135deg, #3b82f6, #1d4ed8)' }
+                    }
                     if (color.includes('gradient(')) return { backgroundImage: color }
                     if (color.includes(',')) {
                         const [first = '#3b82f6', second = '#1d4ed8'] = color.split(',').map((c) => c.trim())
@@ -168,16 +186,15 @@ const AboutUs = ({
         },
     ]
 
-  return (
-    
-    <motion.section ref={sectionRef} className='w-full bg-white ' {...sectionMotion}>
-    <div className='block sm:flex bg-white border-t border-b font-medium dana border-gray-200 justify-between items-center max-w-7xl mx-auto px-4 md:px-6 py-6 md:py-8'>
+    return (
+        <motion.section ref={sectionRef} className='w-full' style={{ backgroundColor: bgColor }} {...sectionMotion}>
+        <div className='grid grid-cols-2 lg:grid-cols-4 gap-y-6 border-t border-b font-medium dana border-gray-200 items-stretch max-w-7xl mx-auto px-4 md:px-6 py-6 md:py-8' style={{ backgroundColor: bgColor }}>
         {
             properties.map((item,index) => {
                 return(
-                    <motion.div key={index} className={`text-center ${itemPadCls}`} {...itemMotion(index)}>
+                    <motion.div key={index} className={`text-center ${itemPadCls} ${itemHeightCls} flex flex-col`} {...itemMotion(index)}>
                         <div className='w-full flex mb-4 justify-center items-center'>
-                            <motion.div className={`${getIconColorClass(item.color)} text-white rounded-2xl ${iconBoxCls} flex items-center justify-center shadow-md`} style={getIconStyle(item.color)} {...iconMotion(index)}>
+                            <motion.div className={`${getIconColorClass(item.color)} text-white rounded-2xl ${iconBoxCls} flex items-center justify-center shrink-0 overflow-visible shadow-md [&>svg]:w-[56%] [&>svg]:h-[56%] [&>svg]:max-w-full [&>svg]:max-h-full`} style={getIconStyle(item.color)} {...iconMotion(index)}>
                                 {item?.icon}
                             </motion.div>
                         </div>
