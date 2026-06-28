@@ -334,7 +334,7 @@ const ViewCategory = ({
                     <img
                       src={imgUrl}
                       alt={label || 'category'}
-                      className="relative md:absolute md:inset-0 w-full h-auto md:h-full object-contain object-center transition-transform duration-500 group-hover:scale-105"
+                      className="relative md:absolute md:inset-0 w-full h-auto md:h-full object-cover object-center transition-transform duration-500 group-hover:scale-105"
                       draggable={false}
                     />
                   ) : (
