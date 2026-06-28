@@ -106,6 +106,7 @@ const HeroBannerSwiper = ({
         <Swiper
           modules={[Autoplay, Pagination, Navigation]}
           slidesPerView={1}
+          autoHeight={true}
           loop={slides.length > 1}
           onSwiper={(swiper) => { swiperRef.current = swiper }}
           autoplay={
@@ -119,18 +120,19 @@ const HeroBannerSwiper = ({
         >
           {slides.map((slide, index) => (
             <SwiperSlide key={index}>
-              <div className="relative w-full h-95 sm:h-100 md:h-85 lg:h-[420px] overflow-hidden">
+              <div className="relative w-full overflow-hidden lg:min-h-[400px] min-h-96">
                 {renderOverlayLink(slide.link, String(slide.title || 'بنر'))}
 
                 {slide.imageUrl ? (
                   <img
                     src={getImageUrl(slide.imageUrl)}
                     alt={String(slide.title || 'بنر')}
-                    className="absolute inset-0 w-full h-full object-cover"
+                    className="block w-full h-auto"
                     draggable={false}
+                    onLoad={() => swiperRef.current?.update?.()}
                   />
                 ) : (
-                  <div className="absolute inset-0 bg-gray-200" />
+                  <div className="w-full aspect-16/6 bg-gray-200" />
                 )}
 
                 <div className={`absolute inset-0 ${textPosition === 'right' ? 'bg-linear-to-l' : 'bg-linear-to-r'} from-black/50 via-black/10 to-transparent`} />
