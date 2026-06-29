@@ -68,7 +68,6 @@ const AboutUs = ({
     cardAnimationDuration = '0.65',
     bgColor = '#ffffff',
 }) => {
-
         const sectionRef = React.useRef(null)
         const animationControls = useAnimationControls()
         const isInView = useInView(sectionRef, {
@@ -104,9 +103,9 @@ const AboutUs = ({
         }
 
         const sectionMotion = getMotionConfig(sectionAnimationType, sectionAnimationDelay, sectionAnimationDuration)
-                const itemPadCls = 'px-5'
-                const iconBoxCls = 'w-16 h-16'
-            const itemHeightCls = 'min-h-[178px]'
+                const itemPadCls = 'px-2 sm:px-4 md:px-5'
+                const iconBoxCls = 'w-11 h-11 sm:w-14 sm:h-14 md:w-16 md:h-16'
+                const itemHeightCls = 'min-h-[140px] sm:min-h-[160px] md:min-h-[178px]'
 
                 const itemMotion = (index) => getMotionConfig(
                     cardAnimationType,
@@ -193,13 +192,13 @@ const AboutUs = ({
             properties.map((item,index) => {
                 return(
                     <motion.div key={index} className={`text-center ${itemPadCls} ${itemHeightCls} flex flex-col`} {...itemMotion(index)}>
-                        <div className='w-full flex mb-4 justify-center items-center'>
-                            <motion.div className={`${getIconColorClass(item.color)} text-white rounded-2xl ${iconBoxCls} flex items-center justify-center shrink-0 overflow-visible shadow-md [&>svg]:w-[56%] [&>svg]:h-[56%] [&>svg]:max-w-full [&>svg]:max-h-full`} style={getIconStyle(item.color)} {...iconMotion(index)}>
+                        <div className='w-full flex mb-2 sm:mb-3 md:mb-4 justify-center items-center'>
+                            <motion.div className={`${getIconColorClass(item.color)} text-white rounded-xl sm:rounded-2xl ${iconBoxCls} flex items-center justify-center shrink-0 overflow-visible shadow-md [&>svg]:w-[56%] [&>svg]:h-[56%] [&>svg]:max-w-full [&>svg]:max-h-full`} style={getIconStyle(item.color)} {...iconMotion(index)}>
                                 {item?.icon}
                             </motion.div>
                         </div>
-                        <motion.span className='mb-1.5 block font-semibold' style={{color: largeTextColor}} {...textMotion(index)}>{item?.text}</motion.span>
-                        <motion.p className='text-[12px] leading-relaxed' style={{color: smallTextColor}} {...textMotion(index)}>
+                        <motion.span className='mb-1 sm:mb-1.5 block font-semibold text-xs sm:text-sm md:text-base' style={{color: largeTextColor}} {...textMotion(index)}>{item?.text}</motion.span>
+                        <motion.p className='text-[10px] sm:text-[11px] md:text-[12px] leading-relaxed' style={{color: smallTextColor}} {...textMotion(index)}>
                             {item?.desc}
                         </motion.p>
                     </motion.div>

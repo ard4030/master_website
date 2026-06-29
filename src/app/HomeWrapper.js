@@ -32,6 +32,7 @@ import SimpleSwiper from '@/components/websitecomp/SimpleSwiper';
 import Slider3 from '@/components/websitecomp/Slider3';
 import ViewCategory from '@/components/websitecomp/ViewCategory';
 import SimpleBlogs from '@/components/websitecomp/SimpleBlogs';
+import ViewCatGlass from '@/components/websitecomp/ViewCatGlass';
 
 
 function renderComponent(component, themeFont, themeColor) {
@@ -114,6 +115,8 @@ function renderComponent(component, themeFont, themeColor) {
       return <ViewCategory key={instanceId} {...mergedProps} {...extraProps} />
            case 'blogs':
       return <SimpleBlogs key={instanceId} {...mergedProps} {...extraProps} />
+           case 'viewCatGlass':
+      return <ViewCatGlass key={instanceId} {...mergedProps} {...extraProps} />
     default:
       return null
   }

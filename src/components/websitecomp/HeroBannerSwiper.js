@@ -119,20 +119,20 @@ const HeroBannerSwiper = ({
           className="hero-banner-swiper"
         >
           {slides.map((slide, index) => (
-            <SwiperSlide key={index}>
-              <div className="relative w-full overflow-hidden lg:min-h-[400px] min-h-96">
+            <SwiperSlide key={index} className="h-auto!">
+              <div className="relative w-full overflow-hidden leading-0 h-[70vw] sm:h-auto">
                 {renderOverlayLink(slide.link, String(slide.title || 'بنر'))}
 
                 {slide.imageUrl ? (
                   <img
                     src={getImageUrl(slide.imageUrl)}
                     alt={String(slide.title || 'بنر')}
-                    className="block w-full h-auto"
+                    className="block w-full h-full object-cover object-center align-top sm:h-auto sm:object-contain"
                     draggable={false}
                     onLoad={() => swiperRef.current?.update?.()}
                   />
                 ) : (
-                  <div className="w-full aspect-16/6 bg-gray-200" />
+                  <div className="w-full h-full sm:aspect-16/6 bg-gray-200" />
                 )}
 
                 <div className={`absolute inset-0 ${textPosition === 'right' ? 'bg-linear-to-l' : 'bg-linear-to-r'} from-black/50 via-black/10 to-transparent`} />
