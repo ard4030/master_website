@@ -144,4 +144,15 @@ export function formatPrice(price, toPersian = false) {
   return formatted;
 }
 
+
+export const getImageUrl = (imagePath) => {
+  if (!imagePath) return null;
+  // اگر مسیر تصویر با http یا https شروع شود، همان را برگردان
+  if (imagePath.startsWith('http://') || imagePath.startsWith('https://')) {
+    return imagePath;
+  }else{
+    return `${process.env.NEXT_PUBLIC_LIARA_IMAGE_URL}${imagePath}`;
+  }
+}
+
 export default apiRequest
