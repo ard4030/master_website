@@ -11,6 +11,7 @@ import { TbLogin2 } from 'react-icons/tb'
 import { AuthContext } from '@/context/AuthContext'
 import { CartContext } from '@/context/CartContext'
 import Login from '@/components/global/Login'
+import { getImageUrl } from '@/utils/functions'
 // import { getImageUrl } from '@/utils/functions'
 
 const ANIMATION_PRESETS = {
@@ -211,6 +212,7 @@ const SimpleHeader = ({
   navLinksAnimationDelay = '0.4',
   navLinksAnimationDuration = '0.45',
   navLinksAnimationStagger = '0.07',
+  activeMerchant
 }) => {
   const [searchValue, setSearchValue] = useState('')
   const [isMenuOpen, setIsMenuOpen] = useState(false)
@@ -240,6 +242,8 @@ const SimpleHeader = ({
     amount: 0.1,
     margin: '0px 0px -5% 0px'
   })
+  logoImage = getImageUrl(activeMerchant?.merchant?.storeImage) || logoImage
+  // console.log("************** logoImage ",logoImage)
 
   useEffect(() => {
     if (isInView) {

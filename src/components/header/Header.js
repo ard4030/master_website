@@ -68,8 +68,6 @@ const Header = () => {
         default:
           return null
       }
-
-
     }
   }
 
