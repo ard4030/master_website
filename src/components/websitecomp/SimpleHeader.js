@@ -223,6 +223,7 @@ const SimpleHeader = ({
   const [mobileActiveCategory, setMobileActiveCategory] = useState(null)
   const [mobileActiveSubcategory, setMobileActiveSubcategory] = useState(null)
   const [isLoginOpen, setIsLoginOpen] = useState(false)
+  const [isSearchOpen, setIsSearchOpen] = useState(false)
   const { user } = useContext(AuthContext) || {}
   const { cart } = useContext(CartContext) || {}
   const router = useRouter()
@@ -317,9 +318,9 @@ const SimpleHeader = ({
       dir="rtl"
       style={{ backgroundColor: bgColor }}
     >
-      {/* ─── ردیف اول: لوگو + آیکون‌ها + جستجو ─── */}
+      {/* ─── ردیف اول: لوگو + آیکون‌ها ─── */}
       <div className="mx-auto max-w-7xl px-3 py-2.5 md:px-6 md:py-3 lg:px-8">
-        <div className="flex items-center gap-2 md:gap-3 lg:gap-5">
+        <div className="grid grid-cols-12 items-center gap-4 md:gap-3 lg:gap-5">
 
           {/* دکمه منوی همبرگری - فقط موبایل/تبلت */}
           <motion.button
@@ -327,22 +328,22 @@ const SimpleHeader = ({
             aria-label="منو"
             aria-expanded={isMenuOpen}
             onClick={() => setIsMenuOpen((prev) => !prev)}
-            className="shrink-0 w-9 h-9 flex items-center justify-center rounded-lg text-[#3a3a57] hover:bg-[#f5f5f7] transition-colors lg:hidden"
+            className="col-span-2 sm:col-span-1 shrink-0 w-9 h-9 flex items-center justify-center rounded-lg text-[#3a3a57] hover:bg-[#f5f5f7] transition-colors lg:hidden"
             {...menuBtnMotion}
           >
             <HiOutlineMenuAlt3 size={22} />
           </motion.button>
 
           {/* لوگو - راست‌ترین قسمت */}
-          <motion.div className="flex items-center shrink-0 gap-1.5 md:gap-2" {...logoMotion}>
+          <motion.div className="col-span-7 sm:col-span-10 lg:col-span-6 flex items-center justify-center gap-1.5 md:gap-2" {...logoMotion}>
             {logoImage ? (
-              <Link href={'/'} className="relative shrink-0 overflow-hidden rounded-full w-9 h-9 md:w-11 md:h-11">
+              <Link href={'/'} className="relative shrink-0 overflow-hidden rounded-full w-full h-9 md:w-11 md:h-11">
                 <Image
                   src={logoImage}
                   alt={storeName || 'logo'}
                   fill
                   sizes="(min-width: 768px) 44px, 36px"
-                  className="object-cover"
+                  className="object-contain"
                 />
               </Link>
             ) : (
@@ -367,23 +368,8 @@ const SimpleHeader = ({
             )} */}
           </motion.div>
 
-          {/* نوار جستجو */}
-          <motion.div className="flex-1 min-w-0" {...searchMotion}>
-            <div className="flex items-center bg-[#f0f0f2] text-[#9a9aa2] border border-transparent focus-within:border-[#c8c8d0] transition-colors h-10 gap-2 rounded-xl px-3 md:h-12 md:gap-3 md:rounded-2xl md:px-4">
-              <FiSearch className="shrink-0 w-4.5 h-4.5 md:w-5 md:h-5" />
-              <input
-                type="text"
-                value={searchValue}
-                onChange={(e) => setSearchValue(e.target.value)}
-                placeholder="جستجو"
-                className="w-full bg-transparent outline-none danaMed placeholder:text-[#9a9aa2] text-right text-[13px] md:text-[16px]"
-                dir="rtl"
-              />
-            </div>
-          </motion.div>
-
           {/* سبد خرید + ورود - فقط دسکتاپ */}
-          <motion.div className="hidden lg:flex items-center gap-3 shrink-0" {...actionsMotion}>
+          <motion.div className="hidden lg:col-span-5 col-span-1 lg:flex items-center justify-end gap-3 shrink-0" {...actionsMotion}>
             {/* آیکون سبد خرید */}
             <Link
               href="/cart"
@@ -412,23 +398,61 @@ const SimpleHeader = ({
             </button>
           </motion.div>
 
-          {/* آیکون سبد - فقط موبایل/تبلت */}
-          <motion.div className="shrink-0 lg:hidden" {...actionsMotion}>
-            <Link
-              href="/cart"
-              aria-label="سبد خرید"
-              className="relative w-9 h-9 flex items-center justify-center text-[#3a3a57]"
+          {/* آیکون‌های سبد و جستجو - فقط موبایل/تبلت */}
+          <div className="col-span-3 lg:hidden flex items-center justify-end gap-1.5 md:gap-2">
+            <motion.div className="shrink-0" {...actionsMotion}>
+              <Link
+                href="/cart"
+                aria-label="سبد خرید"
+                className="relative w-9 h-9 flex items-center justify-center text-[#3a3a57]"
+              >
+                <PiShoppingCartSimpleLight size={22} />
+                {cartItemsCount > 0 && (
+                  <span className="absolute -top-0.5 -right-0.5 bg-red-500 text-white text-[10px] danaBold rounded-full min-w-4 h-4 px-1 flex items-center justify-center border-2 border-white">
+                    {cartItemsCount}
+                  </span>
+                )}
+              </Link>
+            </motion.div>
+
+            <motion.button
+              type="button"
+              aria-label="جستجو"
+              aria-expanded={isSearchOpen}
+              onClick={() => setIsSearchOpen((prev) => !prev)}
+              className="shrink-0 w-9 h-9 md:w-10 md:h-10 flex items-center justify-center rounded-lg text-[#3a3a57] hover:bg-[#f5f5f7] transition-colors"
+              {...searchMotion}
             >
-              <PiShoppingCartSimpleLight size={22} />
-              {cartItemsCount > 0 && (
-                <span className="absolute -top-0.5 -right-0.5 bg-red-500 text-white text-[10px] danaBold rounded-full min-w-4 h-4 px-1 flex items-center justify-center border-2 border-white">
-                  {cartItemsCount}
-                </span>
-              )}
-            </Link>
-          </motion.div>
+              <FiSearch size={20} />
+            </motion.button>
+          </div>
 
         </div>
+
+        {/* نوار جستجو */}
+        <AnimatePresence initial={false}>
+          {isSearchOpen && (
+            <motion.div
+              className="pt-2"
+              initial={{ opacity: 0, y: -8, height: 0 }}
+              animate={{ opacity: 1, y: 0, height: 'auto' }}
+              exit={{ opacity: 0, y: -8, height: 0 }}
+              transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
+            >
+              <div className="flex items-center bg-[#f0f0f2] text-[#9a9aa2] border border-transparent focus-within:border-[#c8c8d0] transition-colors h-10 gap-2 rounded-xl px-3 md:h-12 md:gap-3 md:rounded-2xl md:px-4">
+                <FiSearch className="shrink-0 w-4.5 h-4.5 md:w-5 md:h-5" />
+                <input
+                  type="text"
+                  value={searchValue}
+                  onChange={(e) => setSearchValue(e.target.value)}
+                  placeholder="جستجو"
+                  className="w-full bg-transparent outline-none danaMed placeholder:text-[#9a9aa2] text-right text-[13px] md:text-[16px]"
+                  dir="rtl"
+                />
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
 
       {/* ─── جداکننده ─── */}

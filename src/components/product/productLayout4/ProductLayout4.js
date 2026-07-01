@@ -289,8 +289,8 @@ const ProductLayout4 = ({ idPage, product }) => {
               ...
             </button>
           ) : cartItem ? (
-            <div className="flex items-center gap-1">
-              <div className="flex items-center gap-1 flex-nowrap shrink-0">
+            <div className="grid grid-cols-12 items-center gap-1">
+              <div className="flex items-center gap-1 flex-nowrap shrink-0 col-span-9">
                 <button
                   onClick={() => decreaseQuantity(cartItem.productId, cartItem.variantId)}
                   className="w-11 h-11 flex items-center justify-center border border-red-300 rounded-xl text-red-500"
@@ -309,7 +309,7 @@ const ProductLayout4 = ({ idPage, product }) => {
               </div>
               <Link
                 href="/cart"
-                className="h-11 px-3 flex items-center justify-center rounded-xl border-1 border-gray-400 text-black danaMed text-xs"
+                className="h-11 col-span-3 w-full justify-self-center px-2 flex items-center justify-center text-center whitespace-nowrap rounded-xl underline text-black danaMed text-xs"
               >سبد خرید</Link>
             </div>
           ) : (
