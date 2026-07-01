@@ -13,6 +13,9 @@ const DashboardHeader = () => {
   // نقشه‌ی مسیرها به تایتل‌ها
   const routeTitles = {
     '/dashboard': 'داشبورد',
+    '/dashboard/orders': 'سفارشات من',
+    '/dashboard/addresses': 'آدرس‌های من',
+    '/dashboard/userprofile': 'پروفایل کاربری',
     '/dashboard/reports': 'شارش های من',
     '/dashboard/marketplace': 'بازار معاملات',
     '/dashboard/categories': 'دسته بندی',

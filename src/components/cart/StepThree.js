@@ -7,6 +7,7 @@ import { CartContext } from '@/context/CartContext'
 import { apiRequest, getOrCreateDeviceId } from '@/utils/functions'
 // import { toast } from 'react-toastify'
 import { toast } from 'sonner'
+import { useRouter } from 'next/navigation'
 
 
 const StepThree = () => {
@@ -17,15 +18,21 @@ const StepThree = () => {
   const [isValidatingCode, setIsValidatingCode] = useState(false)
   const [codeError, setCodeError] = useState('')
   const [codeSuccess, setCodeSuccess] = useState('')
+  const [trackingNumber, setTrackingNumber] = useState('')
+  const [senderCardNumber, setSenderCardNumber] = useState('')
+  const [senderCardName, setSenderCardName] = useState('')
 
   const items = cart?.items || []
   const selectedGatewayId = order?.paymentGateway?._id || order?.paymentGateway?.id
+  const selectedGatewayName = order?.paymentGateway?.name
+  const isCartToCartSelected = selectedGatewayName === 'cart_to_cart'
   const shippingPrice = Number(order?.shippingMethod?.price ?? cart?.deliveryPrice ?? 0) || 0
   const totalAmount = Number(cart?.totalAmount || 0)
   const discountAmount = Number(cart?.discountAmount || 0)
   const finalAmount = Number(cart?.finalAmount || 0)
   const hasGateways = Boolean(order?.paymentGateways?.length)
   const canSubmit = Boolean(order?.paymentGateway && hasGateways)
+  const router = useRouter()
 
   useEffect(() => {
     if (order?.discountCode) {
@@ -35,6 +42,13 @@ const StepThree = () => {
 
   const handleSelectPaymentGateway = (gateway) => {
     setOrder((prev) => ({ ...prev, paymentGateway: gateway }))
+  }
+
+  const formatCardNumber = (cardNumber) => {
+    if (!cardNumber) return '****  ****  ****  ****'
+    const cleaned = cardNumber.replace(/\D/g, '')
+    const formatted = cleaned.replace(/(\d{4})(?=\d)/g, '$1 ')
+    return formatted || '****  ****  ****  ****'
   }
 
   const reValidateCart = (couponData) => {
@@ -138,16 +152,26 @@ const StepThree = () => {
       const orderData = {
         address: order.address,
         coupon: order.coupon || null,
-        paymentGateway: order.paymentGateway,
+        paymentGateway: order.paymentGateway.name,
         shippingMethod: order.shippingMethod,
         deviceId,
+        ...(isCartToCartSelected && {
+          trackingNumber,
+          senderCardNumber,
+          senderCardName
+        })
       }
 
       const response = await apiRequest('/orders', 'POST', orderData)
 
       if (response.success) {
-        toast.success('در حال انتقال به درگاه پرداخت...')
-        window.location.href = response.data.link
+        if(response.data.data.type == "cart_to_cart"){
+          toast.success('سفارش با موفقیت ثبت شد. لطفا شماره پیگیری را نگه دارید.')
+          router.push(`/dashboard/orders`)
+        }else{
+          toast.success('در حال انتقال به درگاه پرداخت...')
+          window.location.href = response.data.link
+        }
       } else {
         toast.error(`خطا در ثبت سفارش: ${response.error}`)
       }
@@ -262,6 +286,77 @@ const StepThree = () => {
           ) : (
             <div className="text-center py-8 bg-gray-50 rounded-lg border border-dashed border-gray-200">
               <p className="text-gray-600 dana">هیچ درگاه پرداختی در دسترس نیست</p>
+            </div>
+          )}
+
+          {isCartToCartSelected && order?.paymentGateway && (
+            <div className="mt-6 p-5 bg-gradient-to-br from-amber-50 to-orange-50 rounded-2xl border-2 border-orange-200">
+              <h3 className="text-base danaBold text-gray-800 mb-4 flex items-center gap-2">
+                <span className="w-6 h-6 rounded-full bg-orange-500 text-white flex items-center justify-center text-xs danaBold">💳</span>
+                اطلاعات کارت به کارت
+              </h3>
+
+              <div className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="bg-white rounded-lg p-4 border border-orange-200">
+                    <p className="text-xs text-gray-600 danaMed mb-1">شماره کارت فروشنده</p>
+                    <p className="text-lg text-gray-900 danaBold font-mono ltr:text-left" dir="ltr">
+                      {formatCardNumber(order?.paymentGateway?.cardNumber)}
+                    </p>
+                  </div>
+
+                  <div className="bg-white rounded-lg p-4 border border-orange-200">
+                    <p className="text-xs text-gray-600 danaMed mb-1">نام صاحب حساب</p>
+                    <p className="text-lg text-gray-900 danaBold">
+                      {order?.paymentGateway?.accountHolderName || 'نام ثبت‌نشده'}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="bg-white rounded-lg p-4 border border-orange-200">
+                  <label className="text-xs text-gray-600 danaMed mb-2 block">شماره پیگیری انتقال</label>
+                  <input
+                    type="text"
+                    value={trackingNumber}
+                    onChange={(e) => setTrackingNumber(e.target.value)}
+                    placeholder="مثال: 1234567890"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm dana focus:outline-none focus:ring-2 focus:ring-orange-300 focus:border-orange-400"
+                    dir="ltr"
+                  />
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="bg-white rounded-lg p-4 border border-orange-200">
+                    <label className="text-xs text-gray-600 danaMed mb-2 block">شماره کارت ارسال‌کننده</label>
+                    <input
+                      type="text"
+                      value={senderCardNumber}
+                      onChange={(e) => setSenderCardNumber(e.target.value)}
+                      placeholder="شماره کارتتان"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm dana focus:outline-none focus:ring-2 focus:ring-orange-300 focus:border-orange-400"
+                      dir="ltr"
+                      maxLength="19"
+                    />
+                  </div>
+
+                  <div className="bg-white rounded-lg p-4 border border-orange-200">
+                    <label className="text-xs text-gray-600 danaMed mb-2 block">نام کارت ارسال‌کننده</label>
+                    <input
+                      type="text"
+                      value={senderCardName}
+                      onChange={(e) => setSenderCardName(e.target.value)}
+                      placeholder="مثال: حساب شخصی"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm dana focus:outline-none focus:ring-2 focus:ring-orange-300 focus:border-orange-400"
+                    />
+                  </div>
+                </div>
+
+                <div className="bg-orange-100/60 rounded-lg p-3 border border-orange-300/50">
+                  <p className="text-xs text-gray-700 dana leading-5">
+                    ✓ مبلغ <span className="danaBold text-orange-700">{finalAmount.toLocaleString('fa-IR')} تومان</span> را به کارت فوق منتقل کنید و شماره پیگیری را ثبت کنید
+                  </p>
+                </div>
+              </div>
             </div>
           )}
         </div>
