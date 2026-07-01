@@ -1,5 +1,6 @@
 'use client';
 import React, { useState, useContext } from 'react';
+import Link from 'next/link';
 import ProductOptions4 from './ProductOptions4';
 import ProductPrice4 from './ProductPrice4';
 import ProductImageGallery4 from './ProductImageGallery4';
@@ -289,21 +290,27 @@ const ProductLayout4 = ({ idPage, product }) => {
             </button>
           ) : cartItem ? (
             <div className="flex items-center gap-1">
-              <button
-                onClick={() => decreaseQuantity(cartItem.productId, cartItem.variantId)}
-                className="w-11 h-11 flex items-center justify-center border border-red-300 rounded-xl text-red-500"
-              >
-                {cartItem.quantity > 1 ? <FiMinus size={17} /> : <FiTrash2 size={16} />}
-              </button>
-              <span className="flex-1 h-11 flex items-center justify-center border border-gray-300 rounded-xl danaMed text-gray-900">
-                {cartItem.quantity}
-              </span>
-              <button
-                onClick={() => increaseQuantity(cartItem.productId, cartItem.variantId)}
-                className="w-11 h-11 flex items-center justify-center border border-gray-300 rounded-xl text-gray-700"
-              >
-                <FiPlus size={16} />
-              </button>
+              <div className="flex items-center gap-1 flex-nowrap shrink-0">
+                <button
+                  onClick={() => decreaseQuantity(cartItem.productId, cartItem.variantId)}
+                  className="w-11 h-11 flex items-center justify-center border border-red-300 rounded-xl text-red-500"
+                >
+                  {cartItem.quantity > 1 ? <FiMinus size={17} /> : <FiTrash2 size={16} />}
+                </button>
+                <p className="w-7 h-7 flex items-center justify-center rounded-xl danaMed text-gray-1100">
+                  {cartItem.quantity}
+                </p>
+                <button
+                  onClick={() => increaseQuantity(cartItem.productId, cartItem.variantId)}
+                  className="w-11 h-11 flex items-center justify-center border border-gray-300 rounded-xl text-gray-700"
+                >
+                  <FiPlus size={16} />
+                </button>
+              </div>
+              <Link
+                href="/cart"
+                className="h-11 px-3 flex items-center justify-center rounded-xl border-1 border-gray-400 text-black danaMed text-xs"
+              >سبد خرید</Link>
             </div>
           ) : (
             <button

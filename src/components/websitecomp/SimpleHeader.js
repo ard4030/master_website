@@ -332,7 +332,7 @@ const SimpleHeader = ({
           {/* لوگو - راست‌ترین قسمت */}
           <motion.div className="flex items-center shrink-0 gap-1.5 md:gap-2" {...logoMotion}>
             {logoImage ? (
-              <div className="relative shrink-0 overflow-hidden rounded-full w-9 h-9 md:w-11 md:h-11">
+              <Link href={'/'} className="relative shrink-0 overflow-hidden rounded-full w-9 h-9 md:w-11 md:h-11">
                 <Image
                   src={logoImage}
                   alt={storeName || 'logo'}
@@ -340,9 +340,9 @@ const SimpleHeader = ({
                   sizes="(min-width: 768px) 44px, 36px"
                   className="object-cover"
                 />
-              </div>
+              </Link>
             ) : (
-              <div className="relative shrink-0 w-9 h-9 md:w-11 md:h-11">
+              <Link href={'/'} className="relative shrink-0 w-9 h-9 md:w-11 md:h-11">
                 <span
                   className="absolute inset-0 rounded-full border-4 md:border-[5px]"
                   style={{ borderColor: logoTextColor, borderBottomColor: 'transparent', transform: 'rotate(-45deg)' }}
@@ -351,16 +351,16 @@ const SimpleHeader = ({
                   className="absolute rounded-full top-0.5 right-0.5 w-2.5 h-2.5 md:w-3.5 md:h-3.5"
                   style={{ backgroundColor: logoTextColor }}
                 />
-              </div>
+              </Link>
             )}
-            {showStoreNameBool && (
+            {/* {showStoreNameBool && (
               <span
-                className="danaBold leading-none text-lg md:text-2xl"
+                className="danaBold leading-none text-xs md:text-2xl"
                 style={{ color: logoTextColor }}
               >
                 {storeName}
               </span>
-            )}
+            )} */}
           </motion.div>
 
           {/* نوار جستجو */}
