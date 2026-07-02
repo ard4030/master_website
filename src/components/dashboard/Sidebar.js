@@ -17,30 +17,22 @@ const Sidebar = () => {
       label: 'داشبورد',
       href: '/dashboard/userprofile',
       icon: MdDashboard,
-      type: ['user', 'merchant'],
-      permissions: [],
     },
     {
-      label: 'شارش های من',
-      href: '/dashboard/reports',
+      label: 'سفارش های من',
+      href: '/dashboard/orders',
       icon: MdAssessment,
-      type: ['user'],
-      permissions: [],
     },
     {
       label: 'آدرس‌های من',
       href: '/dashboard/addresses',
       icon: MdLocationOn,
-      type: ['user'],
-      permissions: [],
     },
 
     {
       label: 'اطلاع رسانی',
       href: '/dashboard/notifications',
       icon: MdNotifications,
-      type: ['user', 'merchant'],
-      permissions: [],
       badge: 2,
     },
 
@@ -48,18 +40,10 @@ const Sidebar = () => {
       label: 'پشتیبانی',
       href: '/dashboard/support',
       icon: MdHeadset,
-      type: ['user', 'merchant'],
-      permissions: [],
     },
   ]
 
   const isActive = (href) => pathname === href
-
-  // فیلتر کردن منو بر اساس نوع کاربر و دسترسی
-  const filteredMenuItems = menuItems.filter((item) => {
-    const hasType = item.type.includes(user?.type || user?.role || 'user')
-    return hasType 
-  })
 
   return (
     <aside className={`h-screen bg-white border-r border-gray-200 py-6 px-4 flex flex-col max-w-xs overflow-y-auto dana`}>
@@ -108,7 +92,7 @@ const Sidebar = () => {
       {/* منوی اصلی */}
       <nav className="flex-1 overflow-y-auto">
         <ul className="space-y-2">
-          {filteredMenuItems.map((item) => {
+          {menuItems.map((item) => {
             const IconComponent = item.icon
             return (
               <li key={item.href}>
