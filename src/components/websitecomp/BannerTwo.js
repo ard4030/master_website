@@ -126,7 +126,7 @@ const BannerTwo = ({
         <motion.div key={item.id} className='col-span-1' {...cardMotion}>
           <Link href={item.href || '#'}>
           {item.imageUrl
-            ? <Image src={item.imageUrl} width={1600} alt='image' height={450} className={`w-full ${aspectClass} object-cover rounded-lg bg-gray-50`} />
+            ? <Image src={item.imageUrl} width={1800} alt='image' height={900} className='w-full h-auto rounded-lg object-contain' />
             : <div className={`w-full rounded-lg bg-gray-200 ${aspectClass} flex justify-center items-center`}><FaImage /></div>
           }
           </Link>

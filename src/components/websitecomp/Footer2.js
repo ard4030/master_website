@@ -40,11 +40,15 @@ const Footer2 = ({
   quickLink3Text = 'دسته‌بندی‌ها',  quickLink3Href = '/categories',
   quickLink4Text = '',             quickLink4Href = '',
   quickLink5Text = '',             quickLink5Href = '',
+  trustLogos = [],
   logo1Src = '', logo1Link = '#',
   logo2Src = '', logo2Link = '#',
   logo3Src = '', logo3Link = '#',
   logo4Src = '', logo4Link = '#',
   logo5Src = '', logo5Link = '#',
+  largeTextColor = '#111827',
+  smallTextColor = '#111827',
+  animationEnabled = 'false',
   sectionAnimationType = 'fade',
   sectionAnimationDelay = '0.05',
   sectionAnimationDuration = '0.7'
@@ -62,13 +66,25 @@ const Footer2 = ({
     return `${process.env.NEXT_PUBLIC_LIARA_IMAGE_URL}${src}`
   }
 
-  const trustLogos = [
+  const legacyTrustLogos = [
     { src: logo1Src, link: logo1Link },
     { src: logo2Src, link: logo2Link },
     { src: logo3Src, link: logo3Link },
     { src: logo4Src, link: logo4Link },
     { src: logo5Src, link: logo5Link },
   ].filter(l => l.src)
+
+  const normalizedTrustLogos = Array.isArray(trustLogos)
+    ? trustLogos
+        .map((item) => {
+          if (typeof item === 'string') return { src: item, link: '#' }
+          return {
+            src: item?.src || item?.logo || item?.image || item?.imageUrl || item?.url || item?.path || '',
+            link: item?.link || item?.href || '#'
+          }
+        })
+        .filter((item) => item.src)
+    : []
 
   const quickLinks = [
     { text: quickLink1Text, href: quickLink1Href },
@@ -79,23 +95,42 @@ const Footer2 = ({
   ].filter(l => l.text && l.href)
 
   const accentColor = 'rgba(255,255,255,0.15)'
+  const sectionMotion = motionProps
+  const wrapperPadCls = 'px-4 md:px-8 py-10 md:py-14'
+  const colsGridCls = 'grid-cols-1 sm:grid-cols-2 md:grid-cols-3'
+  const colsGapCls = 'gap-8 md:gap-12'
+  const sectionGapCls = 'gap-4'
+  const brandTitleCls = 'text-xl'
+  const descTextCls = 'text-sm leading-7'
+  const headingCls = 'text-base'
+  const bodyTextCls = 'text-sm'
+  const quickLinkTextCls = 'text-sm'
+  const trustSectionSpacing = 'pb-4'
+  const trustGridCls = 'gap-4 grid-cols-8'
+  const logoBoxSizeCls = 'col-span-2 sm:col-span-1'
+  const resolvedLargeTextColor = largeTextColor || textColor
+  const resolvedSmallTextColor = smallTextColor || textColor
+  const resolvedTrustLogos = [...normalizedTrustLogos, ...legacyTrustLogos].filter((item) => item?.src)
+  const isMobile = false
+  const isAnimationEnabled = animationEnabled === true || animationEnabled === 'true'
+  const appliedSectionMotion = isAnimationEnabled ? sectionMotion : {}
 
   return (
-    <motion.footer ref={sectionRef} dir="rtl" style={{ backgroundColor: bgColor, color: textColor }} className="dana w-full" {...motionProps}>
-      <div className="max-w-7xl mx-auto px-4 md:px-8 py-10 md:py-14">
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8 md:gap-12 mb-10">
+    <motion.footer ref={sectionRef} dir="rtl" style={{ backgroundColor: bgColor, color: textColor }} className="dana w-full" {...appliedSectionMotion}>
+      <div className={`max-w-7xl mx-auto ${wrapperPadCls}`}>
+        <div className={`grid ${colsGridCls} ${colsGapCls} ${isMobile ? 'mb-7' : 'mb-10'}`}>
 
           {/* ستون اول: برند + لوگوها */}
-          <div className="flex flex-col gap-4">
-            <h3 className="danaBold text-xl" style={{ color: textColor }}>{brandName}</h3>
-            <p className="text-sm leading-7 danaMed" style={{ opacity: 0.72 }}>{brandDesc}</p>
+          <div className={`flex flex-col ${sectionGapCls}`}>
+            <h3 className={`danaBold ${brandTitleCls}`} style={{ color: resolvedLargeTextColor }}>{brandName}</h3>
+            <p className={`${descTextCls} danaMed`} style={{ color: resolvedSmallTextColor, opacity: 0.85 }}>{brandDesc}</p>
 
           </div>
 
           {/* ستون دوم: تماس */}
-          <div className="flex flex-col gap-4">
-            <h4 className="danaBold text-base" style={{ color: textColor }}>تماس با ما</h4>
-            <div className="flex flex-col gap-3 text-sm danaMed" style={{ opacity: 0.78 }}>
+          <div className={`flex flex-col ${sectionGapCls}`}>
+            <h4 className={`danaBold ${headingCls}`} style={{ color: resolvedLargeTextColor }}>تماس با ما</h4>
+            <div className={`flex flex-col gap-3 ${bodyTextCls} danaMed`} style={{ color: resolvedSmallTextColor, opacity: 0.9 }}>
               {phone && (
                 <div className="flex items-center gap-2.5">
                   <span className="shrink-0 w-8 h-8 rounded-lg flex items-center justify-center" style={{ backgroundColor: accentColor }}>
@@ -121,21 +156,21 @@ const Footer2 = ({
                 </div>
               )}
               {!phone && !email && !address && (
-                <p style={{ opacity: 0.4 }} className="text-xs">اطلاعات تماس وارد نشده</p>
+                <p style={{ color: resolvedSmallTextColor, opacity: 0.5 }} className="text-xs">اطلاعات تماس وارد نشده</p>
               )}
             </div>
           </div>
 
           {/* ستون سوم: دسترسی سریع */}
-          <div className="flex flex-col gap-4">
-            <h4 className="danaBold text-base" style={{ color: textColor }}>دسترسی سریع</h4>
+          <div className={`flex flex-col ${sectionGapCls}`}>
+            <h4 className={`danaBold ${headingCls}`} style={{ color: resolvedLargeTextColor }}>دسترسی سریع</h4>
             <div className="flex flex-col gap-1">
               {quickLinks.length > 0 ? quickLinks.map((item, i) => (
                 <Link
                   key={i}
                   href={item.href}
-                  className="flex items-center gap-2 text-sm danaMed py-1.5 transition-all group"
-                  style={{ opacity: 0.75 }}
+                  className={`flex items-center gap-2 ${quickLinkTextCls} danaMed py-1.5 transition-all group`}
+                  style={{ color: resolvedSmallTextColor, opacity: 0.9 }}
                 >
                   <span className="shrink-0 opacity-60 group-hover:opacity-100 transition-opacity">
                     <ChevronLeftIcon />
@@ -143,29 +178,29 @@ const Footer2 = ({
                   <span className="group-hover:opacity-100 transition-opacity">{item.text}</span>
                 </Link>
               )) : (
-                <p style={{ opacity: 0.4 }} className="text-xs danaMed">لینکی تعریف نشده</p>
+                <p style={{ color: resolvedSmallTextColor, opacity: 0.5 }} className="text-xs danaMed">لینکی تعریف نشده</p>
               )}
             </div>
           </div>
 
         </div>
 
-        <div className='w-full pb-4'>
-            {trustLogos.length > 0 && (
-              <div className="gap-4 grid grid-cols-8 items-center justify-start mt-1">
-                {trustLogos.map((logo, i) => (
+        <div className={`w-full ${trustSectionSpacing}`}>
+            {resolvedTrustLogos.length > 0 && (
+              <div className={`grid ${trustGridCls} items-stretch justify-start mt-1`}>
+                {resolvedTrustLogos.map((logo, i) => (
                   <a
                     key={i}
                     href={logo.link}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center col-span-2 sm:col-span-1 justify-center rounded-xl p-1.5 transition-all hover:scale-105"
-                    style={{ backgroundColor: accentColor, minWidth: 54, minHeight: 54 }}
+                    className={`inline-flex items-center justify-center rounded-xl p-2 min-w-14 min-h-14 transition-all hover:scale-105 ${logoBoxSizeCls}`}
+                    style={{ backgroundColor: accentColor }}
                   >
                     <img
                       src={getImageUrl(logo.src)}
                       alt={`trust-logo-${i + 1}`}
-                      className="w-24 h-24 object-cover rounded-md"
+                      className="w-full h-full max-h-28 object-contain rounded-md"
                     />
                   </a>
                 ))}
@@ -175,7 +210,7 @@ const Footer2 = ({
 
         {/* خط جداکننده + کپی‌رایت */}
         <div className="border-t pt-6" style={{ borderColor: 'rgba(255,255,255,0.1)' }}>
-          <p className="text-xs danaMed text-center" style={{ opacity: 0.5 }}>{copyright}</p>
+          <p className="text-xs danaMed text-center" style={{ color: resolvedSmallTextColor, opacity: 0.65 }}>{copyright}</p>
         </div>
       </div>
     </motion.footer>

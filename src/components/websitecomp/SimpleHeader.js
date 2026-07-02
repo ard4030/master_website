@@ -4,7 +4,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { motion, AnimatePresence, useAnimationControls, useInView } from 'framer-motion'
-import { FiSearch, FiChevronDown } from 'react-icons/fi'
+import { FiSearch, FiChevronDown, FiPhone } from 'react-icons/fi'
 import { HiOutlineMenuAlt3 } from 'react-icons/hi'
 import { PiShoppingCartSimpleLight } from 'react-icons/pi'
 import { TbLogin2 } from 'react-icons/tb'
@@ -212,6 +212,8 @@ const SimpleHeader = ({
   navLinksAnimationDelay = '0.4',
   navLinksAnimationDuration = '0.45',
   navLinksAnimationStagger = '0.07',
+  phoneNumber = '02112345678',
+  showPhoneContact = 'true',
   activeMerchant
 }) => {
   const [searchValue, setSearchValue] = useState('')
@@ -227,7 +229,9 @@ const SimpleHeader = ({
   const { user } = useContext(AuthContext) || {}
   const { cart } = useContext(CartContext) || {}
   const router = useRouter()
-  const cartItemsCount = cart?.items?.reduce((total, item) => total + (item.quantity || 1), 0) || 0
+  const cartItemsCount = cart?.items?.reduce((total, item) => total + (item.quantity || 1), 0) || 0;
+  const showPhoneContactBool = showPhoneContact === true || showPhoneContact === 'true'
+  const phoneHref = `tel:${String(phoneNumber || '').replace(/[^\d+]/g, '')}`
   const handleUserLogin = () => {
     if (user) {
       router.push('/dashboard/userprofile')
@@ -335,15 +339,16 @@ const SimpleHeader = ({
           </motion.button>
 
           {/* لوگو - راست‌ترین قسمت */}
-          <motion.div className="col-span-7 sm:col-span-10 lg:col-span-6 flex items-center justify-center gap-1.5 md:gap-2" {...logoMotion}>
+          <motion.div className="col-span-7 sm:col-span-9 lg:col-span-3 flex items-center justify-center lg:justify-start gap-1.5 md:gap-2" {...logoMotion}>
             {logoImage ? (
-              <Link href={'/'} className="relative shrink-0 overflow-hidden rounded-full w-full h-9 md:w-11 md:h-11">
+              <Link href={'/'} className="relative shrink-0 overflow-hidden rounded-full w-full h-9 md:w-full md:h-11">
                 <Image
                   src={logoImage}
                   alt={storeName || 'logo'}
                   fill
-                  sizes="(min-width: 768px) 44px, 36px"
-                  className="object-contain"
+                  quality={95}
+                  sizes="(min-width: 1280px) 240px, (min-width: 1024px) 200px, (min-width: 768px) 180px, 140px"
+                  className="object-contain md:object-right object-center"
                 />
               </Link>
             ) : (
@@ -368,8 +373,23 @@ const SimpleHeader = ({
             )} */}
           </motion.div>
 
+          {/* نوار جستجو - فقط دسکتاپ */}
+          <motion.div className="hidden lg:block lg:col-span-5" {...searchMotion}>
+            <div className="flex items-center bg-[#f0f0f2] text-[#9a9aa2] border border-transparent focus-within:border-[#c8c8d0] transition-colors h-10 gap-2 rounded-xl px-3 md:h-12 md:gap-3 md:rounded-2xl md:px-4">
+              <FiSearch className="shrink-0 w-4.5 h-4.5 md:w-5 md:h-5" />
+              <input
+                type="text"
+                value={searchValue}
+                onChange={(e) => setSearchValue(e.target.value)}
+                placeholder="جستجو"
+                className="w-full bg-transparent outline-none danaMed placeholder:text-[#9a9aa2] text-right text-[13px] md:text-[16px]"
+                dir="rtl"
+              />
+            </div>
+          </motion.div>
+
           {/* سبد خرید + ورود - فقط دسکتاپ */}
-          <motion.div className="hidden lg:col-span-5 col-span-1 lg:flex items-center justify-end gap-3 shrink-0" {...actionsMotion}>
+          <motion.div className="hidden lg:col-span-4 lg:flex items-center justify-end gap-3 shrink-0" {...actionsMotion}>
             {/* آیکون سبد خرید */}
             <Link
               href="/cart"
@@ -433,7 +453,7 @@ const SimpleHeader = ({
         <AnimatePresence initial={false}>
           {isSearchOpen && (
             <motion.div
-              className="pt-2"
+              className="pt-2 lg:hidden"
               initial={{ opacity: 0, y: -8, height: 0 }}
               animate={{ opacity: 1, y: 0, height: 'auto' }}
               exit={{ opacity: 0, y: -8, height: 0 }}
@@ -650,6 +670,18 @@ const SimpleHeader = ({
                 )
               })}
             </div>
+
+            {/* دکمه لینک شماره تماس */}
+            {showPhoneContactBool && (
+              <a
+                href={phoneHref}
+                className="shrink-0 flex items-center gap-2 h-10 px-3 rounded-xl border border-[#d8d8de] text-[#3a3a57] danaMed text-[13px] hover:border-[#9a9aa2] hover:bg-[#f5f5f7] transition-colors"
+                aria-label={`تماس با ${phoneNumber}`}
+              >
+                <FiPhone size={16} className="text-[#ee1b24]" />
+                <span className="whitespace-nowrap" dir="ltr">{phoneNumber}</span>
+              </a>
+            )}
 
         </div>
       </motion.div>
